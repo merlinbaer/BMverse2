@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "BMverse2",
+    "slug": "BMverse2",
+    "scheme": "bmverse2.bruu.eu",
+    "platforms": ["ios","android","web"],
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000000"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c331102e-a4ca-487a-a8c8-133fab2467f5"
+      }
+    },
+    "owner": "merlinbaer"
+  }
+}
