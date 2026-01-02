@@ -1,35 +1,53 @@
-import { Stack, useRouter } from 'expo-router';
-import { useEffect } from 'react';
-import { authStore } from '../stores/authStore';
-import { onboardingStore } from '../stores/onboardingStore';
+import { Stack, SplashScreen } from "expo-router";
+import React, { useEffect } from "react";
+import { StatusBar } from "expo-status-bar";
+import { useAuthStore } from "@/utils/authStore";
+import { Platform } from "react-native";
+
+const isWeb = Platform.OS === "web";
+
+if (!isWeb) {
+  SplashScreen.preventAutoHideAsync();
+}
 
 export default function RootLayout() {
-  const router = useRouter();
+  const {
+    isLoggedIn,
+    shouldCreateAccount,
+    hasCompletedOnboarding,
+    _hasHydrated,
+  } = useAuthStore();
 
-  /* useEffect(() => {
-    // Wenn User nicht eingeloggt oder Onboarding nicht abgeschlossen → zu Auth oder Onboarding
-    if (!onboardingStore.completed.get()) {
-      router.replace('(onboarding)/step1');
-    } else if (!authStore.user.get()) {
-      router.replace('(auth)/sign-in');
+  // https://zustand.docs.pmnd.rs/integrations/persisting-store-data#how-can-i-check-if-my-store-has-been-hydrated
+  // Hide the splash screen after the store has been hydrated
+  useEffect(() => {
+    if (_hasHydrated) {
+      SplashScreen.hideAsync();
     }
-  }, [authStore.user.get(), onboardingStore.completed.get()]);
- */
+  }, [_hasHydrated]);
+
+  if (!_hasHydrated && !isWeb) {
+    return null;
+  }
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {!onboardingStore.completed.get() && (
-        <Stack.Screen name="(onboarding)/step1" />
-      )}
-
-      {onboardingStore.completed.get() && !authStore.user.get() && (
-        <Stack.Screen name="(auth)/sign-in" />
-      )}
-      <Stack.Screen name="(auth)/callback" />
-
-      {/* Protected Tabs */}
-      <Stack.Protected guard={authStore.user.get() !== null && onboardingStore.completed.get()}>
-        <Stack.Screen name="(tabs)/_layout" />
-      </Stack.Protected>
-    </Stack>
+    <React.Fragment>
+      <StatusBar style="auto" />
+      <Stack>
+        <Stack.Protected guard={isLoggedIn}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+        </Stack.Protected>
+        <Stack.Protected guard={!isLoggedIn && hasCompletedOnboarding}>
+          <Stack.Screen name="sign-in" />
+          <Stack.Protected guard={shouldCreateAccount}>
+            <Stack.Screen name="create-account" />
+          </Stack.Protected>
+        </Stack.Protected>
+        <Stack.Protected guard={!hasCompletedOnboarding}>
+          <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+        </Stack.Protected>
+      </Stack>
+    </React.Fragment>
   );
 }
