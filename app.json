@@ -1,41 +1,45 @@
 {
   "expo": {
-    "name": "BMverse2",
-    "slug": "BMverse2",
-    "scheme": "bmverse2.bruu.eu",
-    "platforms": ["ios","android","web"],
-    "version": "2.0.0",
+    "name": "expo-supabase-starter",
+    "slug": "expo-supabase-starter",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "scheme": "expo-supabase-starter",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.flemingvincent.expo-supabase-starter"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#000000"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "package": "com.flemingvincent.exposupabasestarter"
     },
     "plugins": [
       "expo-router",
-      "expo-secure-store"
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#ffffff"
+        }
+      ]
     ],
-    "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "c331102e-a4ca-487a-a8c8-133fab2467f5"
-      }
-    },
-    "owner": "merlinbaer"
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
   }
 }
