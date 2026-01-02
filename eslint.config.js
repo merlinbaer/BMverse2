@@ -6,11 +6,6 @@ module.exports = defineConfig([
   expoConfig,
   eslintPluginPrettierRecommended,
   {
-    rules: {
-      "import/no-unresolved": "off",
-    },
-  },
-  {
     ignores: ["dist/*"],
   },
 ]);
