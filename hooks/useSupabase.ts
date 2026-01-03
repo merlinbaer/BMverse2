@@ -2,19 +2,18 @@ import { useContext, useEffect, useState } from "react";
 
 import { SupabaseClient, Session } from "@supabase/supabase-js";
 
-import { SupabaseContext } from "@/components/supabase-provider";
+import { SupabaseContext } from "@/components/authProvider";
 
 interface UseSupabaseProps {
   isLoaded: boolean;
   session: Session | null | undefined;
   supabase: SupabaseClient;
-  signOut: () => Promise<void>;
 }
 
 export const useSupabase = (): UseSupabaseProps => {
   const supabase = useContext(SupabaseContext);
-  const [isLoaded, setIsLoaded] = useState(false);
   const [session, setSession] = useState<Session | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -32,15 +31,9 @@ export const useSupabase = (): UseSupabaseProps => {
     };
   }, [supabase]);
 
-  const signOut = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    setSession(null);
-  };
-
   if (!supabase) {
-    throw new Error("useSupabase must be used within a SupabaseProvider");
+    throw new Error("useSupabase must be used within AuthProvider");
   }
 
-  return { isLoaded, session, supabase, signOut };
+  return { isLoaded, session, supabase };
 };

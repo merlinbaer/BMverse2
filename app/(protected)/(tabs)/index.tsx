@@ -1,10 +1,8 @@
-import { Button, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Button, ScrollView } from "react-native";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Page() {
   const { signOut } = useAuth();
-  const insets = useSafeAreaInsets();
 
   const handleSignOut = async () => {
     try {
@@ -15,16 +13,16 @@ export default function Page() {
   };
 
   return (
-    <View
-      style={{
+    <ScrollView
+      automaticallyAdjustsScrollIndicatorInsets
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{
         flex: 1,
-        justifyContent: "center",
         alignItems: "center",
-        paddingTop: insets.top,
-        paddingBottom: insets.bottom,
+        justifyContent: "center",
       }}
     >
       <Button title="Sign Out" onPress={handleSignOut} />
-    </View>
+    </ScrollView>
   );
 }
