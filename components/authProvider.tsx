@@ -13,7 +13,7 @@ interface SupabaseProviderProps {
 
 export const SupabaseContext = createContext<SupabaseClient | null>(null);
 
-export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
+export const AuthProvider = ({ children }: SupabaseProviderProps) => {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
   const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY!;
 

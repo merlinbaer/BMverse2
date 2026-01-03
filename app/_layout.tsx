@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { AuthProvider } from "@/components/authProvider";
 import { useSupabase } from "@/hooks/useSupabase";
-import { SupabaseProvider } from "@/components/supabase-provider";
 
 SplashScreen.setOptions({
   duration: 500,
@@ -13,9 +13,9 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   return (
-    <SupabaseProvider>
+    <AuthProvider>
       <RootNavigator />
-    </SupabaseProvider>
+    </AuthProvider>
   );
 }
 

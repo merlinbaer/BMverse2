@@ -25,12 +25,13 @@ export default function VerifyPage() {
     <ScrollView
       automaticallyAdjustsScrollIndicatorInsets
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={{ padding: 16, gap: 8 }}
+      contentContainerStyle={{ padding: 32, gap: 16 }}
     >
       <Text>Enter the verification code sent to your email:</Text>
       <TextInput
         value={token}
         placeholder="8-digit code"
+        style={{ borderWidth: 1, padding: 10 }}
         keyboardType="number-pad"
         onChangeText={setToken}
         maxLength={8}

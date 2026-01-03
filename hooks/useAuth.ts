@@ -1,7 +1,7 @@
 import { useSupabase } from "./useSupabase";
 
 export const useAuth = () => {
-  const { isLoaded, supabase, signOut: supabaseSignOut } = useSupabase();
+  const { isLoaded, supabase } = useSupabase();
 
   /**
    * Start OTP Login / Signup
@@ -39,7 +39,7 @@ export const useAuth = () => {
    * Sign Out
    */
   const signOut = async () => {
-    await supabaseSignOut();
+    await supabase.auth.signOut();
   };
 
   return {
