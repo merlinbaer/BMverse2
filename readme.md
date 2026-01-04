@@ -1,58 +1,64 @@
-# Expo Supabase Starter
+# Welcome to my BABYMETAL world (myBMworld)
 
-## Introduction
+This is an [Expo](https://expo.dev) project.
 
-This repository serves as a comprehensive starter project for developing React Native and Expo applications with Supabase as the backend.
+Generate supabase types:
+yarn supabase gen types typescript --project-id kqehjqspszhtcikfdodd > ./database.types.ts
 
-#### Disclaimer
+Build a development build and run on default (Simulator):
+yarn expo run:ios
 
-This is not supposed to be a template, boilerplate or a framework. It is an opinionated guide that shows how to do some things in a certain way. You are not forced to do everything exactly as it is shown here, decide what works best for you and your team and stay consistent with your style.
+Just start the development server:
+yarn expo start
 
-## Get Started
+Create a full development build and upload it to a connected iPhone:
+yarn expo run:ios --configuration Release --device
 
-1. Configure Supabase
-   - If you haven't already, create an new account on [Supabase](https://supabase.com/).
-   - Create a new project and obtain your Supabase URL and API key.
+Managing environment variables with cli (better use the dashboard):
+eas env:list, eas env:create, eas env:update, eas env:delete and eas env:pull commands.
 
-   Note: By default Supabase Auth requires email verification before a session is created for the users. To send users a one-time code, [modify the confirm signup template](https://supabase.com/dashboard/project/_/auth/templates) like so:
+Upload environment variables as secrets to the project (depreceated):
+eas secret:push --scope project --env-file .env
 
-   ```html
-   <h2>Confirm your signup</h2>
+Build in eas cloud for preparation uploading to Appstore or Testflight:
+eas build --platform ios
 
-   <p>{{ .Token }}</p>
-   ```
+Falls man ein ipa lokal builden möchte, dann mit (Achtung env funktioniert dann nur über das eas.json, nicht .env oder eas vault):
+eas build -p ios --local
 
-2. Clone the repository to your local machine
+Submit to Appstore or Testflight:
+eas submit --platform ios
 
-```bash
-git clone https://github.com/FlemingVincent/expo-supabase-starter.git
-```
+## Get started
 
-3. Navigate to the project directory
+Fresh install:
 
-```bash
-cd expo-supabase-starter
-```
+- Globally - only one time: sudo yarn eas-cli
+- Globally - only one time: eas login
+- git clone ...
+- optional: delete yarn.lock
+- yarn install
+- eas env:pull and add keys
+- Sync the folder deploy with "Remote -> Local" with SFTP extension (configuration in .vscode sftp.json)
 
-4. Install dependencies
+## Upgrades
 
-```bash
-bun install
-```
+- check installation with: yarn outdated
+- control installed packages with: yarn list --depth=0
+- Do very carfully upgrades with: yarn upgrade <package_name>
+- Do downgrades to compatibilty with: yarn expo install --fix
 
-5. Update environment variables
-   - Update the `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_KEY` variables in the `.env` file with your Supabase URL and key respectively.
+## Deploy
 
-6. Start the Expo development server
+- Save ipa file from expo as backup.
+- run ./get_download_url.sh in the terminal
+- Download ADP folder with files in Safari Browser into Download folder with Download URL.
+- Move folder structure to deploy/releases (don't change any file)
+- Add a new version with in deploy/Merlin Baer (Metal).json. Use https://altstudio.app to import and check new file. Don't use export. There is a Bug in altstudio.app!!! Patreon keys (there are 2) ar put in the json after export.
+- Copy deploy/Merlin Baer (Metal).json to index.html
+- Sync the folder deploy with "Local -> Remote" with SFTP extension (configuration in .vscode sftp.json)
+- Commit and push last commit of this release (with new index.html)
 
-```bash
-npx expo start --clear --reset-cache
-```
+## Release
 
-## Contributing
-
-Contributions to this starter project are highly encouraged and welcome! If you have any suggestions, bug reports, or feature requests, please feel free to create an issue or submit a pull request. Let's work together to enhance the developer experience and make it easier for everyone to build exceptional Expo applications with Supabase.
-
-## License
-
-This repository is licensed under the MIT License. You are granted the freedom to use, modify, and distribute the code for personal or commercial purposes. For more details, please refer to the [LICENSE](https://github.com/FlemingVincent/supabase-starter/blob/main/LICENSE) file.
+- Run ./create_release.sh
