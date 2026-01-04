@@ -1,0 +1,21 @@
+# Requirements:
+# git clone empty project folder and cd into
+node -v   # (20 LTS)
+yarn -v   # (1.22.22)
+
+# Actions:
+yarn init -y  # creates package.json
+yarn add -D @babel/core 
+yarn add expo @expo/metro-runtime react react-native react-dom 
+yarn add react-native-web react-native-gesture-handler react-native-reanimated react-native-safe-area-context react-native-screens react-native-worklets
+yarn add expo-constants expo-dev-client expo-linking expo-router expo-splash-screen expo-status-bar 
+yarn add -D typescript @types/react @types/react-dom
+yarn add -D eslint eslint-config-expo  eslint-plugin-import eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-react-native @typescript-eslint/eslint-plugin @typescript-eslint/parser 
+yarn add -D prettier eslint-config-prettier
+yarn add -D babel-plugin-module-resolver
+yarn add @supabase/supabase-js @react-native-async-storage/async-storage 
+yarn expo install --fix
+# fix expo version
+# update package.json
+# copy skeleton
+#

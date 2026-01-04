@@ -1,0 +1,42 @@
+Playing iTunes Previews
+https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html
+LEGAL
+
+Developers may use certain promotional content as may be provided by Apple, including previews of songs and music videos, album art, and App icons (“Promo Content”), for the purposes of promoting the subject of the Promo Content; provided such Promo Content: (i) is placed only on pages that promote the content on which the Promo Content is based; (ii) is proximate to a “Download on iTunes”, “Download on App Store” or “Download on iBooks Store” badge (as approved by Apple) that acts as a link directly to pages within iTunes or the App Store where consumers can purchase the promoted content; (iii) includes attribution indicating the Promo Content was “provided courtesy of iTunes” if such Promo Content includes song or music video previews; (iv) is streamed only, and not downloaded, saved, cached, or synchronized with video, if such Promo Content includes song or music video previews; (v) is not used for independent entertainment value apart from its promotional purpose; and (vi) is not used to promote any other goods or services. Developer acknowledges that Apple provides the Promo Content “as is,” and disclaims any and all representations or warranties, including, but not limited to, non-infringement. Developer shall forward any claims received in connection with the Promo Content to Apple immediately upon receipt, and will remove any Promo Content immediately upon request from Apple.
+
+This agreement and your use of Promo Content are governed by California law.
+
+https://developer.apple.com/forums/thread/685311
+Allowed to use other player than musickit from Apple (DRM free previews)
+
+favicon.png
+https://www.flaticon.com/free-icon/fox_235438?related_id=311602&origin=search
+Flaticon License - Free for personal and commercial purpose with attribution.
+
+icon.png / splash-icon.png / adaptive-icon.png
+AI generated with chatgpt  @24.10.2024
+
+unknown_track.png
+https://github.com/CodeWithGionatha-Labs/music-player/assets
+MIT
+
+mute.png
+https://www.cleanpng.com/png-computer-icons-logo-symbol-mute-cliparts-5735318/download-png.html
+free to use
+metal-notes.png
+https://www.cleanpng.com/png-digital-audio-audio-file-format-advanced-audio-cod-1251331/
+free to use
+
+color palette babymetal
+https://www.color-hex.com/color-palette/1016837
+
+Font for BM: Black Han Sans
+https://fonts.google.com/specimen/Black+Han+Sans/license?preview.text=BM&categoryFilters=Seasonal:%2FSeasonal%2FLunar+New+Year
+https://openfontlicense.org/open-font-license-official-text/
+
+AI generated fromn text to speech
+not_available.mp3
+
+500-milliseconds-of-silence.mp3
+https://github.com/anars/blank-audio/blob/master/500-milliseconds-of-silence.mp3
+Discussion about licensing silence https://github.com/anars/blank-audio/issues/1
