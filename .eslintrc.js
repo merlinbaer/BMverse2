@@ -45,6 +45,12 @@ module.exports = {
     'prettier/prettier': 'error',
     'import/no-unresolved': 'error',
     'react-native/no-inline-styles': 'warn',
+    // Unused vars / imports
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'error',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
     // Optional:
     'import/order': [
       'error',

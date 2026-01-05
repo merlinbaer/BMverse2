@@ -1,39 +1,39 @@
-import { useEffect } from "react";
-import { Stack } from "expo-router";
-import * as SplashScreen from "expo-splash-screen";
-import { AuthProvider } from "@/components/authProvider";
-import { useSupabase } from "@/hooks/useSupabase";
+import { useEffect } from 'react'
+import { Stack } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
+import { AuthProvider } from '@/components/AuthProvider'
+import { useSupabase } from '@/hooks/useSupabase'
 
 SplashScreen.setOptions({
   duration: 500,
   fade: true,
-});
+})
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
   return (
     <AuthProvider>
       <RootNavigator />
     </AuthProvider>
-  );
+  )
 }
 
 function RootNavigator() {
-  const { isLoaded, session } = useSupabase();
+  const { isLoaded, session } = useSupabase()
 
   useEffect(() => {
     if (isLoaded) {
-      SplashScreen.hide();
+      SplashScreen.hide()
     }
-  }, [isLoaded]);
+  }, [isLoaded])
 
   return (
     <Stack
       screenOptions={{
         headerShown: false,
         gestureEnabled: false,
-        animation: "none",
+        animation: 'none',
         animationDuration: 0,
       }}
     >
@@ -45,5 +45,5 @@ function RootNavigator() {
         <Stack.Screen name="(public)" />
       </Stack.Protected>
     </Stack>
-  );
+  )
 }

@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from 'react'
 import { SupabaseClient, Session } from '@supabase/supabase-js'
-import { SupabaseContext } from '@/components/authProvider'
+import { SupabaseContext } from '@/components/AuthProvider'
 
 interface UseSupabaseProps {
   isLoaded: boolean
