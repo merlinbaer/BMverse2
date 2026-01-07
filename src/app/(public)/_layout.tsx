@@ -1,4 +1,7 @@
-import { Stack } from "expo-router";
+import { FixedLargeHeaderIos } from '@/components/LargeHeader'
+import { LayoutScreenHeader } from '@/constants/constants'
+import { Stack } from 'expo-router'
+import { Platform } from 'react-native'
 
 export default function PublicLayout() {
   return (
@@ -6,25 +9,22 @@ export default function PublicLayout() {
       <Stack.Screen
         name="welcome"
         options={{
-          title: "Welcome",
-          headerLargeTitle: true,
+          header:
+            Platform.OS === 'ios'
+              ? () => <FixedLargeHeaderIos title="Welcome" />
+              : undefined,
+          ...LayoutScreenHeader,
+          headerTitle: 'Welcome',
         }}
       />
       <Stack.Screen
         name="login"
-        options={{
-          title: "Login",
-          headerLargeTitle: true,
-        }}
+        options={{ ...LayoutScreenHeader, headerTitle: 'Login' }}
       />
       <Stack.Screen
         name="verify"
-        options={{
-          title: "Verify",
-          headerLargeTitle: true,
-          headerBackButtonDisplayMode: "minimal",
-        }}
+        options={{ ...LayoutScreenHeader, headerTitle: 'Verify' }}
       />
     </Stack>
-  );
+  )
 }
