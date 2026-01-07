@@ -6,7 +6,6 @@ type AppButtonProps = {
   onPress?: () => void
   disabled?: boolean
   style?: ViewStyle
-  minWidth?: number // optional, Standardwert möglich
 }
 
 export function AppButton({
@@ -34,8 +33,9 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   button: {
+    alignSelf: 'center', // Layout Button fixed (always center)
+    minWidth: 220, // Minimum width
     backgroundColor: COLORS.PRIMARY,
-    minWidth: 100,
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 10,

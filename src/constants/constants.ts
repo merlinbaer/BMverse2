@@ -1,6 +1,10 @@
+import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { Platform } from 'react-native'
+
 export const COLORS = {
   PRIMARY: '#db1b1a',
   BACKGROUND: '#000',
+  SCROLLVIEW: '#1b1b1b',
   TEXT: '#fff',
   TEXT_MUTED: '#a4a09d',
   ICON: '#fff',
@@ -23,3 +27,62 @@ export const FONT = {
     BASE: '600',
   },
 } as const
+
+export const LAYOUT = {
+  paddingHorizontal: 16,
+  gap: 24,
+}
+
+export const LargeHeaderOptions: NativeStackNavigationOptions = {
+  headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
+  headerTitleStyle: {
+    fontSize: FONT.SIZE.LG + 12,
+    color: COLORS.TEXT,
+  },
+  headerTintColor: COLORS.TEXT,
+  headerShadowVisible: false,
+  headerTitleAlign: 'left',
+}
+
+export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
+  {
+    ios: {
+      headerLargeTitle: true,
+      headerLargeStyle: {
+        backgroundColor: COLORS.BACKGROUND,
+      },
+      headerLargeTitleStyle: {
+        color: COLORS.TEXT,
+      },
+      headerStyle: { backgroundColor: 'rgba(0,0,0,0.9)' },
+      headerTintColor: COLORS.TEXT,
+      headerTransparent: true,
+      headerBlurEffect: 'prominent',
+      headerShadowVisible: false,
+      headerBackButtonDisplayMode: 'minimal',
+    },
+    android: {
+      headerStyle: { backgroundColor: COLORS.BACKGROUND },
+      headerTitleStyle: {
+        fontSize: FONT.SIZE.LG + 12,
+        color: COLORS.TEXT,
+      },
+      headerTintColor: COLORS.TEXT,
+      headerShadowVisible: false,
+    },
+    web: {
+      headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
+      headerTitleStyle: {
+        fontSize: FONT.SIZE.LG + 12,
+        color: COLORS.TEXT,
+      },
+      headerTintColor: COLORS.TEXT,
+      headerShadowVisible: false,
+    },
+    default: {
+      headerStyle: { backgroundColor: COLORS.BACKGROUND },
+      headerTintColor: COLORS.TEXT,
+      headerShadowVisible: false,
+    },
+  },
+)

@@ -1,32 +1,22 @@
-import { COLORS } from '@/constants/constants'
+import { COLORS, LAYOUT } from '@/constants/constants'
 import { ReactNode } from 'react'
-import {
-  Platform,
-  ScrollView,
-  ScrollViewProps,
-  StatusBar,
-  StyleSheet,
-  ViewStyle,
-} from 'react-native'
+import { Platform, StatusBar, StyleSheet, View, ViewStyle } from 'react-native'
 import { SafeAreaView, SafeAreaViewProps } from 'react-native-safe-area-context'
 
-type ScreenContainerProps = {
+type ScreenContainerFixedProps = {
   children: ReactNode
   style?: ViewStyle
   safeAreaProps?: SafeAreaViewProps
-  scrollProps?: ScrollViewProps
   statusBarHidden?: boolean
 }
 
-export function ScreenContainer({
+export function ScreenContainerFixed({
   children,
   style,
   safeAreaProps,
-  scrollProps,
   statusBarHidden = false,
-}: ScreenContainerProps) {
+}: ScreenContainerFixedProps) {
   const statusBarStyle = 'light-content'
-
   if (!statusBarHidden) {
     StatusBar.setBarStyle(statusBarStyle, true)
     if (Platform.OS === 'android') {
@@ -36,16 +26,7 @@ export function ScreenContainer({
 
   return (
     <SafeAreaView style={[styles.safeArea, style]} {...safeAreaProps}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scrollContent}
-        automaticallyAdjustsScrollIndicatorInsets
-        contentInsetAdjustmentBehavior="automatic"
-        showsVerticalScrollIndicator={Platform.OS === 'web'}
-        {...scrollProps}
-      >
-        {children}
-      </ScrollView>
+      <View style={styles.container}>{children}</View>
     </SafeAreaView>
   )
 }
@@ -55,11 +36,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.BACKGROUND,
   },
-  scrollView: {
+  container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 16,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
+    paddingTop: Platform.select({
+      ios: 100,
+      android: 0,
+      web: 10,
+      default: 0,
+    }),
+    paddingBottom: 24,
+    gap: LAYOUT.gap, // funktioniert nur bei React Native 0.71+ oder Web, sonst ggf. marginBottom
   },
 })
