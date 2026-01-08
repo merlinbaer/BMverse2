@@ -86,3 +86,14 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
     },
   },
 )
+
+const createTabBarConstants = (posY: number) =>
+  ({
+    HEIGHT: 75,
+    BLUR_INTENSITY: 95,
+    ICON_SIZE: 50,
+    ICON_POSY: posY - 12,
+    LABEL_POSY: posY - 24,
+  }) as const
+
+export const TAB_BAR = createTabBarConstants(0)
