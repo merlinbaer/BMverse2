@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 export const COLORS = {
   PRIMARY: '#db1b1a',
   BACKGROUND: '#000',
-  SCROLLVIEW: '#1b1b1b',
+  SCROLLVIEW: '#e3dfd3',
   TEXT: '#fff',
   TEXT_MUTED: '#a4a09d',
   ICON: '#fff',
