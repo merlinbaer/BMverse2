@@ -1,4 +1,4 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router'
 
 export default function ProtectedLayout() {
   return (
@@ -9,6 +9,14 @@ export default function ProtectedLayout() {
           headerShown: false,
         }}
       />
+      <Stack.Screen
+        name="(global)/player"
+        options={{
+          title: 'Player',
+          headerBackButtonDisplayMode: 'minimal',
+          headerTransparent: true,
+        }}
+      />
     </Stack>
-  );
+  )
 }

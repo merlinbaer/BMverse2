@@ -1,14 +1,15 @@
-import { useEffect } from 'react'
-import { Stack } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
 import { AuthProvider } from '@/components/AuthProvider'
 import { useSupabase } from '@/hooks/useSupabase'
+import { Stack } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
+import { useEffect } from 'react'
 
 SplashScreen.setOptions({
   duration: 500,
   fade: true,
 })
 
+// SplashScreen bleibt sichtbar, bis wir es explizit ausblenden
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
@@ -20,13 +21,22 @@ export default function RootLayout() {
 }
 
 function RootNavigator() {
-  const { isLoaded, session } = useSupabase()
+  const { session, restoring } = useSupabase()
 
+  // SplashScreen nur ausblenden, wenn Session geladen wurde
   useEffect(() => {
-    if (isLoaded) {
-      SplashScreen.hide()
+    let mounted = true
+    if (!restoring && mounted) {
+      SplashScreen.hideAsync()
     }
-  }, [isLoaded])
+    return () => {
+      mounted = false
+    }
+  }, [restoring])
+
+  // 🔹 Guard-Logik für Screens
+  const isProtected = !restoring && !!session
+  const isPublic = !restoring && !session
 
   return (
     <Stack
@@ -37,11 +47,13 @@ function RootNavigator() {
         animationDuration: 0,
       }}
     >
-      <Stack.Protected guard={!!session}>
+      {/* Protected Screens: nur zeigen, wenn User eingeloggt */}
+      <Stack.Protected guard={isProtected}>
         <Stack.Screen name="(protected)" />
       </Stack.Protected>
 
-      <Stack.Protected guard={!session}>
+      {/* Public Screens: nur zeigen, wenn kein User */}
+      <Stack.Protected guard={isPublic}>
         <Stack.Screen name="(public)" />
       </Stack.Protected>
     </Stack>

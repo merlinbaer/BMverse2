@@ -1,14 +1,17 @@
-import { useSupabase } from './useSupabase'
+import { useSupabase } from '@/hooks/useSupabase'
 
 export const useAuth = () => {
-  const { isLoaded, supabase } = useSupabase()
+  const { supabase, session, restoring } = useSupabase()
+
+  if (!supabase) throw new Error('useAuth must be used within AuthProvider')
 
   /**
    * Start OTP Login / Signup
    * shouldCreateUser = true sorgt dafür, dass neue User automatisch angelegt werden
    */
   const startLogin = async (email: string) => {
-    if (!isLoaded) throw new Error('Init-Auth-Login: Supabase not loaded')
+    if (restoring)
+      throw new Error('Supabase session is restoring. Please wait.')
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -24,26 +27,34 @@ export const useAuth = () => {
    * Verifiziere OTP Code und erzeugt Session
    */
   const verifyOtp = async (email: string, token: string) => {
-    if (!isLoaded) throw new Error('Init-Auth-Verify: Supabase not loaded')
+    if (restoring)
+      throw new Error('Supabase session is restoring. Please wait.')
 
-    const { error } = await supabase.auth.verifyOtp({
+    const { error, data } = await supabase.auth.verifyOtp({
       email,
       token,
       type: 'email',
     })
 
     if (error) throw error
+
+    // Session wird automatisch vom AuthProvider über onAuthStateChange gesetzt
+    return data.session
   }
 
   /**
    * Sign Out
    */
   const signOut = async () => {
-    await supabase.auth.signOut()
+    if (restoring) throw new Error('Cannot sign out while restoring session.')
+
+    const { error } = await supabase.auth.signOut()
+    if (error) throw error
   }
 
   return {
-    isLoaded,
+    restoring, // true, solange Session geladen wird
+    session, // aktuelle Session oder null
     startLogin,
     verifyOtp,
     signOut,
