@@ -1,5 +1,7 @@
-import { COLORS, FONT, TAB_BAR } from '@/constants/constants'
+import { COLORS, TAB_BAR } from '@/constants/constants'
 import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
+import Octicons from '@expo/vector-icons/Octicons'
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { BlurView } from 'expo-blur'
 import { Tabs } from 'expo-router'
 import React from 'react'
@@ -10,19 +12,16 @@ export default function TabsLayout() {
   return (
     <React.Fragment>
       <Tabs
+        initialRouteName="news"
         screenOptions={{
           headerShown: false,
+          tabBarShowLabel: false,
           tabBarStyle: {
             position: 'absolute',
             height: TAB_BAR.HEIGHT + insets.bottom, // Höhe variiert nach Devices
             borderTopLeftRadius: insets.corner, // Ecken varieren nach Devices
             borderTopRightRadius: insets.corner, // Ecken varieren nach Devices
             borderTopWidth: 0, // muss 0 sein
-          },
-          tabBarLabelStyle: {
-            bottom: TAB_BAR.LABEL_POSY,
-            fontSize: FONT.SIZE.XS,
-            fontWeight: '500',
           },
           tabBarActiveTintColor: COLORS.BM_RED, // aktive Labelfarbe
           tabBarInactiveTintColor: COLORS.TEXT_MUTED, // inaktive Labelfarbe
@@ -39,7 +38,7 @@ export default function TabsLayout() {
                 }}
               />
             ) : (
-              // Fallback für Android/Web
+              // Fallback Android
               <View
                 style={[
                   StyleSheet.absoluteFill,
@@ -58,20 +57,9 @@ export default function TabsLayout() {
           name="news"
           options={{
             title: 'News',
-            tabBarIcon: ({ focused }: { focused: boolean }) => (
-              <Image
-                source={
-                  focused
-                    ? require('@/../assets/tabicons/Momo.png')
-                    : require('@/../assets/tabicons/MomoGrey.png')
-                }
-                style={{
-                  width: TAB_BAR.ICON_SIZE,
-                  height: TAB_BAR.ICON_SIZE,
-                  bottom: TAB_BAR.ICON_POSY,
-                }}
-                resizeMode="contain"
-              />
+            tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
+            tabBarIcon: ({ color }: BottomTabBarProps) => (
+              <Octicons name="home" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
         />
@@ -83,13 +71,13 @@ export default function TabsLayout() {
               <Image
                 source={
                   focused
-                    ? require('@/../assets/tabicons/Su-.png')
-                    : require('@/../assets/tabicons/Su-Grey.png')
+                    ? require('@/../assets/tabicons/main.png')
+                    : require('@/../assets/tabicons/mainGrey.png')
                 }
                 style={{
-                  width: TAB_BAR.ICON_SIZE,
-                  height: TAB_BAR.ICON_SIZE,
-                  bottom: TAB_BAR.ICON_POSY,
+                  width: TAB_BAR.ICON_IMAGE_SIZE,
+                  height: TAB_BAR.ICON_IMAGE_SIZE,
+                  bottom: TAB_BAR.ICON_IMAGE_POSY,
                 }}
                 resizeMode="contain"
               />
@@ -100,20 +88,9 @@ export default function TabsLayout() {
           name="profile"
           options={{
             title: 'Profile',
-            tabBarIcon: ({ focused }: { focused: boolean }) => (
-              <Image
-                source={
-                  focused
-                    ? require('@/../assets/tabicons/Moa.png')
-                    : require('@/../assets/tabicons/MoaGrey.png')
-                }
-                style={{
-                  width: TAB_BAR.ICON_SIZE,
-                  height: TAB_BAR.ICON_SIZE,
-                  bottom: TAB_BAR.ICON_POSY,
-                }}
-                resizeMode="contain"
-              />
+            tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
+            tabBarIcon: ({ color }: BottomTabBarProps) => (
+              <Octicons name="person" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
         />

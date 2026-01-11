@@ -10,7 +10,7 @@ import { Alert, ScrollView, StyleSheet, TextInput } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
 export default function LoginPage() {
-  const { isLoaded, startLogin } = useAuth()
+  const { restoring, startLogin } = useAuth()
   const [email, setEmail] = useState('')
 
   const isValidEmail = (email: string) => {
@@ -18,7 +18,7 @@ export default function LoginPage() {
   }
 
   const onSignUpPress = async () => {
-    if (!isLoaded || !email) return
+    if (restoring || !email) return
     if (!isValidEmail(email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address.')
       return

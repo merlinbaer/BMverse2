@@ -3,9 +3,9 @@ import { Stack } from 'expo-router'
 
 export default function Layout() {
   return (
-    <Stack>
+    <Stack initialRouteName="newsScreen">
       <Stack.Screen
-        name="index"
+        name="newsScreen"
         options={{ ...LayoutScreenHeader, headerTitle: 'News' }}
       />
     </Stack>

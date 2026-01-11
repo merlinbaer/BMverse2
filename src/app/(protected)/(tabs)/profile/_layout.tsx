@@ -3,7 +3,7 @@ import { Stack } from 'expo-router'
 
 export default function Layout() {
   return (
-    <Stack>
+    <Stack initialRouteName="profileScreen">
       <Stack.Screen
         name="profileScreen"
         options={{ ...LayoutScreenHeader, headerTitle: 'Profile' }}

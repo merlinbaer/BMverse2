@@ -8,14 +8,14 @@ import { useState } from 'react'
 import { Alert, StyleSheet, TextInput } from 'react-native'
 
 export default function VerifyPage() {
-  const { isLoaded, verifyOtp } = useAuth()
+  const { restoring, verifyOtp } = useAuth()
   const [token, setToken] = useState('')
 
   const params = useLocalSearchParams()
   const email: string = Array.isArray(params.email) ? '' : params.email
 
   const onVerifyPress = async () => {
-    if (!isLoaded || !token) return
+    if (restoring || !token) return
 
     try {
       await verifyOtp(email, token)
