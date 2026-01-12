@@ -14,6 +14,7 @@ export const COLORS = {
   BM_RED_HIGHLIGHTED: '#cb1111',
   BM_DARK_RED: '#5f0a06',
   BM_VERY_DARK_RED: '#310a03',
+  MESSAGE_BUBBLE: '#202c33',
 }
 
 export const FONT = {
