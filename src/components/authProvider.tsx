@@ -1,15 +1,9 @@
 // AuthProvider.tsx
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {
-  createClient,
-  processLock,
-  Session,
-  SupabaseClient,
-} from '@supabase/supabase-js'
+import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react'
 
 /* ---------------------------- Types ---------------------------- */
-
 interface SupabaseProviderProps {
   children: ReactNode
 }
@@ -21,49 +15,62 @@ interface SupabaseContextType {
 }
 
 /* --------------------------- Context --------------------------- */
-
 export const SupabaseContext = createContext<SupabaseContextType | null>(null)
 
 /* ------------------------ Auth Provider ------------------------ */
-
 export const AuthProvider = ({ children }: SupabaseProviderProps) => {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
   const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY!
+  const noOpLock = async (
+    name: string,
+    acquireTimeout: number,
+    fn: () => Promise<any>,
+  ) => {
+    return await fn()
+  }
 
+  /* ------------------ Supabase Client ------------------ */
   const supabase = useMemo(
     () =>
       createClient(supabaseUrl, supabaseKey, {
         auth: {
           storage: AsyncStorage,
           persistSession: true,
-          autoRefreshToken: true,
+          autoRefreshToken: true, // Internes Token-Refresh
           detectSessionInUrl: false,
-          lock: processLock,
+          lock: noOpLock, // Default Lock für Token processLock
         },
       }),
     [],
   )
 
+  /* ------------------ State ------------------ */
   const [session, setSession] = useState<Session | null>(null)
   const [restoring, setRestoring] = useState(true)
 
-  /* ---------------------- Session Restore ---------------------- */
-
+  /* ------------------ Session Restore ------------------ */
   useEffect(() => {
-    let mounted = true
+    let mounted = true // keine race conditions
+    let restored = false // Stellt sicher, dass getSession nur einmal läuft
 
-    // Initial Restore
     const restoreSession = async () => {
-      const { data } = await supabase.auth.getSession()
-      if (!mounted) return
-
-      setSession(data.session ?? null)
-      setRestoring(false) // ⬅️ genau EINMAL hier
+      if (restored || !mounted) return
+      restored = true
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!mounted) return
+        setSession(data.session ?? null)
+      } catch (error) {
+        console.error('Error restoring Supabase session:', error)
+        setSession(null)
+      } finally {
+        if (mounted) setRestoring(false)
+      }
     }
 
     restoreSession()
 
-    // Auth-Updates
+    /* ------------------ Auth-Updates ------------------ */
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
@@ -77,8 +84,7 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
     }
   }, [supabase])
 
-  /* --------------------------- Render -------------------------- */
-
+  /* ------------------ Render ------------------ */
   return (
     <SupabaseContext.Provider value={{ supabase, session, restoring }}>
       {children}
