@@ -1,4 +1,4 @@
-import { AuthProvider } from '@/components/AuthProviderTmp'
+import { AuthProvider } from '@/components/AuthProvider'
 import { useSupabase } from '@/hooks/useSupabase'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
