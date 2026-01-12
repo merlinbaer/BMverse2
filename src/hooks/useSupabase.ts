@@ -1,4 +1,4 @@
-import { SupabaseContext } from '@/components/AuthProvider'
+import { SupabaseContext } from '@/components/AuthProviderTmp'
 import { useContext } from 'react'
 
 export const useSupabase = () => {
