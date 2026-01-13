@@ -6,12 +6,13 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "bmverse",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "platforms": ["ios", "android", "web"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "eu.bruu.bmverse"
+      "bundleIdentifier": "eu.bruu.bmverse",
+      "backgroundColor": "#000000"
     },
     "android": {
       "adaptiveIcon": {

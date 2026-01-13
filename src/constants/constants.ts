@@ -49,18 +49,19 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
   {
     ios: {
       headerLargeTitle: true,
-      headerLargeStyle: {
-        backgroundColor: COLORS.BACKGROUND,
-      },
       headerLargeTitleStyle: {
         color: COLORS.TEXT,
       },
-      headerStyle: { backgroundColor: 'rgba(0,0,0,0.9)' },
+      headerTitleStyle: {
+        color: COLORS.TEXT,
+      },
+      headerStyle: { backgroundColor: 'transparent' },
+      headerLargeStyle: { backgroundColor: COLORS.BACKGROUND },
       headerTintColor: COLORS.TEXT,
       headerTransparent: true,
-      headerBlurEffect: 'prominent',
-      headerShadowVisible: false,
+      headerBlurEffect: 'dark',
       headerBackButtonDisplayMode: 'minimal',
+      contentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     android: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND },
@@ -70,6 +71,7 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
       },
       headerTintColor: COLORS.TEXT,
       headerShadowVisible: false,
+      contentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     web: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
@@ -79,11 +81,13 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
       },
       headerTintColor: COLORS.TEXT,
       headerShadowVisible: false,
+      contentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     default: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND },
       headerTintColor: COLORS.TEXT,
       headerShadowVisible: false,
+      contentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
   },
 )

@@ -1,39 +1,45 @@
 import { AppText } from '@/components/AppText'
 import { ScreenContainerScroll } from '@/components/ScreenContainerScroll'
-import { FlatList, StyleSheet, View } from 'react-native'
+import { FlatList, Platform, StyleSheet, View } from 'react-native'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 import Markdown from 'react-native-markdown-display'
+import { useMemo } from 'react'
 
 export default function NewsScreen() {
+  const data = useMemo(() => {
+    return Array.from({ length: 20 }, (_, index) => {
+      const messages = [
+        'Welcome to the **news feed**!',
+        'This is a sample message to demonstrate the **WhatsApp-style** bubble layout.',
+        'News updates will appear here [regularly](https://bmverse.bruu.eu).',
+        'You can scroll through the list to see older updates.',
+        'Check out our website: https://bmverse.bruu.eu',
+        'The bubbles are limited\n- in width\n- and align\n- to the left.',
+        '**React Native FlatList** is used for efficient rendering.',
+        '## This looks much better\n than random characters_!',
+        'Stay tuned for *more updates* from BMverse.',
+        'Enjoy the [new design](https://bmverse.bruu.eu)!',
+      ]
+      const randomText = messages[index % messages.length]
+      const date = new Date(Date.now() - index * 3600000 * (Math.random() * 5))
+      return {
+        id: index.toString(),
+        text: randomText,
+        date: date,
+      }
+    }).sort((a, b) => b.date.getTime() - a.date.getTime())
+  }, [])
+
   return (
     <ScreenContainerScroll isList>
       <FlatList
-        data={Array.from({ length: 20 }, (_, index) => {
-          const messages = [
-            'Welcome to the **news feed**!',
-            'This is a sample message to demonstrate the **WhatsApp-style** bubble layout.',
-            'News updates will appear here [regularly](https://bmverse.bruu.eu).',
-            'You can scroll through the list to see older updates.',
-            'Check out our website: https://bmverse.bruu.eu',
-            'The bubbles are limited\n- in width\n- and align\n- to the left.',
-            '**React Native FlatList** is used for efficient rendering.',
-            '## This looks much better\n than random characters_!',
-            'Stay tuned for *more updates* from BMverse.',
-            'Enjoy the [new design](https://bmverse.bruu.eu)!',
-          ]
-          const randomText = messages[index % messages.length]
-          const date = new Date(
-            Date.now() - index * 3600000 * (Math.random() * 5),
-          )
-          return {
-            id: index.toString(),
-            text: randomText,
-            date: date,
-          }
-        }).sort((a, b) => b.date.getTime() - a.date.getTime())}
+        style={styles.flatList}
+        automaticallyAdjustsScrollIndicatorInsets
+        data={data}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.listContent}
         contentInsetAdjustmentBehavior="automatic"
+        scrollEventThrottle={16}
         renderItem={({ item }) => (
           <View style={styles.itemContainer}>
             <Markdown style={markdownStyles}>{item.text}</Markdown>
@@ -82,6 +88,10 @@ const markdownStyles = {
 }
 
 const styles = StyleSheet.create({
+  flatList: {
+    flex: 1,
+    backgroundColor: COLORS.BACKGROUND,
+  },
   listContent: {
     paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingBottom: 24,

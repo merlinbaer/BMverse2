@@ -1,5 +1,5 @@
 import { COLORS, LAYOUT } from '@/constants/constants'
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import {
   Platform,
   ScrollView,
@@ -31,19 +31,29 @@ export function ScreenContainerScroll({
   statusBarHidden = false,
   isList = false,
 }: ScreenContainerScrollProps) {
-  if (!statusBarHidden) {
-    StatusBar.setBarStyle('light-content', true)
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor(COLORS.BACKGROUND, true)
+  useEffect(() => {
+    if (!statusBarHidden) {
+      StatusBar.setBarStyle('light-content', true)
+      if (Platform.OS === 'android') {
+        StatusBar.setBackgroundColor(COLORS.BACKGROUND, true)
+      }
     }
-  }
+  }, [statusBarHidden])
 
   // For iOS with large headers (headerTransparent: true), we want the scroll view
   // to extend to the top of the screen. contentInsetAdjustmentBehavior="automatic"
   // will handle the padding correctly.
-  const edges = Platform.OS === 'ios' ? ['left', 'right', 'bottom'] : undefined
+  // Using SafeAreaView on iOS can sometimes prevent the large title from appearing.
+  const isIOS = Platform.OS === 'ios'
+  const edges = isIOS ? ['left', 'right', 'bottom'] : undefined
 
   if (isList) {
+    if (isIOS) {
+      // Return children directly to allow the scrollable component (FlatList/SectionList)
+      // to be the root of the screen, which is required for iOS native large title transitions.
+      // Note: background color and flex should be applied to the child component.
+      return children as any
+    }
     return (
       <SafeAreaView
         style={[styles.safeArea, style]}
@@ -52,6 +62,22 @@ export function ScreenContainerScroll({
       >
         {children}
       </SafeAreaView>
+    )
+  }
+
+  if (isIOS) {
+    return (
+      <ScrollView
+        style={[styles.scrollView, style]}
+        contentContainerStyle={styles.scrollContent}
+        automaticallyAdjustsScrollIndicatorInsets
+        contentInsetAdjustmentBehavior="automatic"
+        showsVerticalScrollIndicator={Platform.OS === 'web'}
+        scrollEventThrottle={16}
+        {...scrollProps}
+      >
+        {children}
+      </ScrollView>
     )
   }
 
@@ -67,6 +93,7 @@ export function ScreenContainerScroll({
         automaticallyAdjustsScrollIndicatorInsets
         contentInsetAdjustmentBehavior="automatic"
         showsVerticalScrollIndicator={Platform.OS === 'web'}
+        scrollEventThrottle={16}
         {...scrollProps}
       >
         {children}
@@ -82,6 +109,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    backgroundColor: COLORS.BACKGROUND,
   },
   scrollContent: {
     flexGrow: 1,
