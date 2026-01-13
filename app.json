@@ -1,17 +1,17 @@
 {
   "expo": {
-    "name": "bmverse",
-    "slug": "bmverse",
+    "name": "bmverse2",
+    "slug": "bmverse2",
     "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "bmverse",
+    "scheme": "bmverse2",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "platforms": ["ios", "android", "web"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "eu.bruu.bmverse",
+      "bundleIdentifier": "eu.bruu.bmverse2",
       "backgroundColor": "#000000"
     },
     "android": {

@@ -94,7 +94,7 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingBottom: 24,
+    paddingBottom: 80,
     gap: 12,
   },
   itemContainer: {
