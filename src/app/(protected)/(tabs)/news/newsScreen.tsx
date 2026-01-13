@@ -1,6 +1,6 @@
 import { AppText } from '@/components/AppText'
 import { ScreenContainerScroll } from '@/components/ScreenContainerScroll'
-import { FlatList, Platform, StyleSheet, View } from 'react-native'
+import { FlatList, StyleSheet, View } from 'react-native'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 import Markdown from 'react-native-markdown-display'
 import { useMemo } from 'react'

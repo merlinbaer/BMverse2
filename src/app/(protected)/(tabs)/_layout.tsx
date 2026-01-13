@@ -1,7 +1,6 @@
 import { COLORS, TAB_BAR } from '@/constants/constants'
 import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
 import Octicons from '@expo/vector-icons/Octicons'
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs'
 import { BlurView } from 'expo-blur'
 import { Tabs } from 'expo-router'
 import React from 'react'
@@ -58,7 +57,7 @@ export default function TabsLayout() {
           options={{
             title: 'News',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
-            tabBarIcon: ({ color }: BottomTabBarProps) => (
+            tabBarIcon: ({ color }: { color: string }) => (
               <Octicons name="home" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
@@ -89,7 +88,7 @@ export default function TabsLayout() {
           options={{
             title: 'Profile',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
-            tabBarIcon: ({ color }: BottomTabBarProps) => (
+            tabBarIcon: ({ color }: { color: string }) => (
               <Octicons name="person" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
