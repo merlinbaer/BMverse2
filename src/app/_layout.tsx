@@ -20,7 +20,7 @@ SplashScreen.setOptions({
   fade: true,
 })
 
-// SplashScreen bleibt sichtbar, bis wir es explizit ausblenden
+// SplashScreen remains visible until we explicitly hide it
 SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
@@ -34,7 +34,7 @@ export default function RootLayout() {
 function RootNavigator() {
   const { session, restoring } = useSupabase()
 
-  // SplashScreen nur ausblenden, wenn Session geladen wurde
+  // Only hide SplashScreen when session has been loaded
   useEffect(() => {
     let mounted = true
     if (!restoring && mounted) {
@@ -45,7 +45,7 @@ function RootNavigator() {
     }
   }, [restoring])
 
-  // 🔹 Guard-Logik für Screens
+  // 🔹 Guard logic for screens
   const isProtected = !restoring && !!session
   const isPublic = !restoring && !session
 
@@ -57,12 +57,12 @@ function RootNavigator() {
           gestureEnabled: false,
         }}
       >
-        {/* Protected Screens: nur zeigen, wenn User eingeloggt */}
+        {/* Protected Screens: only show if user is logged in */}
         <Stack.Protected guard={isProtected}>
           <Stack.Screen name="(protected)" />
         </Stack.Protected>
 
-        {/* Public Screens: nur zeigen, wenn kein User */}
+        {/* Public Screens: only show if no user */}
         <Stack.Protected guard={isPublic}>
           <Stack.Screen name="(public)" />
         </Stack.Protected>

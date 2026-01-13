@@ -44,10 +44,9 @@ export default function VerifyPage() {
     </ScreenContainerFixed>
   )
 }
-
-const styles = StyleSheet.create({
+StyleSheet.create({
   scrollArea: {
-    flex: 1, // füllt den verfügbaren Platz
+    flex: 1, // fills the available space
     backgroundColor: COLORS.SCROLLVIEW,
     width: '100%',
     borderRadius: 8,

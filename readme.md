@@ -23,7 +23,7 @@ eas secret:push --scope project --env-file .env
 Build in eas cloud for preparation uploading to Appstore or Testflight:
 eas build --platform ios
 
-Falls man ein ipa lokal builden möchte, dann mit (Achtung env funktioniert dann nur über das eas.json, nicht .env oder eas vault):
+If you want to build an ipa locally, then use (Note: env only works via eas.json then, not .env or eas vault):
 eas build -p ios --local
 
 Submit to Appstore or Testflight:

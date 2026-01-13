@@ -28,7 +28,7 @@ export default function WelcomePage() {
 
 const styles = StyleSheet.create({
   scrollArea: {
-    flex: 1, // füllt den verfügbaren Platz
+    flex: 1, // fills the available space
     backgroundColor: COLORS.SCROLLVIEW,
     width: '100%',
     borderRadius: 8,

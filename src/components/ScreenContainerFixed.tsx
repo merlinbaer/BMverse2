@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
       default: 0,
     }),
     paddingBottom: 24,
-    gap: LAYOUT.gap, // funktioniert nur bei React Native 0.71+ oder Web, sonst ggf. marginBottom
+    gap: LAYOUT.gap, // works only with React Native 0.71+ or Web, otherwise maybe marginBottom
   },
 })

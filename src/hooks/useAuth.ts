@@ -7,7 +7,7 @@ export const useAuth = () => {
 
   /**
    * Start OTP Login / Signup
-   * shouldCreateUser = true sorgt dafür, dass neue User automatisch angelegt werden
+   * shouldCreateUser = true ensures that new users are created automatically
    */
   const startLogin = async (email: string) => {
     if (restoring)
@@ -24,7 +24,7 @@ export const useAuth = () => {
   }
 
   /**
-   * Verifiziere OTP Code und erzeugt Session
+   * Verifies OTP code and creates a session
    */
   const verifyOtp = async (email: string, token: string) => {
     if (restoring)
@@ -38,7 +38,7 @@ export const useAuth = () => {
 
     if (error) throw error
 
-    // Session wird automatisch vom AuthProvider über onAuthStateChange gesetzt
+    // Session is automatically set by the AuthProvider via onAuthStateChange
     return data.session
   }
 
@@ -53,8 +53,8 @@ export const useAuth = () => {
   }
 
   return {
-    restoring, // true, solange Session geladen wird
-    session, // aktuelle Session oder null
+    restoring, // true as long as the session is being loaded
+    session, // current session or null
     startLogin,
     verifyOtp,
     signOut,

@@ -17,35 +17,35 @@ export default function TabsLayout() {
           tabBarShowLabel: false,
           tabBarStyle: {
             position: 'absolute',
-            height: TAB_BAR.HEIGHT + insets.bottom, // Höhe variiert nach Devices
-            borderTopLeftRadius: insets.corner, // Ecken varieren nach Devices
-            borderTopRightRadius: insets.corner, // Ecken varieren nach Devices
-            borderTopWidth: 0, // muss 0 sein
+            height: TAB_BAR.HEIGHT + insets.bottom, // Height varies by device
+            borderTopLeftRadius: insets.corner, // Corners vary by device
+            borderTopRightRadius: insets.corner, // Corners vary by device
+            borderTopWidth: 0, // must be 0
           },
-          tabBarActiveTintColor: COLORS.BM_RED, // aktive Labelfarbe
-          tabBarInactiveTintColor: COLORS.TEXT_MUTED, // inaktive Labelfarbe
+          tabBarActiveTintColor: COLORS.BM_RED, // active label color
+          tabBarInactiveTintColor: COLORS.TEXT_MUTED, // inactive label color
           tabBarBackground: () =>
             Platform.OS !== 'android' ? (
               <BlurView
                 intensity={TAB_BAR.BLUR_INTENSITY}
-                tint="dark" // "light", "dark" oder "default"
+                tint="dark" // "light", "dark" or "default"
                 style={{
                   ...StyleSheet.absoluteFillObject,
                   overflow: 'hidden',
-                  borderTopLeftRadius: insets.corner, // Ecken varieren nach Devices
-                  borderTopRightRadius: insets.corner, // Ecken varieren nach Devices
+                  borderTopLeftRadius: insets.corner, // Corners vary by device
+                  borderTopRightRadius: insets.corner, // Corners vary by device
                 }}
               />
             ) : (
-              // Fallback Android
+              // Android Fallback
               <View
                 style={[
                   StyleSheet.absoluteFill,
                   {
                     backgroundColor: COLORS.BACKGROUND,
                     overflow: 'hidden',
-                    borderTopLeftRadius: insets.corner, // Ecken varieren nach Devices
-                    borderTopRightRadius: insets.corner, // Ecken varieren nach Devices
+                    borderTopLeftRadius: insets.corner, // Corners vary by device
+                    borderTopRightRadius: insets.corner, // Corners vary by device
                   },
                 ]}
               />

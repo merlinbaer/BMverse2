@@ -36,9 +36,9 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
         auth: {
           storage: AsyncStorage,
           persistSession: true,
-          autoRefreshToken: true, // Internes Token-Refresh
+          autoRefreshToken: true, // Internal token refresh
           detectSessionInUrl: false,
-          lock: noOpLock, // Default Lock für Token processLock
+          lock: noOpLock, // Default lock for Token processLock
         },
       }),
     [],
@@ -50,8 +50,8 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
 
   /* ------------------ Session Restore ------------------ */
   useEffect(() => {
-    let mounted = true // keine race conditions
-    let restored = false // Stellt sicher, dass getSession nur einmal läuft
+    let mounted = true // avoid race conditions
+    let restored = false // Ensures that getSession only runs once
 
     const restoreSession = async () => {
       if (restored || !mounted) return

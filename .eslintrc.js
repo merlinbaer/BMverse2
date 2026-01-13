@@ -26,8 +26,8 @@ module.exports = {
   settings: {
     react: { version: 'detect' },
     'import/resolver': {
-      typescript: {}, // damit @/ alias aufgelöst wird
-      'babel-module': {}, // optional, falls Babel resolver genutzt wird
+      typescript: {}, // so that @/ alias is resolved
+      'babel-module': {}, // optional if Babel resolver is used
     },
   },
   env: {

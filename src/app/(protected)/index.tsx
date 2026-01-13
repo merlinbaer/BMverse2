@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 export default function ProtectedIndex() {
   useEffect(() => {
-    router.replace('/(protected)/(tabs)/news/newsScreen') //start screen
+    router.replace('/(protected)/(tabs)/main/mainScreen') //start screen
   }, [])
 
   return null
