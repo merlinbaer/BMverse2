@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 export const COLORS = {
   PRIMARY: '#db1b1a',
   BACKGROUND: '#000',
-  SCROLLVIEW: '#e3dfd3',
+  SCROLL_VIEW: '#e3dfd3',
   TEXT: '#fff',
   TEXT_MUTED: '#a4a09d',
   ICON: '#fff',
@@ -32,17 +32,6 @@ export const FONT = {
 export const LAYOUT = {
   paddingHorizontal: 16,
   gap: 24,
-}
-
-export const LargeHeaderOptions: NativeStackNavigationOptions = {
-  headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
-  headerTitleStyle: {
-    fontSize: FONT.SIZE.LG + 12,
-    color: COLORS.TEXT,
-  },
-  headerTintColor: COLORS.TEXT,
-  headerShadowVisible: false,
-  headerTitleAlign: 'left',
 }
 
 export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(

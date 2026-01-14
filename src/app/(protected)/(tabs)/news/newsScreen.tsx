@@ -1,5 +1,4 @@
 import { AppText } from '@/components/AppText'
-import { ScreenContainerScroll } from '@/components/ScreenContainerScroll'
 import { FlatList, StyleSheet, View } from 'react-native'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 import Markdown from 'react-native-markdown-display'
@@ -31,33 +30,31 @@ export default function NewsScreen() {
   }, [])
 
   return (
-    <ScreenContainerScroll isList>
-      <FlatList
-        style={styles.flatList}
-        automaticallyAdjustsScrollIndicatorInsets
-        data={data}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.listContent}
-        contentInsetAdjustmentBehavior="automatic"
-        scrollEventThrottle={16}
-        renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <Markdown style={markdownStyles}>{item.text}</Markdown>
-            <View style={styles.footer}>
-              <AppText style={styles.dateText}>
-                {item.date.toLocaleDateString([], {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </AppText>
-            </View>
+    <FlatList
+      style={styles.flatList}
+      automaticallyAdjustsScrollIndicatorInsets
+      data={data}
+      keyExtractor={item => item.id}
+      contentContainerStyle={styles.listContent}
+      contentInsetAdjustmentBehavior="automatic"
+      scrollEventThrottle={16}
+      renderItem={({ item }) => (
+        <View style={styles.itemContainer}>
+          <Markdown style={markdownStyles}>{item.text}</Markdown>
+          <View style={styles.footer}>
+            <AppText style={styles.dateText}>
+              {item.date.toLocaleDateString([], {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </AppText>
           </View>
-        )}
-      />
-    </ScreenContainerScroll>
+        </View>
+      )}
+    />
   )
 }
 

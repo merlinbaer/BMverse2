@@ -1,17 +1,36 @@
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
-import { ScreenContainerFixed } from '@/components/ScreenContainerFixed'
 import { COLORS, LAYOUT } from '@/constants/constants'
 import privacyText from '@/constants/privacy'
 import { useAuth } from '@/hooks/useAuth'
 import { router } from 'expo-router'
 import { useState } from 'react'
-import { Alert, ScrollView, StyleSheet, TextInput } from 'react-native'
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  useWindowDimensions,
+  View,
+} from 'react-native'
 import Markdown from 'react-native-markdown-display'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default function LoginPage() {
   const { restoring, startLogin } = useAuth()
   const [email, setEmail] = useState('')
+  const { height } = useWindowDimensions()
+
+  // Calculate available height: screen height - top padding - other elements - gaps
+  const textAreaHeight =
+    height -
+    Platform.select({
+      ios: 160,
+      android: 105,
+      default: 70,
+    }) -
+    275
 
   const isValidEmail = (email: string) => {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -33,39 +52,64 @@ export default function LoginPage() {
   }
 
   return (
-    <ScreenContainerFixed>
+    <KeyboardAwareScrollView
+      style={styles.keyboardAwareScrollView}
+      contentContainerStyle={styles.keyboardAwareContentContainer}
+      keyboardShouldPersistTaps="handled"
+      enableOnAndroid={true}
+      extraScrollHeight={100}
+    >
       <AppText>Please read the Privacy Policy & Login:</AppText>
-      <ScrollView
-        style={styles.scrollArea}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={true}
-      >
-        <Markdown>{privacyText}</Markdown>
-      </ScrollView>
+      <View style={[styles.privacyTextArea, { height: textAreaHeight }]}>
+        <ScrollView
+          nestedScrollEnabled={true}
+          contentContainerStyle={styles.privacyTextContentContainer}
+        >
+          <Markdown>{privacyText}</Markdown>
+        </ScrollView>
+      </View>
       <TextInput
         autoCapitalize="none"
         value={email}
         placeholder="Enter email"
-        style={{ borderWidth: 1, padding: 10, backgroundColor: 'white' }}
+        placeholderTextColor={COLORS.TEXT_MUTED}
+        style={styles.textInput}
         onChangeText={setEmail}
         keyboardType="email-address"
       />
       <AppButton title="Accept & Send" onPress={onSignUpPress} />
-    </ScreenContainerFixed>
+    </KeyboardAwareScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  scrollArea: {
-    flex: 1, // fills the available space
-    backgroundColor: COLORS.SCROLLVIEW,
+  keyboardAwareScrollView: {
+    flex: 1,
+    backgroundColor: COLORS.BACKGROUND,
+  },
+  keyboardAwareContentContainer: {
+    paddingHorizontal: LAYOUT.paddingHorizontal,
+    gap: LAYOUT.gap,
+    paddingTop: Platform.select({
+      ios: 150,
+      android: 20,
+      default: 10,
+    }),
+    paddingBottom: 24,
+  },
+  privacyTextArea: {
+    backgroundColor: COLORS.SCROLL_VIEW,
     width: '100%',
     borderRadius: 8,
     overflow: 'hidden',
   },
-  scrollContent: {
-    gap: LAYOUT.gap,
+  privacyTextContentContainer: {
     paddingVertical: 12,
     paddingHorizontal: LAYOUT.paddingHorizontal,
+  },
+  textInput: {
+    borderWidth: 1,
+    padding: 10,
+    backgroundColor: 'white',
   },
 })

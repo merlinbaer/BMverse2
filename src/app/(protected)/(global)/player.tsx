@@ -1,10 +1,18 @@
 import { AppText } from '@/components/AppText'
-import { ScreenContainerScroll } from '@/components/ScreenContainerScroll'
+import { StyleSheet, View } from 'react-native'
+import { COLORS } from '@/constants/constants'
 
 export default function PlayerScreen() {
   return (
-    <ScreenContainerScroll>
+    <View style={styles.container}>
       <AppText>Player</AppText>
-    </ScreenContainerScroll>
+    </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.BACKGROUND,
+  },
+})

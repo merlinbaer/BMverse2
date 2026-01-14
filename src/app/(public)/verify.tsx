@@ -1,11 +1,11 @@
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
-import { ScreenContainerFixed } from '@/components/ScreenContainerFixed'
 import { COLORS, LAYOUT } from '@/constants/constants'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
-import { Alert, StyleSheet, TextInput } from 'react-native'
+import { Alert, Platform, StyleSheet, TextInput } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 export default function VerifyPage() {
   const { restoring, verifyOtp } = useAuth()
@@ -26,14 +26,21 @@ export default function VerifyPage() {
   }
 
   return (
-    <ScreenContainerFixed>
+    <KeyboardAwareScrollView
+      style={styles.keyboardAwareScrollView}
+      contentContainerStyle={styles.keyboardAwareContentContainer}
+      keyboardShouldPersistTaps="handled"
+      enableOnAndroid={true}
+      extraScrollHeight={100}
+    >
       <AppText>Enter the verification code sent to your email:</AppText>
       <TextInput
         value={token}
-        placeholder="8-digit code"
-        style={{ borderWidth: 1, padding: 10, backgroundColor: 'white' }}
-        keyboardType="number-pad"
+        placeholder="Enter 8-digit code"
+        placeholderTextColor={COLORS.TEXT_MUTED}
+        style={styles.textInput}
         onChangeText={setToken}
+        keyboardType="number-pad"
         maxLength={8}
       />
       <AppButton
@@ -41,20 +48,28 @@ export default function VerifyPage() {
         onPress={onVerifyPress}
         disabled={token.length !== 8}
       />
-    </ScreenContainerFixed>
+    </KeyboardAwareScrollView>
   )
 }
-StyleSheet.create({
-  scrollArea: {
-    flex: 1, // fills the available space
-    backgroundColor: COLORS.SCROLLVIEW,
-    width: '100%',
-    borderRadius: 8,
-    overflow: 'hidden',
+
+const styles = StyleSheet.create({
+  keyboardAwareScrollView: {
+    flex: 1,
+    backgroundColor: COLORS.BACKGROUND,
   },
-  scrollContent: {
-    gap: LAYOUT.gap,
-    paddingVertical: 12,
+  keyboardAwareContentContainer: {
     paddingHorizontal: LAYOUT.paddingHorizontal,
+    gap: LAYOUT.gap,
+    paddingTop: Platform.select({
+      ios: 180,
+      android: 20,
+      default: 10,
+    }),
+    paddingBottom: 24,
+  },
+  textInput: {
+    borderWidth: 1,
+    padding: 10,
+    backgroundColor: 'white',
   },
 })
