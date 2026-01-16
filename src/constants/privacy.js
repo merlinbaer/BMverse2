@@ -47,7 +47,7 @@ Contact details are provided on the website https://bmverse.bruu.eu/ at the cont
 BMverse uses **Supabase Auth** to authenticate users via **passwordless email login**:
 
 - Users enter their email address
-- A **6-digit one-time authentication token** is sent to the provided email address
+- A **8-digit one-time authentication token** is sent to the provided email address
 - No passwords are created or stored by BMverse
 
 If an email address is not yet known to Supabase Auth, a new user account is automatically created. If the email address already exists, the user is authenticated.
