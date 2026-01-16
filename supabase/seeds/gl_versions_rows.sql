@@ -1,0 +1,1 @@
+INSERT INTO "public"."gl_versions" ("id", "created_at", "updated_at", "deleted", "version", "version_info") VALUES ('aa67d296-4fae-4a2a-bb6e-c456df0c191a', '2026-01-16 18:44:01.876416+00', '2026-01-16 18:44:01.876416+00', 'false', '2.0.0', 'initial version 2');

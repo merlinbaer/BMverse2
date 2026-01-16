@@ -1,5 +1,8 @@
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { Platform } from 'react-native'
+import appJson from '../../app.json'
+
+export const APP_VERSION = appJson.expo.version
 
 export const COLORS = {
   PRIMARY: '#db1b1a',

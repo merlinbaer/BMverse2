@@ -8,11 +8,18 @@
     "scheme": "bmverse2",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "eu.bruu.bmverse2",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#000000",
+      "infoPlist": {
+        "UIDesignRequiresCompatibility": true
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +27,7 @@
         "backgroundColor": "#000000"
       },
       "edgeToEdgeEnabled": true,
-      "package": "eu.bruu.bmverse"
+      "package": "eu.bruu.bmverse2"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,15 +43,20 @@
         "expo-splash-screen",
         {
           "image": "./assets/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
+          "enableFullScreenImage_legacy": true,
           "backgroundColor": "#000000"
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
+      "tsconfigPaths": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      }
     }
   }
 }

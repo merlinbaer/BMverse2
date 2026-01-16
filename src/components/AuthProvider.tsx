@@ -57,11 +57,21 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
       if (restored || !mounted) return
       restored = true
       try {
-        const { data } = await supabase.auth.getSession()
+        const { data, error } = await supabase.auth.getSession()
+        if (error) {
+          // When token gets invalid, deleting session
+          if (
+            error.message.includes('Refresh Token Not Found') ||
+            error.message.includes('invalid_grant')
+          ) {
+            await supabase.auth.signOut()
+          } else {
+            console.error('Error restoring Supabase session:', error)
+          }
+        }
         if (!mounted) return
         setSession(data.session ?? null)
       } catch (error) {
-        console.error('Error restoring Supabase session:', error)
         setSession(null)
       } finally {
         if (mounted) setRestoring(false)

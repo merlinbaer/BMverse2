@@ -1,8 +1,10 @@
 import { AppButton } from '@/components/AppButton'
 import { useAuth } from '@/hooks/useAuth'
-import { Alert, Platform, StyleSheet, View } from 'react-native'
+import { Alert, Platform, StyleSheet } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { COLORS, LAYOUT } from '@/constants/constants'
+import { APP_VERSION } from '@/constants/constants'
+import { AppText } from '@/components/AppText'
 
 export default function ProfileScreen() {
   const { signOut, restoring } = useAuth()
@@ -28,7 +30,7 @@ export default function ProfileScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
-      <View style={styles.container} />
+      <AppText>Current Version: {APP_VERSION}</AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
     </KeyboardAwareScrollView>
   )
@@ -48,9 +50,5 @@ const styles = StyleSheet.create({
       default: 10,
     }),
     paddingBottom: 24,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
   },
 })

@@ -1,0 +1,43 @@
+CREATE TABLE
+    public.gl_versions (
+                        id uuid not null default gen_random_uuid (),
+                        created_at timestamp with time zone not null default now(),
+                        updated_at timestamp with time zone not null default now(),
+                        deleted boolean null default false,
+                        version text not null,
+                        version_info text not null,
+                        constraint gl_version_pkey primary key (id)
+) tablespace pg_default;
+
+ALTER TABLE public.gl_versions ENABLE ROW LEVEL SECURITY;
+
+CREATE TRIGGER handle_times BEFORE INSERT
+    OR
+UPDATE ON gl_versions FOR each row
+    execute function handle_times ();
+
+CREATE POLICY allow_public_users_to_select
+  ON public.gl_versions
+  FOR SELECT
+  using (public.is_public_user());
+
+-- version has to be numeric values divided by dots!
+CREATE VIEW public.gl_version_view
+            WITH (security_invoker = true) AS
+SELECT DISTINCT ON (deleted)
+    id,
+    created_at,
+    updated_at,
+    deleted,
+    version,
+    version_info
+FROM
+    public.gl_versions
+WHERE
+    deleted = false
+ORDER BY
+    deleted,
+    string_to_array(version, '.')::int[] DESC;
+
+-- Grant permissions to the roles used by Supabase
+GRANT SELECT ON public.gl_version_view TO anon, authenticated, service_role;
