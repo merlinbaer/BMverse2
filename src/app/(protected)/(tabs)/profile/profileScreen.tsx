@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import { AppButton } from '@/components/AppButton'
 import { useAuth } from '@/hooks/useAuth'
 import { Platform, StyleSheet } from 'react-native'
