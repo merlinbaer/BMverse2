@@ -2,7 +2,7 @@ import { AppButton } from '@/components/AppButton'
 import { useAuth } from '@/hooks/useAuth'
 import { Platform, StyleSheet } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { COLORS, LAYOUT } from '@/constants/constants'
+import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 import { APP_VERSION } from '@/constants/constants'
 import { AppText } from '@/components/AppText'
 import { useMemo } from 'react'
@@ -72,9 +72,10 @@ export default function ProfileScreen() {
     >
       <AppText>Current App Version: {APP_VERSION}</AppText>
       <AppText>Available App Version: </AppText>
-      <AppText>User Email: {userEmail}</AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
       <AppButton title="Delete Account" onPress={handleDeleteAccount} />
+      <AppText fontSize={FONT.SIZE.BASE}>Debug Info:</AppText>
+      <AppText>User Email: {userEmail}</AppText>
       <AppText>Next Token Renew on {expiryLabel}</AppText>
     </KeyboardAwareScrollView>
   )
