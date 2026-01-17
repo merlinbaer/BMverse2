@@ -18,6 +18,30 @@ CREATE TRIGGER on_auth_user_created
 AFTER INSERT ON auth.users
 FOR each ROW execute procedure public.handle_new_user();
 
+CREATE OR REPLACE FUNCTION public.delete_user()
+    RETURNS void
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path = public, auth
+AS $$
+BEGIN
+    DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$;
+
+CREATE OR REPLACE FUNCTION public.update_last_seen()
+    RETURNS void
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path = public
+AS $$
+BEGIN
+    UPDATE public.gl_profiles
+    SET last_seen_at = now()
+    WHERE id = auth.uid();
+END;
+$$;
+
 CREATE OR REPLACE FUNCTION public.handle_times()
     RETURNS trigger
     SET search_path = 'public'

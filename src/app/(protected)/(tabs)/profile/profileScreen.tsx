@@ -1,25 +1,65 @@
 import { AppButton } from '@/components/AppButton'
 import { useAuth } from '@/hooks/useAuth'
-import { Alert, Platform, StyleSheet } from 'react-native'
+import { Platform, StyleSheet } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { COLORS, LAYOUT } from '@/constants/constants'
 import { APP_VERSION } from '@/constants/constants'
 import { AppText } from '@/components/AppText'
+import { useMemo } from 'react'
+import { useAlert } from '@/hooks/useAlert'
 
 export default function ProfileScreen() {
-  const { signOut, restoring } = useAuth()
+  const { restoring, session, signOut, deleteAccount } = useAuth()
+  const { showAlert } = useAlert()
+  const userEmail = session?.user?.email ?? 'Unknown'
+
+  const expiryLabel = useMemo(() => {
+    if (session?.expires_at) {
+      const date = new Date(session.expires_at * 1000)
+
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      const hours = String(date.getHours()).padStart(2, '0')
+      const minutes = String(date.getMinutes()).padStart(2, '0')
+      const seconds = String(date.getSeconds()).padStart(2, '0')
+
+      return `${year}/${month}/${day} at ${hours}:${minutes}:${seconds}`
+    }
+    return 'Not available'
+  }, [session?.expires_at])
 
   const handleSignOut = async () => {
     if (restoring) {
-      Alert.alert('Please wait', 'Session is restoring. Try again in a moment.')
+      showAlert('Please wait', 'Session is restoring. Try again in a moment.')
       return
     }
     try {
       await signOut()
     } catch (err: any) {
       console.error(JSON.stringify(err, null, 2))
-      Alert.alert('Error', err.message || 'Failed to sign out.')
+      showAlert('Error', err.message || 'Failed to sign out.')
     }
+  }
+  const handleDeleteAccount = async () => {
+    showAlert(
+      'Delete Account',
+      'Are you sure you want to permanently delete your account with all user data? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAccount()
+            } catch (err: any) {
+              showAlert('Error', err.message || 'Failed to delete account.')
+            }
+          },
+        },
+      ],
+    )
   }
 
   return (
@@ -30,8 +70,12 @@ export default function ProfileScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
-      <AppText>Current Version: {APP_VERSION}</AppText>
+      <AppText>Current App Version: {APP_VERSION}</AppText>
+      <AppText>Available App Version: </AppText>
+      <AppText>User Email: {userEmail}</AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
+      <AppButton title="Delete Account" onPress={handleDeleteAccount} />
+      <AppText>Next Token Renew on {expiryLabel}</AppText>
     </KeyboardAwareScrollView>
   )
 }

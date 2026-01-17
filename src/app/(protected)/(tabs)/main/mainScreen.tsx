@@ -1,15 +1,17 @@
 import { AppText } from '@/components/AppText'
 import { useState } from 'react'
-import { Alert, Platform, StyleSheet, TextInput } from 'react-native'
+import { Platform, StyleSheet, TextInput } from 'react-native'
 import { AppButton } from '@/components/AppButton'
 import { COLORS, LAYOUT } from '@/constants/constants'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useAlert } from '@/hooks/useAlert'
 
 export default function MainScreen() {
   const [token, setToken] = useState('')
+  const { showAlert } = useAlert()
 
-  const onVerifyPress = async () => {
-    Alert.alert('Hi', 'Button pressed')
+  const handlePressMe = async () => {
+    showAlert('Hi', 'Button pressed')
   }
 
   return (
@@ -32,7 +34,7 @@ export default function MainScreen() {
       />
       <AppButton
         title="Press me"
-        onPress={onVerifyPress}
+        onPress={handlePressMe}
         disabled={token.length !== 3}
       />
     </KeyboardAwareScrollView>

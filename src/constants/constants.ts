@@ -3,6 +3,7 @@ import { Platform } from 'react-native'
 import appJson from '../../app.json'
 
 export const APP_VERSION = appJson.expo.version
+export const AUTH_STORAGE_KEY = 'sb-eu-bruu-bmverse2-app-auth-token'
 
 export const COLORS = {
   PRIMARY: '#db1b1a',

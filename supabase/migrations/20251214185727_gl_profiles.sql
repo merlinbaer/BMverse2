@@ -13,7 +13,8 @@ CREATE TABLE
     user_email text not null,
     user_role public.user_role not null default 'user',
     user_name text null,
-    user_country text null
+    user_country text null,
+    last_seen_at timestamp with time zone null default now()
 ) tablespace pg_default;
 
 CREATE POLICY users_can_read_own_profile

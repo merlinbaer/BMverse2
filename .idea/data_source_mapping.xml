@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/supabase/migrations/20251214185727_gl_profiles.sql" value="3d92bbc1-af86-45ae-99ec-f70d3dd41eab" />
     <file url="file://$PROJECT_DIR$/supabase/migrations/20251214190732_gl_functions.sql" value="3d92bbc1-af86-45ae-99ec-f70d3dd41eab" />
-    <file url="file://$PROJECT_DIR$/supabase/migrations/20260116174511_gl_version.sql" value="3d92bbc1-af86-45ae-99ec-f70d3dd41eab" />
   </component>
 </project>

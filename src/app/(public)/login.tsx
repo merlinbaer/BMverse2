@@ -6,7 +6,6 @@ import { useAuth } from '@/hooks/useAuth'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
-  Alert,
   Platform,
   ScrollView,
   StyleSheet,
@@ -16,11 +15,13 @@ import {
 } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useAlert } from '@/hooks/useAlert'
 
 export default function LoginPage() {
   const { restoring, startLogin } = useAuth()
   const [email, setEmail] = useState('')
   const { height } = useWindowDimensions()
+  const { showAlert } = useAlert()
 
   // Calculate available height: screen height - top padding - other elements - gaps
   const textAreaHeight =
@@ -39,7 +40,7 @@ export default function LoginPage() {
   const onSignUpPress = async () => {
     if (restoring || !email) return
     if (!isValidEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.')
+      showAlert('Invalid Email', 'Please enter a valid email address.')
       return
     }
     try {
@@ -47,7 +48,7 @@ export default function LoginPage() {
       setEmail('')
       router.push(`/verify?email=${email}`)
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Failed to send email.')
+      showAlert('Error', err.message || 'Failed to send email.')
     }
   }
 

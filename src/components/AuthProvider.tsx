@@ -34,6 +34,7 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
     () =>
       createClient(supabaseUrl, supabaseKey, {
         auth: {
+          storageKey: 'sb-eu-bruu-bmverse2-app-auth-token', // storage key for token
           storage: AsyncStorage,
           persistSession: true,
           autoRefreshToken: true, // Internal token refresh
@@ -83,8 +84,22 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
     /* ------------------ Auth-Updates ------------------ */
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       if (!mounted) return
+      // Update last seen on login or token refresh
+      if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+        ;(async () => {
+          try {
+            const { error } = await supabase.rpc('update_last_seen')
+            if (error) {
+              console.log('Info: update_last_seen not possible.')
+            }
+          } catch (err) {
+            console.log('Info: update_last_seen not possible.')
+          }
+        })()
+      }
+
       setSession(newSession ?? null)
     })
 

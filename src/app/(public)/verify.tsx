@@ -4,11 +4,13 @@ import { COLORS, LAYOUT } from '@/constants/constants'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
-import { Alert, Platform, StyleSheet, TextInput } from 'react-native'
+import { Platform, StyleSheet, TextInput } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { useAlert } from '@/hooks/useAlert'
 
 export default function VerifyPage() {
   const { restoring, verifyOtp } = useAuth()
+  const { showAlert } = useAlert()
   const [token, setToken] = useState('')
 
   const params = useLocalSearchParams()
@@ -21,7 +23,7 @@ export default function VerifyPage() {
       await verifyOtp(email, token)
       setToken('')
     } catch (err: any) {
-      Alert.alert('Error', err.message || 'Invalid code')
+      showAlert('Error', err.message || 'Invalid code')
     }
   }
 
