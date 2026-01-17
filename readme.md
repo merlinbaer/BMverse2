@@ -3,7 +3,9 @@
 This is an [Expo](https://expo.dev) project.
 
 Generate supabase types:
-yarn supabase gen types typescript --project-id kqehjqspszhtcikfdodd > ./database.types.ts
+yarn supabase gen types typescript --project-id {project-ref} > ./database.types.ts
+or
+yarn supabase gen types typescript --local > ./database.types.ts
 
 Build a development build and run on default (Simulator):
 yarn expo run:ios

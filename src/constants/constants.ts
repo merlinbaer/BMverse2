@@ -97,3 +97,10 @@ const createTabBarConstants = (posY: number) =>
   }) as const
 
 export const TAB_BAR = createTabBarConstants(0)
+
+export const AUTH = {
+  STORAGE_KEY: 'sb-eu-bruu-bmverse2-app-auth-token',
+  OTP_LENGTH: 8,
+  OTP_TIMEOUT_MS: 15000,
+  MAX_RETRY_ATTEMPTS: 2,
+} as const

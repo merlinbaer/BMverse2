@@ -1,7 +1,9 @@
 // AuthProvider.tsx
+import { Database } from '@/types/database.types'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react'
+import { AUTH } from '@/constants/constants'
 
 /* ---------------------------- Types ---------------------------- */
 interface SupabaseProviderProps {
@@ -9,7 +11,7 @@ interface SupabaseProviderProps {
 }
 
 interface SupabaseContextType {
-  supabase: SupabaseClient
+  supabase: SupabaseClient<Database>
   session: Session | null
   restoring: boolean
 }
@@ -32,9 +34,9 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
   /* ------------------ Supabase Client ------------------ */
   const supabase = useMemo(
     () =>
-      createClient(supabaseUrl, supabaseKey, {
+      createClient<Database>(supabaseUrl, supabaseKey, {
         auth: {
-          storageKey: 'sb-eu-bruu-bmverse2-app-auth-token', // storage key for token
+          storageKey: AUTH.STORAGE_KEY, // storage key for token
           storage: AsyncStorage,
           persistSession: true,
           autoRefreshToken: true, // Internal token refresh
@@ -60,14 +62,14 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
       try {
         const { data, error } = await supabase.auth.getSession()
         if (error) {
-          // When token gets invalid, deleting session
+          console.error('Session restore error:', error.message)
           if (
             error.message.includes('Refresh Token Not Found') ||
-            error.message.includes('invalid_grant')
+            error.message.includes('invalid_grant') ||
+            error.message.includes('expired')
           ) {
-            await supabase.auth.signOut()
-          } else {
-            console.error('Error restoring Supabase session:', error)
+            console.log('Token expired or invalid - clearing session')
+            await supabase.auth.signOut({ scope: 'local' }) // Only clear locally
           }
         }
         if (!mounted) return

@@ -1,6 +1,6 @@
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
-import { COLORS, LAYOUT } from '@/constants/constants'
+import { AUTH, COLORS, LAYOUT } from '@/constants/constants'
 import { useAuth } from '@/hooks/useAuth'
 import { useLocalSearchParams } from 'expo-router'
 import { useState } from 'react'
@@ -12,18 +12,22 @@ export default function VerifyPage() {
   const { restoring, verifyOtp } = useAuth()
   const { showAlert } = useAlert()
   const [token, setToken] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
 
   const params = useLocalSearchParams()
   const email: string = Array.isArray(params.email) ? '' : params.email
 
   const onVerifyPress = async () => {
-    if (restoring || !token) return
+    if (restoring || !token || isLoading) return
 
+    setIsLoading(true)
     try {
       await verifyOtp(email, token)
       setToken('')
     } catch (err: any) {
       showAlert('Error', err.message || 'Invalid code')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -43,12 +47,12 @@ export default function VerifyPage() {
         style={styles.textInput}
         onChangeText={setToken}
         keyboardType="number-pad"
-        maxLength={8}
+        maxLength={AUTH.OTP_LENGTH}
       />
       <AppButton
         title="Verify"
         onPress={onVerifyPress}
-        disabled={token.length !== 8}
+        disabled={token.length !== AUTH.OTP_LENGTH}
       />
     </KeyboardAwareScrollView>
   )

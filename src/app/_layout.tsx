@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 import { AuthProvider } from '@/components/AuthProvider'
 import { useSupabase } from '@/hooks/useSupabase'
 import { DarkTheme, ThemeProvider } from '@react-navigation/native'
@@ -5,6 +7,7 @@ import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { COLORS } from '@/constants/constants'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
 const AppTheme = {
   ...DarkTheme,
@@ -21,7 +24,7 @@ SplashScreen.setOptions({
 })
 
 // SplashScreen remains visible until we explicitly hide it
-SplashScreen.preventAutoHideAsync()
+SplashScreen.preventAutoHideAsync().catch(() => {})
 
 export default function RootLayout() {
   return (
@@ -34,20 +37,28 @@ export default function RootLayout() {
 function RootNavigator() {
   const { session, restoring } = useSupabase()
 
-  // Only hide SplashScreen when session has been loaded
+  // Only hide SplashScreen when the session has been loaded
   useEffect(() => {
     let mounted = true
     if (!restoring && mounted) {
-      SplashScreen.hideAsync()
+      SplashScreen.hideAsync().catch(() => {})
     }
     return () => {
       mounted = false
     }
   }, [restoring])
 
+  if (restoring) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
+      </View>
+    )
+  }
+
   // 🔹 Guard logic for screens
-  const isProtected = !restoring && !!session
-  const isPublic = !restoring && !session
+  const isProtected = !!session
+  const isPublic = !session
 
   return (
     <ThemeProvider value={AppTheme}>
@@ -70,3 +81,12 @@ function RootNavigator() {
     </ThemeProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.BACKGROUND,
+  },
+})

@@ -69,5 +69,14 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['src/app/**/*.tsx', 'src/app/**/*.ts'],
+      rules: {
+        'import/no-unused-modules': 'off',
+        'no-unused-vars': 'off',
+      },
+    },
+  ],
   ignorePatterns: ['node_modules/', 'dist/'],
 }

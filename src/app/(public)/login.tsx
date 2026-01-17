@@ -20,6 +20,7 @@ import { useAlert } from '@/hooks/useAlert'
 export default function LoginPage() {
   const { restoring, startLogin } = useAuth()
   const [email, setEmail] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const { height } = useWindowDimensions()
   const { showAlert } = useAlert()
 
@@ -43,12 +44,16 @@ export default function LoginPage() {
       showAlert('Invalid Email', 'Please enter a valid email address.')
       return
     }
+    setIsLoading(true) // Prevent double-tap
     try {
       await startLogin(email)
+      const normalizedEmail = email.trim().toLowerCase()
       setEmail('')
-      router.push(`/verify?email=${email}`)
+      router.push(`/verify?email=${normalizedEmail}`)
     } catch (err: any) {
       showAlert('Error', err.message || 'Failed to send email.')
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -77,8 +82,13 @@ export default function LoginPage() {
         style={styles.textInput}
         onChangeText={setEmail}
         keyboardType="email-address"
+        editable={!isLoading} // Disable during loading
       />
-      <AppButton title="Accept & Send" onPress={onSignUpPress} />
+      <AppButton
+        title="Accept & Send"
+        onPress={onSignUpPress}
+        disabled={isLoading || !email}
+      />
     </KeyboardAwareScrollView>
   )
 }
