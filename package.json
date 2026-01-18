@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "^6.1.2",
+    "@legendapp/state": "^3.0.0-beta.43",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.89.0",
     "expo": "~54.0.31",
@@ -60,7 +61,8 @@
     "react-native-safe-area-context": "^5.6.2",
     "react-native-screens": "~4.16.0",
     "react-native-web": "^0.21.2",
-    "react-native-worklets": "0.5.1"
+    "react-native-worklets": "0.5.1",
+    "uuid": "^13.0.0"
   },
   "private": true
 }

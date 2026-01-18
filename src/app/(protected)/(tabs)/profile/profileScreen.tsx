@@ -1,5 +1,3 @@
-// noinspection JSUnusedGlobalSymbols
-
 import { AppButton } from '@/components/AppButton'
 import { useAuth } from '@/hooks/useAuth'
 import { Platform, StyleSheet } from 'react-native'
@@ -9,10 +7,19 @@ import { APP_VERSION } from '@/constants/constants'
 import { AppText } from '@/components/AppText'
 import { useMemo } from 'react'
 import { useAlert } from '@/hooks/useAlert'
+import { useSupabase } from '@/hooks/useSupabase'
+import { getStores } from '@/stores/supabaseStore'
+import { observer } from '@legendapp/state/react'
 
-export default function ProfileScreen() {
+export default observer(function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
+  const { supabase } = useSupabase()
+  const { version$ } = getStores(supabase)
+  const versions = version$.get()
+  const versionArray = versions ? Object.values(versions) : []
+  const dbVersion = versionArray.length > 0 ? versionArray[0].version : '---'
+
   const userEmail = session?.user?.email ?? 'Unknown'
 
   const expiryLabel = useMemo(() => {
@@ -73,7 +80,7 @@ export default function ProfileScreen() {
       extraScrollHeight={100}
     >
       <AppText>Current App Version: {APP_VERSION}</AppText>
-      <AppText>Available App Version: </AppText>
+      <AppText>Available App Version: {dbVersion || 'Loading...'}</AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
       <AppButton title="Delete Account" onPress={handleDeleteAccount} />
       <AppText fontSize={FONT.SIZE.BASE}>Debug Info:</AppText>
@@ -81,7 +88,7 @@ export default function ProfileScreen() {
       <AppText>Next Token Renew on {expiryLabel}</AppText>
     </KeyboardAwareScrollView>
   )
-}
+})
 
 const styles = StyleSheet.create({
   keyboardAwareScrollView: {

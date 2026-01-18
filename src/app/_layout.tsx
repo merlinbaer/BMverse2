@@ -1,30 +1,18 @@
-// noinspection JSUnusedGlobalSymbols
-
-import { AuthProvider } from '@/components/AuthProvider'
-import { useSupabase } from '@/hooks/useSupabase'
-import { DarkTheme, ThemeProvider } from '@react-navigation/native'
-import { Stack } from 'expo-router'
+import {
+  initializeSplashScreen,
+  initializeState,
+} from '@/services/initServices'
 import * as SplashScreen from 'expo-splash-screen'
+import { AuthProvider } from '@/components/AuthProvider'
 import { useEffect } from 'react'
-import { COLORS } from '@/constants/constants'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import LoadScreen from '@/components/LoadScreen'
+import { ThemeProvider } from '@react-navigation/native'
+import { AppTheme } from '@/constants/constants'
+import { Stack } from 'expo-router'
+import { useSupabase } from '@/hooks/useSupabase'
 
-const AppTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    background: COLORS.BACKGROUND,
-    card: COLORS.BACKGROUND,
-  },
-}
-
-SplashScreen.setOptions({
-  duration: 500,
-  fade: true,
-})
-
-// SplashScreen remains visible until we explicitly hide it
-SplashScreen.preventAutoHideAsync().catch(() => {})
+initializeSplashScreen()
+initializeState()
 
 export default function RootLayout() {
   return (
@@ -48,15 +36,12 @@ function RootNavigator() {
     }
   }, [restoring])
 
+  // Just in case. Usually the splash screen should be hidden by now
   if (restoring) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.PRIMARY} />
-      </View>
-    )
+    return <LoadScreen />
   }
 
-  // 🔹 Guard logic for screens
+  // Guard logic for screens
   const isProtected = !!session
   const isPublic = !session
 
@@ -68,7 +53,7 @@ function RootNavigator() {
           gestureEnabled: false,
         }}
       >
-        {/* Protected Screens: only show if user is logged in */}
+        {/* Protected Screens: only show if user is logged in  */}
         <Stack.Protected guard={isProtected}>
           <Stack.Screen name="(protected)" />
         </Stack.Protected>
@@ -81,12 +66,3 @@ function RootNavigator() {
     </ThemeProvider>
   )
 }
-
-const styles = StyleSheet.create({
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: COLORS.BACKGROUND,
-  },
-})

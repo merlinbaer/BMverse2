@@ -1,0 +1,32 @@
+After DB reset?
+
+
+IOS:
+ERROR  [AuthApiError: Invalid Refresh Token: Refresh Token Not Found]
+
+Call Stack
+  construct (<native>)
+  apply (<native>)
+  _construct (node_modules/@babel/runtime/helpers/construct.js:4:65)
+  Wrapper (node_modules/@babel/runtime/helpers/wrapNativeSuper.js:15:23)
+  construct (<native>)
+  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)
+  AuthError#constructor (node_modules/@supabase/auth-js/dist/main/lib/errors.js:23:9)
+  construct (<native>)
+  _callSuper (node_modules/@babel/runtime/helpers/callSuper.js:5:108)
+  AuthApiError#constructor (node_modules/@supabase/auth-js/dist/main/lib/errors.js:46:9)
+  handleError (node_modules/@supabase/auth-js/dist/main/lib/fetch.js:66:36)
+  next (<native>)
+  asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+  _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:27)
+  tryCallOne (address at (InternalBytecode.js:1:1180)
+  anonymous (address at (InternalBytecode.js:1:1874)
+
+WEB:
+192.168.178.201:54331/auth/v1/token?grant_type=refresh_token:1  Failed to load resource: the server responded with a status of 400 (Bad Request)
+installHook.js:1 AuthApiError: Invalid Refresh Token: Refresh Token Not Found
+    at handleError (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=src%2Fapp&transform.reactCompiler=true&unstable_transformProfile=hermes-stable:121609:11)
+    at async _handleRequest (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=src%2Fapp&transform.reactCompiler=true&unstable_transformProfile=hermes-stable:121659:7)
+    at async _request (entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=src%2Fapp&transform.reactCompiler=true&unstable_transformProfile=hermes-stable:121639:18)
+    at async entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=src%2Fapp&transform.reactCompiler=true&unstable_transformProfile=hermes-stable:125238:18
+    at async entry.bundle?platform=web&dev=true&hot=false&lazy=true&transform.engine=hermes&transform.routerRoot=src%2Fapp&transform.reactCompiler=true&unstable_transformProfile=hermes-stable:122116:28

@@ -1,7 +1,7 @@
 # Setup
-- yarn add supabase
-- yarn supabase login
 - yarn supabase init
+- yarn supabase login
+- yarn add supabase
 - yarn supabase link --project-ref <your-project-ref>  
 
 ## Edit Config.toml 

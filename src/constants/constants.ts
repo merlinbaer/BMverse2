@@ -1,9 +1,9 @@
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { Platform } from 'react-native'
 import appJson from '../../app.json'
+import { DarkTheme } from '@react-navigation/native'
 
 export const APP_VERSION = appJson.expo.version
-export const AUTH_STORAGE_KEY = 'sb-eu-bruu-bmverse2-app-auth-token'
 
 export const COLORS = {
   PRIMARY: '#db1b1a',
@@ -19,6 +19,15 @@ export const COLORS = {
   BM_DARK_RED: '#5f0a06',
   BM_VERY_DARK_RED: '#310a03',
   MESSAGE_BUBBLE: '#202c33',
+}
+
+export const AppTheme = {
+  ...DarkTheme,
+  colors: {
+    ...DarkTheme.colors,
+    background: COLORS.BACKGROUND,
+    card: COLORS.BACKGROUND,
+  },
 }
 
 export const FONT = {
