@@ -15,11 +15,8 @@ export default observer(function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
   const { supabase } = useSupabase()
-  const { version$ } = getStores(supabase)
-  const versions = version$.get()
-  const versionArray = versions ? Object.values(versions) : []
-  const dbVersion = versionArray.length > 0 ? versionArray[0].version : '---'
-
+  const { version$, dbVersion$ } = getStores(supabase)
+  const dbVersion = dbVersion$.get()
   const userEmail = session?.user?.email ?? 'Unknown'
 
   const expiryLabel = useMemo(() => {
@@ -37,7 +34,17 @@ export default observer(function ProfileScreen() {
     }
     return 'Not available'
   }, [session?.expires_at])
-
+  const handleDeleteVersion = async () => {
+    version$.delete()
+  }
+  const handleSync = async () => {
+    getStores(supabase)
+      .syncAllData()
+      .catch(err => {
+        console.error('Sync failed', err)
+      })
+    console.log('ProfileScreen: version$:', version$.get())
+  }
   const handleSignOut = async () => {
     if (restoring) {
       showAlert('Please wait', 'Session is restoring. Try again in a moment.')
@@ -80,7 +87,10 @@ export default observer(function ProfileScreen() {
       extraScrollHeight={100}
     >
       <AppText>Current App Version: {APP_VERSION}</AppText>
-      <AppText>Available App Version: {dbVersion || 'Loading...'}</AppText>
+      <AppText>Available App Version: {dbVersion}</AppText>
+      <AppButton title="Sync Version" onPress={handleSync} />
+      <AppButton title="Delete Versions" onPress={handleDeleteVersion} />
+      <AppText>Authentication: </AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
       <AppButton title="Delete Account" onPress={handleDeleteAccount} />
       <AppText fontSize={FONT.SIZE.BASE}>Debug Info:</AppText>
