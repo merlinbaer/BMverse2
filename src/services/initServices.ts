@@ -19,10 +19,13 @@ export function initializeState() {
       }),
       retrySync: true,
     },
-    // global retry logic or error handling here later
     retry: {
       infinite: true,
+      backoff: 'exponential', //  "constant" | "exponential" | undefined
+      delay: 1000, // ms?
+      maxDelay: 3600000, // 1 hour
     },
-    onError: error => console.error('Synced Supabase error:', error),
+    onError: error =>
+      console.error('LegendState: Synced Supabase error:', error),
   })
 }

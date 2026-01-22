@@ -149,7 +149,8 @@ export type Database = {
           id: string
           updated_at: string
           version: string
-          version_info: string
+          version_id: number
+          version_info: string | null
         }
         Insert: {
           created_at?: string
@@ -157,7 +158,8 @@ export type Database = {
           id?: string
           updated_at?: string
           version: string
-          version_info: string
+          version_id?: number
+          version_info?: string | null
         }
         Update: {
           created_at?: string
@@ -165,23 +167,14 @@ export type Database = {
           id?: string
           updated_at?: string
           version?: string
-          version_info?: string
+          version_id?: number
+          version_info?: string | null
         }
         Relationships: []
       }
     }
     Views: {
-      gl_version_view: {
-        Row: {
-          created_at: string | null
-          deleted: boolean | null
-          id: string | null
-          updated_at: string | null
-          version: string | null
-          version_info: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       delete_user: { Args: never; Returns: undefined }

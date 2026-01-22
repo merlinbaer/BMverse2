@@ -8,14 +8,15 @@ import { AppText } from '@/components/AppText'
 import { useMemo } from 'react'
 import { useAlert } from '@/hooks/useAlert'
 import { useSupabase } from '@/hooks/useSupabase'
-import { getStores } from '@/stores/supabaseStore'
+import { getStoreVersion } from '@/stores/supabaseStore'
 import { observer } from '@legendapp/state/react'
 
 export default observer(function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
   const { supabase } = useSupabase()
-  const { version$, dbVersion$ } = getStores(supabase)
+  const { dbVersion$, syncVersion, clearVersionCache } =
+    getStoreVersion(supabase)
   const dbVersion = dbVersion$.get()
   const userEmail = session?.user?.email ?? 'Unknown'
 
@@ -35,15 +36,10 @@ export default observer(function ProfileScreen() {
     return 'Not available'
   }, [session?.expires_at])
   const handleDeleteVersion = async () => {
-    version$.delete()
+    await clearVersionCache()
   }
   const handleSync = async () => {
-    getStores(supabase)
-      .syncAllData()
-      .catch(err => {
-        console.error('Sync failed', err)
-      })
-    console.log('ProfileScreen: version$:', version$.get())
+    await syncVersion()
   }
   const handleSignOut = async () => {
     if (restoring) {
