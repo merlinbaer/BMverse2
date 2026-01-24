@@ -25,7 +25,7 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
     customSynced({
       supabase,
       collection: tableName,
-      // use changesSince:'all' for small tables < 100 rows. 'all' can recover soft deletes
+      // use changesSince:'all' for small tables < 100 rows and more robust sync
       changesSince: 'all', // 'all' | 'last-sync'
       // use syncMode:'manual' when an event (change) should not be synced automatically
       syncMode: 'auto', // 'auto' | 'manual'
