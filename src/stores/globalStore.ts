@@ -16,7 +16,61 @@ const customSynced = configureSynced(syncedSupabase, {
   realtime: false,
 })
 
-// Singleton instance (per JS runtime/app session)
+// create gl_sync store
+let storeSyncInstance: ReturnType<typeof createStoreSync> | null = null
+
+function createStoreSync(supabase: SupabaseClient<Database>) {
+  const tableName = 'gl_sync'
+  const sync$ = observable(
+    customSynced({
+      supabase,
+      collection: tableName,
+      as: 'value', // table is a singleton with one row. Values can be fetched directly
+      // use changesSince:'all' for small tables < 100 rows and more robust sync
+      changesSince: 'all', // 'all' | 'last-sync'
+      // use syncMode:'manual' when an event (change) should not be synced automatically
+      syncMode: 'auto', // 'auto' | 'manual'
+      actions: ['read'], // ['create' | 'read' | 'update' | 'delete'];
+      persist: { name: tableName },
+    }),
+  )
+
+  // Attach sync listener
+  const state = syncState(sync$)
+  state.lastSync?.onChange?.(({ value }) => {
+    if (value == null) return // handles undefined (and null just in case)
+    const iso = new Date(value).toISOString()
+    console.log(
+      `LegendState: Sync ${tableName} complete (lastSync)=${iso}-UTC)`,
+    )
+  })
+
+  // Function to trigger a local first gl_versions sync
+  const syncSync = async () => {
+    await when(syncState(sync$).isPersistLoaded)
+    try {
+      await syncState(sync$).sync()
+    } catch (err) {
+      console.error('LegendState: Manual sync ' + tableName + ' failed:', err)
+    }
+  }
+
+  const clearSyncCache = async () => {
+    await syncState(sync$).clearPersist()
+    syncState(sync$).reset?.()
+  }
+
+  return { sync$: sync$, syncSync: syncSync, clearSyncCache: clearSyncCache }
+}
+
+export const getStoreSync = (supabase: SupabaseClient<Database>) => {
+  if (!storeSyncInstance) {
+    storeSyncInstance = createStoreSync(supabase)
+  }
+  return storeSyncInstance
+}
+
+// create gl_version store
 let storeVersionInstance: ReturnType<typeof createStoreVersion> | null = null
 
 function createStoreVersion(supabase: SupabaseClient<Database>) {

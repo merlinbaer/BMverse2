@@ -1,6 +1,6 @@
 import {
   initializeSplashScreen,
-  initializeState,
+  initializeCacheStateConfig,
 } from '@/services/initServices'
 import * as SplashScreen from 'expo-splash-screen'
 import { AuthProvider } from '@/components/AuthProvider'
@@ -12,7 +12,7 @@ import { Stack } from 'expo-router'
 import { useSupabase } from '@/hooks/useSupabase'
 
 initializeSplashScreen()
-initializeState()
+initializeCacheStateConfig()
 
 export default function RootLayout() {
   return (

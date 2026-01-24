@@ -2,6 +2,9 @@ import { configureObservableSync } from '@legendapp/state/sync'
 import { ObservablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SplashScreen from 'expo-splash-screen'
+import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { Database } from '@/types/database.types'
 
 export function initializeSplashScreen(duration = 500) {
   SplashScreen.setOptions({
@@ -11,7 +14,7 @@ export function initializeSplashScreen(duration = 500) {
   SplashScreen.preventAutoHideAsync().catch(() => {})
 }
 
-export function initializeState() {
+export function initializeCacheStateConfig() {
   configureObservableSync({
     persist: {
       plugin: new ObservablePersistAsyncStorage({
@@ -21,11 +24,20 @@ export function initializeState() {
     },
     retry: {
       infinite: true,
-      backoff: 'exponential', //  "constant" | "exponential" | undefined
-      delay: 1000, // ms?
-      maxDelay: 3600000, // 1 hour
+      backoff: 'exponential', //  "constant" | "exponential"
+      delay: 1000, // hopefully ms?
+      maxDelay: 4096000, // approx. 1 hour 14 min
     },
     onError: error =>
       console.error('LegendState: Synced Supabase error:', error),
   })
+}
+
+export const initializeDatabaseStates = (
+  supabase: SupabaseClient<Database>,
+) => {
+  const { sync$ } = getStoreSync(supabase)
+  sync$.peek()
+  const { version$ } = getStoreVersion(supabase)
+  version$.peek()
 }

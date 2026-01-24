@@ -8,7 +8,7 @@ import { AppText } from '@/components/AppText'
 import { useMemo } from 'react'
 import { useAlert } from '@/hooks/useAlert'
 import { useSupabase } from '@/hooks/useSupabase'
-import { getStoreVersion } from '@/stores/supabaseStore'
+import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
 import { observer } from '@legendapp/state/react'
 
 export default observer(function ProfileScreen() {
@@ -17,6 +17,8 @@ export default observer(function ProfileScreen() {
   const { supabase } = useSupabase()
   const { dbVersion$, syncVersion, clearVersionCache } =
     getStoreVersion(supabase)
+  const { sync$, syncSync } = getStoreSync(supabase)
+  const syncUpdated = sync$.updated_at.get()
   const dbVersion = dbVersion$.get()
   const userEmail = session?.user?.email ?? 'Unknown'
 
@@ -40,6 +42,7 @@ export default observer(function ProfileScreen() {
   }
   const handleSync = async () => {
     await syncVersion()
+    await syncSync()
   }
   const handleSignOut = async () => {
     if (restoring) {
@@ -84,7 +87,7 @@ export default observer(function ProfileScreen() {
     >
       <AppText>Current App Version: {APP_VERSION}</AppText>
       <AppText>Available App Version: {dbVersion}</AppText>
-      <AppButton title="Sync Version" onPress={handleSync} />
+      <AppButton title="Sync Data" onPress={handleSync} />
       <AppButton title="Delete Versions" onPress={handleDeleteVersion} />
       <AppText>Authentication: </AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
@@ -92,6 +95,7 @@ export default observer(function ProfileScreen() {
       <AppText fontSize={FONT.SIZE.BASE}>Debug Info:</AppText>
       <AppText>User Email: {userEmail}</AppText>
       <AppText>Next Token Renew on {expiryLabel}</AppText>
+      <AppText>Sync Date: {syncUpdated}</AppText>
     </KeyboardAwareScrollView>
   )
 })

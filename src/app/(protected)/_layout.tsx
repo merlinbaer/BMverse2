@@ -1,16 +1,14 @@
 import { Stack } from 'expo-router'
 import { useSupabase } from '@/hooks/useSupabase'
 import { useEffect } from 'react'
-import { getStoreVersion } from '@/stores/supabaseStore'
+import { initializeDatabaseStates } from '@/services/initServices'
 
 export default function ProtectedLayout() {
   const { supabase, session } = useSupabase()
 
   useEffect(() => {
     if (supabase && session) {
-      // Signed in: initialize + kick off persist load early (local-first)
-      const { version$ } = getStoreVersion(supabase)
-      version$.peek()
+      initializeDatabaseStates(supabase)
     }
   }, [supabase, session])
 
