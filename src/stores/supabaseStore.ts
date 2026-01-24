@@ -34,6 +34,16 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
     }),
   )
 
+  // Attach sync listener
+  const state = syncState(version$)
+  state.lastSync?.onChange?.(({ value }) => {
+    if (value == null) return // handles undefined (and null just in case)
+    const iso = new Date(value).toISOString()
+    console.log(
+      `LegendState: Sync ${tableName} complete (lastSync)=${iso}-UTC)`,
+    )
+  })
+
   // Computed observable for the latest version string
   const dbVersion$ = computed(() => {
     const versions = version$.get()
@@ -50,9 +60,8 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
     await when(syncState(version$).isPersistLoaded)
     try {
       await syncState(version$).sync()
-      console.log('LegendState: Sync ' + tableName + ' complete')
     } catch (err) {
-      console.error('LegendState: Sync  ' + tableName + ' failed:', err)
+      console.error('LegendState: Manual sync  ' + tableName + ' failed:', err)
     }
   }
 
