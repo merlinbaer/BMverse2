@@ -1,7 +1,8 @@
+import { DarkTheme } from '@react-navigation/native'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { Platform } from 'react-native'
+
 import appJson from '../../app.json'
-import { DarkTheme } from '@react-navigation/native'
 
 export const APP_VERSION = appJson.expo.version
 
@@ -18,6 +19,7 @@ export const COLORS = {
   BM_RED_HIGHLIGHTED: '#cb1111',
   BM_DARK_RED: '#5f0a06',
   BM_VERY_DARK_RED: '#310a03',
+  TEXT_INPUT: '#fff',
   MESSAGE_BUBBLE: '#202c33',
 }
 

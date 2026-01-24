@@ -1,15 +1,16 @@
-import {
-  initializeSplashScreen,
-  initializeCacheStateConfig,
-} from '@/services/initServices'
-import * as SplashScreen from 'expo-splash-screen'
-import { AuthProvider } from '@/components/AuthProvider'
-import { useEffect } from 'react'
-import LoadScreen from '@/components/LoadScreen'
 import { ThemeProvider } from '@react-navigation/native'
-import { AppTheme } from '@/constants/constants'
 import { Stack } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
+import { useEffect } from 'react'
+
+import { AuthProvider } from '@/components/AuthProvider'
+import LoadScreen from '@/components/LoadScreen'
+import { AppTheme } from '@/constants/constants'
 import { useSupabase } from '@/hooks/useSupabase'
+import {
+  initializeCacheStateConfig,
+  initializeSplashScreen,
+} from '@/services/initServices'
 
 initializeSplashScreen()
 initializeCacheStateConfig()

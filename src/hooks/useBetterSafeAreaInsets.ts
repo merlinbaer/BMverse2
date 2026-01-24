@@ -19,7 +19,7 @@ const dynamicBottomInset = (insets: EdgeInsets) => {
       ),
     )
   }
-  // If insets.bottom === 0, iPhone with Home Button remains unchanged
+  // If insets.bottom === 0, an iPhone with Home Button remains unchanged
   return bottomInset
 }
 

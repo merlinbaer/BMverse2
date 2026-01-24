@@ -1,8 +1,3 @@
-import { AppButton } from '@/components/AppButton'
-import { AppText } from '@/components/AppText'
-import { COLORS, LAYOUT } from '@/constants/constants'
-import privacyText from '@/constants/privacy'
-import { useAuth } from '@/hooks/useAuth'
 import { router } from 'expo-router'
 import { useState } from 'react'
 import {
@@ -13,9 +8,15 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native'
-import Markdown from 'react-native-markdown-display'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Markdown from 'react-native-markdown-display'
+
+import { AppButton } from '@/components/AppButton'
+import { AppText } from '@/components/AppText'
+import { COLORS, LAYOUT } from '@/constants/constants'
+import privacyText from '@/constants/privacy'
 import { useAlert } from '@/hooks/useAlert'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
   const { restoring, startLogin } = useAuth()
@@ -50,8 +51,10 @@ export default function LoginPage() {
       const normalizedEmail = email.trim().toLowerCase()
       setEmail('')
       router.push(`/verify?email=${normalizedEmail}`)
-    } catch (err: any) {
-      showAlert('Error', err.message || 'Failed to send email.')
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to send email.'
+      showAlert('Error', message)
     } finally {
       setIsLoading(false)
     }
@@ -94,33 +97,33 @@ export default function LoginPage() {
 }
 
 const styles = StyleSheet.create({
-  keyboardAwareScrollView: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
-  },
   keyboardAwareContentContainer: {
-    paddingHorizontal: LAYOUT.paddingHorizontal,
     gap: LAYOUT.gap,
+    paddingBottom: 24,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
       ios: 150,
       android: 20,
       default: 10,
     }),
-    paddingBottom: 24,
+  },
+  keyboardAwareScrollView: {
+    backgroundColor: COLORS.BACKGROUND,
+    flex: 1,
   },
   privacyTextArea: {
     backgroundColor: COLORS.SCROLL_VIEW,
-    width: '100%',
     borderRadius: 8,
     overflow: 'hidden',
+    width: '100%',
   },
   privacyTextContentContainer: {
-    paddingVertical: 12,
     paddingHorizontal: LAYOUT.paddingHorizontal,
+    paddingVertical: 12,
   },
   textInput: {
+    backgroundColor: COLORS.TEXT_INPUT,
     borderWidth: 1,
     padding: 10,
-    backgroundColor: 'white',
   },
 })

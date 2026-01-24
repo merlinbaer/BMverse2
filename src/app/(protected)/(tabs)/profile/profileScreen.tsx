@@ -1,15 +1,15 @@
-import { AppButton } from '@/components/AppButton'
-import { useAuth } from '@/hooks/useAuth'
+import { observer } from '@legendapp/state/react'
+import { useMemo } from 'react'
 import { Platform, StyleSheet } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
-import { APP_VERSION } from '@/constants/constants'
+
+import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
-import { useMemo } from 'react'
+import { APP_VERSION, COLORS, FONT, LAYOUT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
+import { useAuth } from '@/hooks/useAuth'
 import { useSupabase } from '@/hooks/useSupabase'
 import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
-import { observer } from '@legendapp/state/react'
 
 export default observer(function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
@@ -49,12 +49,7 @@ export default observer(function ProfileScreen() {
       showAlert('Please wait', 'Session is restoring. Try again in a moment.')
       return
     }
-    try {
-      await signOut()
-    } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2))
-      showAlert('Error', err.message || 'Failed to sign out.')
-    }
+    await signOut()
   }
   const handleDeleteAccount = async () => {
     showAlert(
@@ -66,11 +61,7 @@ export default observer(function ProfileScreen() {
           text: 'Delete',
           style: 'destructive',
           onPress: async () => {
-            try {
-              await deleteAccount()
-            } catch (err: any) {
-              showAlert('Error', err.message || 'Failed to delete account.')
-            }
+            await deleteAccount()
           },
         },
       ],
@@ -101,18 +92,18 @@ export default observer(function ProfileScreen() {
 })
 
 const styles = StyleSheet.create({
-  keyboardAwareScrollView: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
-  },
   keyboardAwareContentContainer: {
-    paddingHorizontal: LAYOUT.paddingHorizontal,
     gap: LAYOUT.gap,
+    paddingBottom: 24,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
       ios: 180,
       android: 20,
       default: 10,
     }),
-    paddingBottom: 24,
+  },
+  keyboardAwareScrollView: {
+    backgroundColor: COLORS.BACKGROUND,
+    flex: 1,
   },
 })

@@ -1,6 +1,7 @@
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
-import { StyleSheet, Text, View } from 'react-native'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { StyleSheet, Text, View } from 'react-native'
+
+import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 
 // Use in _layout to simulate Large Header at ios without collapsing header
 /*
@@ -39,14 +40,14 @@ export function FixedLargeHeaderIos({ title }: FixedLargeHeaderProps) {
 
 const styles = StyleSheet.create({
   headerContainer: {
-    height: 140,
     backgroundColor: COLORS.BACKGROUND,
+    height: 140,
     justifyContent: 'flex-end',
     paddingHorizontal: LAYOUT.paddingHorizontal,
   },
   headerTitle: {
+    color: COLORS.TEXT,
     fontSize: FONT.SIZE.LG + 12,
     fontWeight: 'bold',
-    color: COLORS.TEXT,
   },
 })

@@ -1,9 +1,10 @@
-import { AppText } from '@/components/AppText'
 import { useState } from 'react'
 import { Platform, StyleSheet, TextInput } from 'react-native'
-import { AppButton } from '@/components/AppButton'
-import { COLORS, LAYOUT } from '@/constants/constants'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+
+import { AppButton } from '@/components/AppButton'
+import { AppText } from '@/components/AppText'
+import { COLORS, LAYOUT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
 
 export default function MainScreen() {
@@ -42,23 +43,23 @@ export default function MainScreen() {
 }
 
 const styles = StyleSheet.create({
-  keyboardAwareScrollView: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
-  },
   keyboardAwareContentContainer: {
-    paddingHorizontal: LAYOUT.paddingHorizontal,
     gap: LAYOUT.gap,
+    paddingBottom: 24,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
       ios: 180,
       android: 20,
       default: 10,
     }),
-    paddingBottom: 24,
+  },
+  keyboardAwareScrollView: {
+    backgroundColor: COLORS.BACKGROUND,
+    flex: 1,
   },
   textInput: {
+    backgroundColor: COLORS.TEXT_INPUT,
     borderWidth: 1,
     padding: 10,
-    backgroundColor: 'white',
   },
 })

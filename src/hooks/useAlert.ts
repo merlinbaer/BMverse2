@@ -1,16 +1,10 @@
-import { Alert, Platform } from 'react-native'
-
-interface AlertOption {
-  text: string
-  onPress?: () => void
-  style?: 'default' | 'cancel' | 'destructive'
-}
+import { Alert, AlertButton, Platform } from 'react-native'
 
 export const useAlert = () => {
   const showAlert = (
     title: string,
     message?: string,
-    options?: AlertOption[],
+    options?: AlertButton[],
   ) => {
     if (Platform.OS === 'web') {
       // Wenn Optionen vorhanden sind, nutzen wir confirm/alert
@@ -21,7 +15,7 @@ export const useAlert = () => {
         const hasCancel = options.some(opt => opt.style === 'cancel')
 
         if (hasCancel) {
-          // Bestätigungs-Dialog
+          // Confirmation-Dialog
           const confirmed = window.confirm(
             `${title}${message ? `\n\n${message}` : ''}`,
           )
@@ -38,7 +32,7 @@ export const useAlert = () => {
       }
     } else {
       // Mobile: Nutze natives Alert-Modul
-      Alert.alert(title, message, options as any)
+      Alert.alert(title, message, options)
     }
   }
 

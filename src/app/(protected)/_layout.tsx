@@ -1,6 +1,7 @@
 import { Stack } from 'expo-router'
-import { useSupabase } from '@/hooks/useSupabase'
 import { useEffect } from 'react'
+
+import { useSupabase } from '@/hooks/useSupabase'
 import { initializeDatabaseStates } from '@/services/initServices'
 
 export default function ProtectedLayout() {

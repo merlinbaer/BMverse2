@@ -1,5 +1,6 @@
-import { LayoutScreenHeader } from '@/constants/constants'
 import { Stack } from 'expo-router'
+
+import { LayoutScreenHeader } from '@/constants/constants'
 
 export default function PublicLayout() {
   return (
@@ -19,13 +20,3 @@ export default function PublicLayout() {
     </Stack>
   )
 }
-
-/*  Use FixedLargeHeaderIos when the screen is Scrollview and the the return of a stacked view is not nice
-      name="welcome"
-        options={{
-          header:
-            Platform.OS === 'ios'
-              ? () => <FixedLargeHeaderIos title="Welcome" />
-              : undefined,
-          ...LayoutScreenHeader,
-          headerTitle: 'Welcome', */

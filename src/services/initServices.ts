@@ -1,9 +1,10 @@
-import { configureObservableSync } from '@legendapp/state/sync'
 import { ObservablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
+import { configureObservableSync } from '@legendapp/state/sync'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import * as SplashScreen from 'expo-splash-screen'
-import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
 import { SupabaseClient } from '@supabase/supabase-js'
+import * as SplashScreen from 'expo-splash-screen'
+
+import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
 import { Database } from '@/types/database.types'
 
 export function initializeSplashScreen(duration = 500) {

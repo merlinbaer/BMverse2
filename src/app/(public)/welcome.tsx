@@ -1,7 +1,3 @@
-import { AppButton } from '@/components/AppButton'
-import { AppText } from '@/components/AppText'
-import { COLORS, LAYOUT } from '@/constants/constants'
-import termsText from '@/constants/terms'
 import { Link } from 'expo-router'
 import {
   Platform,
@@ -10,8 +6,13 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native'
-import Markdown from 'react-native-markdown-display'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import Markdown from 'react-native-markdown-display'
+
+import { AppButton } from '@/components/AppButton'
+import { AppText } from '@/components/AppText'
+import { COLORS, LAYOUT } from '@/constants/constants'
+import termsText from '@/constants/terms'
 
 export default function WelcomePage() {
   const { height } = useWindowDimensions()
@@ -51,28 +52,28 @@ export default function WelcomePage() {
 }
 
 const styles = StyleSheet.create({
-  keyboardAwareScrollView: {
-    flex: 1,
-    backgroundColor: COLORS.BACKGROUND,
-  },
   keyboardAwareContentContainer: {
-    paddingHorizontal: LAYOUT.paddingHorizontal,
     gap: LAYOUT.gap,
+    paddingBottom: 24,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
       ios: 150,
       android: 20,
       default: 10,
     }),
-    paddingBottom: 24,
+  },
+  keyboardAwareScrollView: {
+    backgroundColor: COLORS.BACKGROUND,
+    flex: 1,
   },
   privacyTextArea: {
     backgroundColor: COLORS.SCROLL_VIEW,
-    width: '100%',
     borderRadius: 8,
     overflow: 'hidden',
+    width: '100%',
   },
   privacyTextContentContainer: {
-    paddingVertical: 12,
     paddingHorizontal: LAYOUT.paddingHorizontal,
+    paddingVertical: 12,
   },
 })

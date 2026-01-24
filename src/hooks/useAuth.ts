@@ -1,8 +1,10 @@
-import { useSupabase } from '@/hooks/useSupabase'
-import { AUTH } from '@/constants/constants'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { DevSettings, Platform } from 'react-native'
+import { AuthResponse } from '@supabase/supabase-js'
 import * as Updates from 'expo-updates'
+import { DevSettings, Platform } from 'react-native'
+
+import { AUTH } from '@/constants/constants'
+import { useSupabase } from '@/hooks/useSupabase'
 
 export const useAuth = () => {
   const { supabase, session, restoring } = useSupabase()
@@ -54,10 +56,10 @@ export const useAuth = () => {
       },
     })
 
-    const { error } = (await Promise.race([
+    const { error } = await Promise.race<AuthResponse>([
       loginPromise,
-      timeoutPromise,
-    ])) as any
+      timeoutPromise as Promise<AuthResponse>,
+    ])
 
     if (error) throw error
   }
@@ -107,7 +109,7 @@ export const useAuth = () => {
     try {
       await supabase.auth.signOut()
     } catch (error) {
-      console.warn('Supabase signOut failed, forcing local reset.')
+      console.warn('Supabase signOut failed, forcing local reset.', error)
     } finally {
       await forceLogout()
     }

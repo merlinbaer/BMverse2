@@ -1,6 +1,7 @@
-import { COLORS, FONT } from '@/constants/constants'
 import { ReactNode } from 'react'
 import { StyleSheet, Text, TextProps } from 'react-native'
+
+import { COLORS, FONT } from '@/constants/constants'
 
 type AppTextProps = TextProps & {
   children: ReactNode

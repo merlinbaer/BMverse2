@@ -1,10 +1,12 @@
-import { AppText } from '@/components/AppText'
-import { FlatList, StyleSheet, View } from 'react-native'
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
-import Markdown from 'react-native-markdown-display'
 import { useMemo } from 'react'
+import { FlatList, StyleSheet, View } from 'react-native'
+import Markdown from 'react-native-markdown-display'
+
+import { AppText } from '@/components/AppText'
+import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 
 export default function NewsScreen() {
+  // mock data, removed later
   const data = useMemo(() => {
     return Array.from({ length: 20 }, (_, index) => {
       const messages = [
@@ -20,6 +22,7 @@ export default function NewsScreen() {
         'Enjoy the [new design](https://bmverse.bruu.eu)!',
       ]
       const randomText = messages[index % messages.length]
+      // eslint-disable-next-line react-hooks/purity
       const date = new Date(Date.now() - index * 3600000 * (Math.random() * 5))
       return {
         id: index.toString(),
@@ -85,37 +88,38 @@ const markdownStyles = {
 }
 
 const styles = StyleSheet.create({
+  dateText: {
+    color: COLORS.TEXT_MUTED,
+    fontSize: 11,
+  },
   flatList: {
-    flex: 1,
     backgroundColor: COLORS.BACKGROUND,
-  },
-  listContent: {
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingBottom: 80,
-    gap: 12,
-  },
-  itemContainer: {
-    backgroundColor: COLORS.MESSAGE_BUBBLE,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 12,
-    borderTopLeftRadius: 2,
-    alignSelf: 'flex-start',
-    maxWidth: '85%',
-    // Shadow for iOS
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
-    // Elevation for Android
-    elevation: 1,
+    flex: 1,
   },
   footer: {
     alignSelf: 'flex-end',
     marginTop: 4,
   },
-  dateText: {
-    fontSize: 11,
-    color: COLORS.TEXT_MUTED,
+  itemContainer: {
+    alignSelf: 'flex-start',
+    backgroundColor: COLORS.MESSAGE_BUBBLE,
+    borderRadius: 12,
+    borderTopLeftRadius: 2,
+    // Elevation for Android
+    elevation: 1,
+    // All
+    maxWidth: '85%',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    // Shadow for iOS
+    shadowColor: COLORS.BACKGROUND,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1,
+  },
+  listContent: {
+    gap: 12,
+    paddingBottom: 80,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
   },
 })

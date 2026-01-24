@@ -1,10 +1,11 @@
-import { COLORS, TAB_BAR } from '@/constants/constants'
-import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
 import Octicons from '@expo/vector-icons/Octicons'
 import { BlurView } from 'expo-blur'
 import { Tabs } from 'expo-router'
 import React from 'react'
 import { Image, Platform, StyleSheet, View } from 'react-native'
+
+import { COLORS, TAB_BAR } from '@/constants/constants'
+import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
 
 export default function TabsLayout() {
   const insets = useBetterSafeAreaInsets()

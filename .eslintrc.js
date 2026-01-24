@@ -36,6 +36,14 @@ module.exports = {
     'react-native/react-native': true,
   },
   rules: {
+    // React Native / Project specific
+    'react-native/no-inline-styles': 'off',
+    'react-native/no-raw-text': [
+      'error',
+      {
+        skip: ['AppText'],
+      },
+    ],
     // React / TS specific
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
@@ -44,7 +52,6 @@ module.exports = {
     // Code Style / Prettier
     'prettier/prettier': 'error',
     'import/no-unresolved': 'error',
-    'react-native/no-inline-styles': 'warn',
     // Unused vars / imports
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': [

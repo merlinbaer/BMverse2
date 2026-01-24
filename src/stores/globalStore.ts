@@ -1,8 +1,9 @@
 import { computed, observable, syncState, when } from '@legendapp/state'
 import { configureSynced } from '@legendapp/state/sync'
 import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
-import { v4 as uuid4 } from 'uuid'
 import { SupabaseClient } from '@supabase/supabase-js'
+import { v4 as uuid4 } from 'uuid'
+
 import { Database } from '@/types/database.types'
 
 const generateId = () => uuid4()
@@ -26,7 +27,7 @@ function createStoreSync(supabase: SupabaseClient<Database>) {
       supabase,
       collection: tableName,
       as: 'value', // table is a singleton with one row. Values can be fetched directly
-      // use changesSince:'all' for small tables < 100 rows and more robust sync
+      //  using changesSince:'all' for small tables < 100 rows and more robust sync
       changesSince: 'all', // 'all' | 'last-sync'
       // use syncMode:'manual' when an event (change) should not be synced automatically
       syncMode: 'auto', // 'auto' | 'manual'

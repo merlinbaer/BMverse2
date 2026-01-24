@@ -1,5 +1,6 @@
-import { COLORS, FONT } from '@/constants/constants'
 import { Platform, Pressable, StyleSheet, Text, ViewStyle } from 'react-native'
+
+import { COLORS, FONT } from '@/constants/constants'
 
 type AppButtonProps = {
   title: string
@@ -33,30 +34,30 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   button: {
+    alignItems: 'center',
     alignSelf: 'center', // Layout Button fixed (always center)
-    minWidth: 220, // Minimum width
     backgroundColor: COLORS.PRIMARY,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
     borderRadius: 10,
     elevation: 5, // For Android shadow
-    shadowColor: '#000', // For iOS shadow
+    justifyContent: 'center',
+    minWidth: 220, // Minimum width
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    shadowColor: COLORS.BACKGROUND, // For iOS shadow
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.1,
     shadowRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
     userSelect: 'none', // Web
   },
-  pressed: {
-    opacity: 0.85,
-    transform: [{ scale: 0.98 }],
+  disabled: {
+    opacity: 0.5,
   },
   hovered: {
     backgroundColor: COLORS.BM_RED_HIGHLIGHTED,
   },
-  disabled: {
-    opacity: 0.5,
+  pressed: {
+    opacity: 0.85,
+    transform: [{ scale: 0.98 }],
   },
   text: {
     color: COLORS.TEXT,

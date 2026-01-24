@@ -1,9 +1,10 @@
 // AuthProvider.tsx
-import { Database } from '@/types/database.types'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { createContext, ReactNode, useEffect, useMemo, useState } from 'react'
+
 import { AUTH } from '@/constants/constants'
+import { Database } from '@/types/database.types'
 
 /* ---------------------------- Types ---------------------------- */
 interface SupabaseProviderProps {
@@ -24,8 +25,9 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
   const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY!
   const noOpLock = async (
-    name: string,
-    acquireTimeout: number,
+    _name: string,
+    _acquireTimeout: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     fn: () => Promise<any>,
   ) => {
     return await fn()
@@ -44,7 +46,7 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
           lock: noOpLock, // Default lock for Token processLock
         },
       }),
-    [],
+    [supabaseKey, supabaseUrl],
   )
 
   /* ------------------ State ------------------ */
@@ -68,20 +70,21 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
             error.message.includes('invalid_grant') ||
             error.message.includes('expired')
           ) {
-            console.log('Token expired or invalid - clearing session')
+            console.log('Auth: Token expired or invalid - clearing session')
             await supabase.auth.signOut({ scope: 'local' }) // Only clear locally
           }
         }
         if (!mounted) return
         setSession(data.session ?? null)
       } catch (error) {
+        console.error('Auth: Error restoring session:', error)
         setSession(null)
       } finally {
         if (mounted) setRestoring(false)
       }
     }
 
-    restoreSession()
+    void restoreSession()
 
     /* ------------------ Auth-Updates ------------------ */
     const {
@@ -94,10 +97,10 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
           try {
             const { error } = await supabase.rpc('update_last_seen')
             if (error) {
-              console.log('Info: update_last_seen not possible.')
+              console.log('Auth: update_last_seen not possible.', error.message)
             }
           } catch (err) {
-            console.log('Info: update_last_seen not possible.')
+            console.log('Auth: update_last_seen not possible.', err)
           }
         })()
       }
