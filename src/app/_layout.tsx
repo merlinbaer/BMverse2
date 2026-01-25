@@ -8,12 +8,14 @@ import LoadScreen from '@/components/LoadScreen'
 import { AppTheme } from '@/constants/constants'
 import { useSupabase } from '@/hooks/useSupabase'
 import {
-  initializeCacheStateConfig,
+  initializeLocalStates,
   initializeSplashScreen,
+  initializeStateCacheConfig,
 } from '@/services/initServices'
 
 initializeSplashScreen()
-initializeCacheStateConfig()
+initializeLocalStates()
+initializeStateCacheConfig()
 
 export default function RootLayout() {
   return (

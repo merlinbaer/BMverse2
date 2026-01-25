@@ -5,6 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
+import { localSync$ } from '@/stores/localStore'
 import { Database } from '@/types/database.types'
 
 export function initializeSplashScreen(duration = 500) {
@@ -15,7 +16,7 @@ export function initializeSplashScreen(duration = 500) {
   SplashScreen.preventAutoHideAsync().catch(() => {})
 }
 
-export function initializeCacheStateConfig() {
+export function initializeStateCacheConfig() {
   configureObservableSync({
     persist: {
       plugin: new ObservablePersistAsyncStorage({
@@ -32,6 +33,11 @@ export function initializeCacheStateConfig() {
     onError: error =>
       console.error('LegendState: Synced Supabase error:', error),
   })
+}
+
+export const initializeLocalStates = () => {
+  // Wake up local-only persisted stores
+  localSync$.peek()
 }
 
 export const initializeDatabaseStates = (

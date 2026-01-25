@@ -4,6 +4,7 @@ import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { v4 as uuid4 } from 'uuid'
 
+import { localSync$ } from '@/stores/localStore'
 import { Database } from '@/types/database.types'
 
 const generateId = () => uuid4()
@@ -35,6 +36,33 @@ function createStoreSync(supabase: SupabaseClient<Database>) {
       persist: { name: tableName },
     }),
   )
+
+  // Attach sync listener to handle cascading App Sync
+  sync$.onChange(async ({ value }) => {
+    if (!value || !value.updated_at) return
+
+    const serverUpdatedAt = value.updated_at
+    const lastLocalSync = localSync$.localLastSync.get()
+
+    // If the server date is newer than our stored localLastSync
+    if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
+      console.log(
+        `LegendState: New update detected (${serverUpdatedAt}). Syncing version...`,
+      )
+
+      const { syncVersion } = getStoreVersion(supabase)
+
+      try {
+        // Trigger the cascade
+        await syncVersion()
+
+        // Update the local persistent record only after successful sync
+        localSync$.localLastSync.set(serverUpdatedAt)
+      } catch (err) {
+        console.error('LegendState: Cascade sync failed:', err)
+      }
+    }
+  })
 
   // Attach sync listener
   const state = syncState(sync$)
