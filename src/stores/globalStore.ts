@@ -103,6 +103,15 @@ function createStoreSync(supabase: SupabaseClient<Database>) {
   return { sync$: sync$, syncSync: syncSync, clearSyncCache: clearSyncCache }
 }
 
+export const useStoreSync = () => {
+  if (!storeSyncInstance) {
+    throw new Error(
+      'LegendState: useStoreSync accessed before initialization. Ensure initializeDatabaseStates was called.',
+    )
+  }
+  return storeSyncInstance
+}
+
 export const getStoreSync = (supabase: SupabaseClient<Database>) => {
   if (!storeSyncInstance) {
     storeSyncInstance = createStoreSync(supabase)
@@ -170,6 +179,15 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
   }
 
   return { version$, dbVersion$, syncVersion, clearVersionCache }
+}
+
+export const useStoreVersion = () => {
+  if (!storeVersionInstance) {
+    throw new Error(
+      'LegendState: useStoreVersion accessed before initialization.',
+    )
+  }
+  return storeVersionInstance
 }
 
 export const getStoreVersion = (supabase: SupabaseClient<Database>) => {

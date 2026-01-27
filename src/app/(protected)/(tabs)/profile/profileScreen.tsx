@@ -1,5 +1,4 @@
-import { observer } from '@legendapp/state/react'
-import { useMemo } from 'react'
+import { useValue } from '@legendapp/state/react'
 import { Platform, StyleSheet } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
@@ -8,40 +7,29 @@ import { AppText } from '@/components/AppText'
 import { APP_VERSION, COLORS, FONT, LAYOUT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
 import { useAuth } from '@/hooks/useAuth'
-import { useSupabase } from '@/hooks/useSupabase'
-import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
+import { useStoreSync, useStoreVersion } from '@/stores/globalStore'
 
-export default observer(function ProfileScreen() {
+export default function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
-  const { supabase } = useSupabase()
-  const { dbVersion$, syncVersion, clearVersionCache } =
-    getStoreVersion(supabase)
-  const { sync$, syncSync } = getStoreSync(supabase)
-  const syncUpdated = sync$.updated_at.get()
-  const dbVersion = dbVersion$.get()
+  const { dbVersion$, clearVersionCache } = useStoreVersion()
+  const { sync$, syncSync } = useStoreSync()
+  const syncUpdated = useValue(sync$.updated_at)
+  const dbVersion = useValue(dbVersion$)
   const userEmail = session?.user?.email ?? 'Unknown'
 
-  const expiryLabel = useMemo(() => {
-    if (session?.expires_at) {
-      const date = new Date(session.expires_at * 1000)
+  let expiryLabel = 'Not available'
+  if (session?.expires_at) {
+    const date = new Date(session.expires_at * 1000)
+    const pad = (n: number) => String(n).padStart(2, '0')
 
-      const year = date.getFullYear()
-      const month = String(date.getMonth() + 1).padStart(2, '0')
-      const day = String(date.getDate()).padStart(2, '0')
-      const hours = String(date.getHours()).padStart(2, '0')
-      const minutes = String(date.getMinutes()).padStart(2, '0')
-      const seconds = String(date.getSeconds()).padStart(2, '0')
+    expiryLabel = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} at ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  }
 
-      return `${year}/${month}/${day} at ${hours}:${minutes}:${seconds}`
-    }
-    return 'Not available'
-  }, [session?.expires_at])
   const handleDeleteVersion = async () => {
     await clearVersionCache()
   }
   const handleSync = async () => {
-    await syncVersion()
     await syncSync()
   }
   const handleSignOut = async () => {
@@ -78,7 +66,7 @@ export default observer(function ProfileScreen() {
     >
       <AppText>Current App Version: {APP_VERSION}</AppText>
       <AppText>Available App Version: {dbVersion}</AppText>
-      <AppButton title="Sync Data" onPress={handleSync} />
+      <AppButton title="Sync" onPress={handleSync} />
       <AppButton title="Delete Versions" onPress={handleDeleteVersion} />
       <AppText>Authentication: </AppText>
       <AppButton title="Sign Out" onPress={handleSignOut} />
@@ -89,7 +77,7 @@ export default observer(function ProfileScreen() {
       <AppText>Sync Date: {syncUpdated}</AppText>
     </KeyboardAwareScrollView>
   )
-})
+}
 
 const styles = StyleSheet.create({
   keyboardAwareContentContainer: {
