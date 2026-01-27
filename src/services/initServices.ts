@@ -5,7 +5,7 @@ import { SupabaseClient } from '@supabase/supabase-js'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { getStoreSync, getStoreVersion } from '@/stores/globalStore'
-import { localSync$ } from '@/stores/localStore'
+import { localStore$ } from '@/stores/localStore'
 import { Database } from '@/types/database.types'
 
 export function initializeSplashScreen(duration = 500) {
@@ -30,14 +30,24 @@ export function initializeStateCacheConfig() {
       delay: 1000, // hopefully ms?
       maxDelay: 4096000, // approx. 1 hour 14 min
     },
-    onError: error =>
-      console.error('LegendState: Synced Supabase error:', error),
+    onError: error => {
+      // Check if it's a network failure (common in local-first apps)
+      if (
+        error?.message?.includes('Network request failed') ||
+        error?.message?.includes('Fetch')
+      ) {
+        console.log('LegendState: Sync paused (Offline/Network unavailable)')
+      } else {
+        // Log other actual logic errors as errors
+        console.error('LegendState: Synced Supabase error:', error)
+      }
+    },
   })
 }
 
 export const initializeLocalStates = () => {
   // Wake up local-only persisted stores
-  localSync$.peek()
+  localStore$.peek()
 }
 
 export const initializeDatabaseStates = (

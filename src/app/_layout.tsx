@@ -14,8 +14,8 @@ import {
 } from '@/services/initServices'
 
 initializeSplashScreen()
-initializeLocalStates()
 initializeStateCacheConfig()
+initializeLocalStates()
 
 export default function RootLayout() {
   return (

@@ -100,7 +100,7 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
               console.log('Auth: update_last_seen not possible.', error.message)
             }
           } catch (err) {
-            console.log('Auth: update_last_seen not possible.', err)
+            console.log('Auth: update_last_seen not possible caught.', err)
           }
         })()
       }

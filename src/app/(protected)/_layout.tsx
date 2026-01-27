@@ -3,6 +3,10 @@ import { useEffect } from 'react'
 
 import { useSupabase } from '@/hooks/useSupabase'
 import { initializeDatabaseStates } from '@/services/initServices'
+// import { useEffect } from 'react'
+
+// import { useSupabase } from '@/hooks/useSupabase'
+// import { initializeDatabaseStates } from '@/services/initServices'
 
 export default function ProtectedLayout() {
   const { supabase, session } = useSupabase()
@@ -12,7 +16,6 @@ export default function ProtectedLayout() {
       initializeDatabaseStates(supabase)
     }
   }, [supabase, session])
-
   return (
     <Stack>
       <Stack.Screen
