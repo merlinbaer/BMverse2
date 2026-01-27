@@ -7,15 +7,21 @@ import { AppText } from '@/components/AppText'
 import { APP_VERSION, COLORS, FONT, LAYOUT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
 import { useAuth } from '@/hooks/useAuth'
-import { useStoreSync, useStoreVersion } from '@/stores/globalStore'
+import {
+  useStoreProfile,
+  useStoreSync,
+  useStoreVersion,
+} from '@/stores/globalStore'
 
 export default function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
-  const { dbVersion$, clearVersionCache } = useStoreVersion()
+  const { dbVersion$, clearCacheVersion } = useStoreVersion()
   const { sync$, syncSync } = useStoreSync()
+  const { profile$ } = useStoreProfile()
   const syncUpdated = useValue(sync$.updated_at)
   const dbVersion = useValue(dbVersion$)
+  const userName = useValue(profile$.user_name)
   const userEmail = session?.user?.email ?? 'Unknown'
 
   let expiryLabel = 'Not available'
@@ -27,7 +33,7 @@ export default function ProfileScreen() {
   }
 
   const handleDeleteVersion = async () => {
-    await clearVersionCache()
+    await clearCacheVersion()
   }
   const handleSync = async () => {
     await syncSync()
@@ -73,6 +79,7 @@ export default function ProfileScreen() {
       <AppButton title="Delete Account" onPress={handleDeleteAccount} />
       <AppText fontSize={FONT.SIZE.BASE}>Debug Info:</AppText>
       <AppText>User Email: {userEmail}</AppText>
+      <AppText>User Name: {userName}</AppText>
       <AppText>Next Token Renew on {expiryLabel}</AppText>
       <AppText>Sync Date: {syncUpdated}</AppText>
     </KeyboardAwareScrollView>

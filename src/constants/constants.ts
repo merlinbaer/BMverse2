@@ -115,3 +115,9 @@ export const AUTH = {
   OTP_TIMEOUT_MS: 15000,
   MAX_RETRY_ATTEMPTS: 2,
 } as const
+
+export const SYNC = {
+  DELAY: 1000,
+  MAX_DELAY: 4096 * 1000,
+  REFRESH_INTERVAL: 60 * 1000, // 60 * 60 * 1000 = 1 hour,
+} as const

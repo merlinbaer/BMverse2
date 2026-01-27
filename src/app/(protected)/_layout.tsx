@@ -13,7 +13,7 @@ export default function ProtectedLayout() {
 
   useEffect(() => {
     if (supabase && session) {
-      initializeDatabaseStates(supabase)
+      initializeDatabaseStates(supabase, session)
     }
   }, [supabase, session])
   return (
