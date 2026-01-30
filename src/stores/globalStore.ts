@@ -26,7 +26,6 @@ export function createStoreSync(supabase: SupabaseClient<Database>) {
     customSynced({
       supabase,
       collection: tableName,
-      as: 'value', // table is a singleton with one row. Values can be fetched directly
       //  using changesSince:'all' for small tables < 100 rows and more robust sync
       changesSince: 'all', // 'all' | 'last-sync'
       // use syncMode:'manual' when an event (change) should not be synced automatically

@@ -18,10 +18,14 @@ import {
 export default function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
-  const { sync$ } = useStoreSync()
+  const { sync$, clearCacheSync } = useStoreSync()
   const { dbVersion$, syncVersion, clearCacheVersion } = useStoreVersion()
   const { userName$, syncProfile, clearCacheProfile } = useStoreProfile()
-  const syncUpdated = useValue(sync$.updated_at)
+  const syncRows = useValue(sync$)
+  const syncRow =
+    Object.values(syncRows ?? {}).find(row => row?.sync_id === 1) ??
+    Object.values(syncRows ?? {})[0]
+  const syncUpdated = syncRow?.updated_at ?? '---'
   const dbVersion = useValue(dbVersion$)
   const name = useValue(userName$)
   const userEmail = session?.user?.email ?? 'Unknown'
@@ -33,6 +37,7 @@ export default function ProfileScreen() {
     expiryLabel = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} at ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
   }
   const handleDeleteVersion = async () => {
+    await clearCacheSync()
     await clearCacheVersion()
     await clearCacheProfile()
     //setLocalName('')

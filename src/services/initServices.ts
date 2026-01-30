@@ -7,6 +7,7 @@ import * as SplashScreen from 'expo-splash-screen'
 import { SYNC } from '@/constants/constants'
 import { StoreContextType } from '@/contexts/legendstate'
 import { localStore$ } from '@/stores/localStore'
+import { Database } from '@/types/database.types'
 
 // Used in root _layout
 export function initializeSplashScreen(duration = 500) {
@@ -61,11 +62,20 @@ export const initializeLocalStates = () => {
 export const startSyncCoordinator = (stores: StoreContextType) => {
   const { sync, version, profile } = stores
 
+  type SyncRow = Database['public']['Tables']['gl_sync']['Row']
+  type SyncCollection = Record<string, SyncRow>
+
+  const getSyncRow = (value?: SyncCollection) => {
+    const rows = Object.values(value ?? {})
+    return rows.find(row => row?.sync_id === 1) ?? rows[0]
+  }
+
   // Cascade on sync marker change
   const unsubscribeSync = sync.sync$.onChange(async ({ value }) => {
-    if (!value || !value.updated_at) return
+    const row = getSyncRow(value as SyncCollection | undefined)
+    if (!row?.updated_at) return
 
-    const serverUpdatedAt = value.updated_at
+    const serverUpdatedAt = row.updated_at
     const lastLocalSync = localStore$.lastSync.get()
 
     if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
@@ -87,7 +97,6 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
       }
     }
   })
-
   // Automated "Heartbeat" Sync
   const intervalId = setInterval(async () => {
     const state$ = syncState(sync.sync$)
