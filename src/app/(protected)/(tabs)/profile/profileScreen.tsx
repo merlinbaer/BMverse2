@@ -13,7 +13,7 @@ import {
   useStoreProfile,
   useStoreSync,
   useStoreVersion,
-} from '@/stores/globalStore'
+} from '@/hooks/useStore'
 
 export default function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()

@@ -1,24 +1,15 @@
-// AuthProvider.tsx
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
-import { createContext, ReactNode, useEffect, useMemo, useState } from 'react'
+import { createClient, Session } from '@supabase/supabase-js'
+import { ReactNode, useEffect, useMemo, useState } from 'react'
 
 import { AUTH } from '@/constants/constants'
+import { SupabaseContext } from '@/contexts/supabase'
 import { Database } from '@/types/database.types'
 
 /* ---------------------------- Types ---------------------------- */
 interface SupabaseProviderProps {
   children: ReactNode
 }
-
-interface SupabaseContextType {
-  supabase: SupabaseClient<Database>
-  session: Session | null
-  restoring: boolean
-}
-
-/* --------------------------- Context --------------------------- */
-export const SupabaseContext = createContext<SupabaseContextType | null>(null)
 
 /* ------------------------ Auth Provider ------------------------ */
 export const AuthProvider = ({ children }: SupabaseProviderProps) => {

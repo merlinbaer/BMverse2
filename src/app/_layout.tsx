@@ -3,10 +3,10 @@ import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 
-import { AuthProvider } from '@/components/AuthProvider'
 import LoadScreen from '@/components/LoadScreen'
 import { AppTheme } from '@/constants/constants'
 import { useSupabase } from '@/hooks/useSupabase'
+import { AuthProvider } from '@/providers/AuthProvider'
 import {
   initializeLocalStates,
   initializeSplashScreen,

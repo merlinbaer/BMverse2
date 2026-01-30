@@ -1,6 +1,6 @@
 import { useContext } from 'react'
 
-import { SupabaseContext } from '@/components/AuthProvider'
+import { SupabaseContext } from '@/contexts/supabase'
 
 export const useSupabase = () => {
   const context = useContext(SupabaseContext)

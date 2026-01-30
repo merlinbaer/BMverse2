@@ -3,23 +3,10 @@ import { configureSynced } from '@legendapp/state/sync'
 import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
 import { Session } from '@supabase/auth-js'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { createContext, useContext } from 'react'
 import { v4 as uuid4 } from 'uuid'
 
-import { localStore$ } from '@/stores/localStore'
+import { StoreCache, StoreContextType } from '@/contexts/legendstate'
 import { Database } from '@/types/database.types'
-
-export interface GlobalStoreContextType {
-  sync: ReturnType<typeof createStoreSync>
-  version: ReturnType<typeof createStoreVersion>
-  profile: ReturnType<typeof createStoreProfile>
-}
-
-const StoreCache: Partial<GlobalStoreContextType> = {}
-
-export const GlobalStoreContext = createContext<GlobalStoreContextType | null>(
-  null,
-)
 
 const generateId = () => uuid4()
 
@@ -33,7 +20,7 @@ const customSynced = configureSynced(syncedSupabase, {
 })
 
 // create gl_sync store
-function createStoreSync(supabase: SupabaseClient<Database>, session: Session) {
+export function createStoreSync(supabase: SupabaseClient<Database>) {
   const tableName = 'gl_sync'
   const sync$ = observable(
     customSynced({
@@ -48,37 +35,6 @@ function createStoreSync(supabase: SupabaseClient<Database>, session: Session) {
       persist: { name: tableName },
     }),
   )
-  // Attach sync listener to handle cascading App Sync
-  sync$.onChange(async ({ value }) => {
-    if (!value || !value.updated_at) return
-
-    const serverUpdatedAt = value.updated_at
-    const lastLocalSync = localStore$.lastSync.get()
-
-    if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
-      console.log(
-        `LegendState: Last server update at ${serverUpdatedAt}. Start syncing tables...`,
-      )
-
-      try {
-        // 1. Sync Version
-        const versionStore = getStoreVersion(supabase)
-        await when(syncState(versionStore.version$).isPersistLoaded)
-        await versionStore.syncVersion()
-
-        // 2. Sync Profile
-        const profileStore = getStoreProfile(supabase, session)
-        await when(syncState(profileStore.profile$).isPersistLoaded)
-        await profileStore.syncProfile()
-
-        // 3. Commit the sync marker
-        localStore$.lastSync.set(serverUpdatedAt)
-        console.log('LegendState: Cascade sync successful.')
-      } catch (err) {
-        console.error('LegendState: Cascade sync failed:', err)
-      }
-    }
-  })
   // Attach sync listener on the lastSync state for logging
   const state = syncState(sync$)
   state.lastSync?.onChange?.(({ value }) => {
@@ -115,26 +71,18 @@ function createStoreSync(supabase: SupabaseClient<Database>, session: Session) {
   return { sync$: sync$, syncSync: syncSync, clearCacheSync }
 }
 
-// Define hook for storeSyncInstance
-export const useStoreSync = () => {
-  const context = useContext(GlobalStoreContext)
-  if (!context)
-    throw new Error('useStoreSync must be used within GlobalStoreProvider')
-  return context.sync
-}
 // Define getter for storeSyncInstance
 export const getStoreSync = (
   supabase: SupabaseClient<Database>,
-  session: Session,
-): GlobalStoreContextType['sync'] => {
+): StoreContextType['sync'] => {
   if (!StoreCache.sync) {
-    StoreCache.sync = createStoreSync(supabase, session)
+    StoreCache.sync = createStoreSync(supabase)
   }
   return StoreCache.sync
 }
 
 // create gl_versions store
-function createStoreVersion(supabase: SupabaseClient<Database>) {
+export function createStoreVersion(supabase: SupabaseClient<Database>) {
   const tableName = 'gl_versions'
   const version$ = observable(
     customSynced({
@@ -196,17 +144,10 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
   return { version$, dbVersion$, syncVersion, clearCacheVersion }
 }
 
-// Define hook for storeVersionInstance
-export const useStoreVersion = () => {
-  const context = useContext(GlobalStoreContext)
-  if (!context)
-    throw new Error('useStoreVersion must be used within GlobalStoreProvider')
-  return context.version
-}
 // Define getter for storeVersionInstance
 export const getStoreVersion = (
   supabase: SupabaseClient<Database>,
-): GlobalStoreContextType['version'] => {
+): StoreContextType['version'] => {
   if (!StoreCache.version) {
     StoreCache.version = createStoreVersion(supabase)
   }
@@ -214,7 +155,7 @@ export const getStoreVersion = (
 }
 
 // create gl_profiles store
-function createStoreProfile(
+export function createStoreProfile(
   supabase: SupabaseClient<Database>,
   session: Session,
 ) {
@@ -295,18 +236,11 @@ function createStoreProfile(
   return { profile$, userName$, syncProfile, clearCacheProfile }
 }
 
-// Define hook for storeProfileInstance
-export const useStoreProfile = () => {
-  const context = useContext(GlobalStoreContext)
-  if (!context)
-    throw new Error('useStoreProfile must be used within GlobalStoreProvider')
-  return context.profile
-}
 // Define singleton for storeProfileInstance
 export const getStoreProfile = (
   supabase: SupabaseClient<Database>,
   session: Session,
-): GlobalStoreContextType['profile'] => {
+): StoreContextType['profile'] => {
   if (!StoreCache.profile) {
     StoreCache.profile = createStoreProfile(supabase, session)
   }

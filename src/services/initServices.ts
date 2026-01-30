@@ -1,13 +1,14 @@
-import { syncState } from '@legendapp/state'
+import { syncState, when } from '@legendapp/state'
 import { ObservablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
 import { configureObservableSync } from '@legendapp/state/sync'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { SYNC } from '@/constants/constants'
-import { GlobalStoreContextType } from '@/stores/globalStore'
+import { StoreContextType } from '@/contexts/legendstate'
 import { localStore$ } from '@/stores/localStore'
 
+// Used in root _layout
 export function initializeSplashScreen(duration = 500) {
   SplashScreen.setOptions({
     duration: duration,
@@ -16,6 +17,7 @@ export function initializeSplashScreen(duration = 500) {
   SplashScreen.preventAutoHideAsync().catch(() => {})
 }
 
+// Used in root _layout
 export function initializeStateCacheConfig() {
   configureObservableSync({
     persist: {
@@ -45,20 +47,49 @@ export function initializeStateCacheConfig() {
   })
 }
 
+// Used in root _layout
 export const initializeLocalStates = () => {
   // Wake up local-only persisted stores
-  localStore$.peek()
+  try {
+    localStore$.peek()
+  } catch (error) {
+    console.log('LegendState: Failed to initialize local states:', error)
+  }
 }
 
-export const initializeDatabaseStates = (stores: GlobalStoreContextType) => {
+// Used in StoreProvider
+export const startSyncCoordinator = (stores: StoreContextType) => {
   const { sync, version, profile } = stores
 
-  sync.sync$.peek()
-  version.version$.peek()
-  profile.profile$.peek()
+  // Cascade on sync marker change
+  const unsubscribeSync = sync.sync$.onChange(async ({ value }) => {
+    if (!value || !value.updated_at) return
+
+    const serverUpdatedAt = value.updated_at
+    const lastLocalSync = localStore$.lastSync.get()
+
+    if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
+      console.log(
+        `LegendState: Last server update at ${serverUpdatedAt}. Start syncing tables...`,
+      )
+
+      try {
+        await when(syncState(version.version$).isPersistLoaded)
+        await version.syncVersion()
+
+        await when(syncState(profile.profile$).isPersistLoaded)
+        await profile.syncProfile()
+
+        localStore$.lastSync.set(serverUpdatedAt)
+        console.log('LegendState: Cascade sync successful.')
+      } catch (err) {
+        console.error('LegendState: Cascade sync failed:', err)
+      }
+    }
+  })
 
   // Automated "Heartbeat" Sync
-  setInterval(async () => {
+  const intervalId = setInterval(async () => {
     const state$ = syncState(sync.sync$)
     const isReady = state$.isLoaded.get() && !state$.error.get()
 
@@ -71,4 +102,9 @@ export const initializeDatabaseStates = (stores: GlobalStoreContextType) => {
       }
     }
   }, SYNC.REFRESH_INTERVAL)
+
+  return () => {
+    unsubscribeSync?.()
+    clearInterval(intervalId)
+  }
 }
