@@ -57,14 +57,10 @@ function createStoreSync(supabase: SupabaseClient<Database>, session: Session) {
 
     if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
       console.log(
-        `LegendState: Global DB-change at ${serverUpdatedAt}. Start syncing tables...`,
+        `LegendState: Last server update at ${serverUpdatedAt}. Start syncing tables...`,
       )
 
       try {
-        // IMPORTANT: Use the pure factory functions to get the stores.
-        // Because of the 'StoreCache' or 'useMemo' logic we discussed,
-        // we must ensure we are triggering the sync on the existing observables.
-
         // 1. Sync Version
         const versionStore = getStoreVersion(supabase)
         await when(syncState(versionStore.version$).isPersistLoaded)
@@ -87,12 +83,10 @@ function createStoreSync(supabase: SupabaseClient<Database>, session: Session) {
   const state = syncState(sync$)
   state.lastSync?.onChange?.(({ value }) => {
     if (!value) {
-      console.log(`LegendState: Empty lastSync of ${tableName}`)
+      console.log(`LegendState: No lastSync of ${tableName}`)
     } else {
       const iso = new Date(value).toISOString()
-      console.log(
-        `LegendState: LastSync of ${tableName} changed to (lastSync)=${iso}-UTC)`,
-      )
+      console.log(`LegendState: LastSync of ${tableName} changed to ${iso}-UTC`)
     }
   })
   // Function to trigger a local first sync
@@ -100,21 +94,22 @@ function createStoreSync(supabase: SupabaseClient<Database>, session: Session) {
     await when(syncState(sync$).isPersistLoaded)
     try {
       await syncState(sync$).sync()
-      // console.log('LegendState: Sync for ' + tableName + ' called')  // Log not needed. Heartbeat log is sufficient
     } catch (err) {
-      console.error('LegendState: Manual sync ' + tableName + ' failed:', err)
+      console.error(`LegendState: Sync ${tableName} failed:`, err)
     }
   }
-  // Function to reset the cache
+  // Function to reset the cache and call a sync
   const clearCacheSync = async () => {
     try {
       // Clear the physical file from AsyncStorage
       await syncState(sync$).clearPersist()
       // Reset metadata (syncCount, error, lastSync) to prevent stale state
       syncState(sync$).reset?.()
-      console.log('LegendState: gl_sync cache cleared.')
+      console.log(`LegendState: ${tableName} cache cleared.`)
     } catch (err) {
-      console.warn('LegendState: Failed to clear gl_sync cache:', err)
+      console.warn(`LegendState: Failed to clear ${tableName} cache:`, err)
+    } finally {
+      await syncSync()
     }
   }
   return { sync$: sync$, syncSync: syncSync, clearCacheSync }
@@ -157,7 +152,7 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
   const dbVersion$ = computed(() => {
     const versions = version$.get()
     const versionArray = versions ? Object.values(versions) : []
-    if (versionArray.length === 0) return '---'
+    if (versionArray.length === 0) return '---' // Used for Display in UI
     const latestEntry = versionArray.reduce((prev, current) => {
       return prev.version_id > current.version_id ? prev : current
     })
@@ -167,12 +162,10 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
   const state = syncState(version$)
   state.lastSync?.onChange?.(({ value }) => {
     if (!value) {
-      console.log(`LegendState: Empty lastSync of ${tableName}`)
+      console.log(`LegendState: No lastSync of ${tableName}`)
     } else {
       const iso = new Date(value).toISOString()
-      console.log(
-        `LegendState: LastSync of ${tableName} changed to (lastSync)=${iso}-UTC)`,
-      )
+      console.log(`LegendState: LastSync of ${tableName} changed to ${iso}-UTC`)
     }
   })
   // Function to trigger a local first sync
@@ -180,24 +173,24 @@ function createStoreVersion(supabase: SupabaseClient<Database>) {
     await when(syncState(version$).isPersistLoaded)
     try {
       await syncState(version$).sync()
-      console.log('LegendState: Sync for ' + tableName + ' called')
+      console.log(`LegendState: Sync for ${tableName} called`)
     } catch (err) {
-      console.error('LegendState: Sync  ' + tableName + ' failed:', err)
+      console.error(`LegendState: Sync ${tableName} failed:`, err)
     }
   }
-  // Function to reset the cache
+  // Function to reset the cache and call a sync
   const clearCacheVersion = async () => {
     try {
       // Clear the physical file from AsyncStorage
       await syncState(version$).clearPersist()
       // Reset metadata (syncCount, error, lastSync) to prevent stale state
       syncState(version$).reset?.()
-      console.log('LegendState: gl_version cache cleared.')
+      console.log(`LegendState: ${tableName} cache cleared.`)
     } catch (err) {
-      console.warn('LegendState: Failed to clear gl_profiles cache:', err)
+      console.log(`LegendState: Failed to clear ${tableName} cache:`, err)
     } finally {
-      // await syncVersion()
-      console.log('LegendState: Finally in clearCacheVersion')
+      // Call sync
+      await syncVersion()
     }
   }
   return { version$, dbVersion$, syncVersion, clearCacheVersion }
@@ -244,21 +237,19 @@ function createStoreProfile(
   const userName$ = computed(() => {
     const profile = profile$.get()
     const profileArray = profile ? Object.values(profile) : []
-    return profileArray?.[0]?.user_name ?? '<no-set>'
+    return profileArray?.[0]?.user_name ?? '' // Used for TextInput in UI
   })
   // Attach sync listener on the lastSync state for logging
   const state = syncState(profile$)
   state.lastSync?.onChange?.(({ value }) => {
     if (!value) {
-      console.log(`LegendState: Empty lastSync of ${tableName}`)
+      console.log(`LegendState: No lastSync of ${tableName}`)
     } else {
       const iso = new Date(value).toISOString()
-      console.log(
-        `LegendState: LastSync of ${tableName} changed to (lastSync)=${iso}-UTC)`,
-      )
+      console.log(`LegendState: LastSync of ${tableName} changed to ${iso}-UTC`)
     }
   })
-  // Attach sync listener for updates
+  // Attach update listener
   const state$ = syncState(profile$)
   state$.onChange(({ value, getPrevious }) => {
     const prev = getPrevious()
@@ -271,11 +262,9 @@ function createStoreProfile(
     const nothingPending = value.numPendingSets === 0
 
     if (wasSetting && isNotSetting && nothingPending) {
-      if (profile$.peek()) {
-        console.log(
-          `LegendState: gl_profiles update successfully confirmed by Supabase!`,
-        )
-      }
+      console.log(
+        `LegendState: ${tableName} update successfully and confirmed by Supabase!`,
+      )
     }
   })
   // Function to trigger a local first sync
@@ -283,24 +272,23 @@ function createStoreProfile(
     await when(syncState(profile$).isPersistLoaded)
     try {
       await syncState(profile$).sync()
-      console.log('LegendState: Sync for ' + tableName + ' called')
+      console.log(`LegendState: Sync for ${tableName} called`)
     } catch (err) {
-      console.error('LegendState: Sync  ' + tableName + ' failed:', err)
+      console.error(`LegendState: Sync ${tableName} failed:`, err)
     }
   }
-  // Function to reset the cache
+  // Function to reset the cache and call a sync
   const clearCacheProfile = async () => {
     try {
       // Clear the physical file from AsyncStorage
       await syncState(profile$).clearPersist()
       // Reset metadata (syncCount, error, lastSync) to prevent stale state
       syncState(profile$).reset?.()
-      console.log('LegendState: gl_profiles cache cleared.')
+      console.log(`LegendState: ${tableName} cache cleared.`)
     } catch (err) {
-      console.warn('LegendState: Failed to clear gl_profiles cache:', err)
+      console.warn(`LegendState: Failed to clear ${tableName} cache:`, err)
     } finally {
-      console.log('LegendState: Finally in clearCacheProfile')
-      // await syncProfile()
+      await syncProfile()
     }
   }
 

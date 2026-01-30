@@ -24,7 +24,6 @@ export default function ProfileScreen() {
   const syncUpdated = useValue(sync$.updated_at)
   const dbVersion = useValue(dbVersion$)
   const name = useValue(userName$)
-
   const userEmail = session?.user?.email ?? 'Unknown'
   let expiryLabel = 'Not available'
   if (session?.expires_at) {
