@@ -18,7 +18,8 @@
       "bundleIdentifier": "eu.bruu.bmverse2",
       "backgroundColor": "#000000",
       "infoPlist": {
-        "UIDesignRequiresCompatibility": true
+        "UIDesignRequiresCompatibility": true,
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -56,7 +57,11 @@
     "extra": {
       "router": {
         "origin": false
+      },
+      "eas": {
+        "projectId": "777dff8d-b5cb-401c-8fe8-045f75656806"
       }
-    }
+    },
+    "owner": "merlinbaer"
   }
 }

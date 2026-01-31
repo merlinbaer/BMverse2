@@ -2,6 +2,22 @@
 
 This is an [Expo](https://expo.dev) project.
 
+## Changes to eas setup
+
+### 1. Changes calling eas cli
+
+eas will be called now locally (no global install/always newest version): "npx eas-cli ..." instead of "eas ..."
+
+### 2. Build iOS for TestFlight
+
+npx eas-cli build -p ios --profile production
+
+### 3. Submit to TestFlight
+
+npx eas-cli submit -p ios --profile production
+
+## Commands
+
 Generate supabase types:
 yarn supabase gen types typescript --project-id {project-ref} > ./database.types.ts
 or
@@ -56,7 +72,8 @@ Fresh install:
 - run ./get_download_url.sh in the terminal
 - Download ADP folder with files in Safari Browser into Download folder with Download URL.
 - Move folder structure to deploy/releases (don't change any file)
-- Add a new version with in deploy/Merlin Baer (Metal).json. Use https://altstudio.app to import and check new file. Don't use export. There is a Bug in altstudio.app!!! Patreon keys (there are 2) ar put in the json after export.
+- Add a new version with in deploy/Merlin Baer (Metal).json. Use https://altstudio.app to import and check new file.
+  Don't use export. There is a Bug in altstudio.app!!! Patreon keys (there are 2) ar put in the json after export.
 - Copy deploy/Merlin Baer (Metal).json to index.html
 - Sync the folder deploy with "Local -> Remote" with SFTP extension (configuration in .vscode sftp.json)
 - Commit and push last commit of this release (with new index.html)
