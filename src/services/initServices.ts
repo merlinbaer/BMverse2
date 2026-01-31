@@ -53,6 +53,7 @@ export const initializeLocalStates = () => {
   // Wake up local-only persisted stores
   try {
     localStore$.peek()
+    console.log('LegendState: Local states initialized.')
   } catch (error) {
     console.log('LegendState: Failed to initialize local states:', error)
   }
@@ -71,7 +72,7 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
   }
 
   // Cascade on sync marker change
-  const unsubscribeSync = sync.sync$.onChange(async ({ value }) => {
+  const unsubscribeSync = sync.data$.onChange(async ({ value }) => {
     const row = getSyncRow(value as SyncCollection | undefined)
     if (!row?.updated_at) return
 
@@ -84,10 +85,10 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
       )
 
       try {
-        await when(syncState(version.version$).isPersistLoaded)
+        await when(syncState(version.data$).isPersistLoaded)
         await version.syncVersion()
 
-        await when(syncState(profile.profile$).isPersistLoaded)
+        await when(syncState(profile.data$).isPersistLoaded)
         await profile.syncProfile()
 
         localStore$.lastSync.set(serverUpdatedAt)
@@ -99,11 +100,12 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
   })
   // Automated "Heartbeat" Sync
   const intervalId = setInterval(async () => {
-    const state$ = syncState(sync.sync$)
+    const state$ = syncState(sync.data$)
     const isReady = state$.isLoaded.get() && !state$.error.get()
 
     if (isReady) {
-      console.log('LegendState: Heartbeat trigger - checking for updates...')
+      // console.log('LegendState: Heartbeat trigger - checking for updates...')
+      // Above log is not needed "Sync for gl_sync called" is shown in syncSync
       try {
         await sync.syncSync()
       } catch {

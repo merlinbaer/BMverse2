@@ -32,9 +32,9 @@ export const StoreProvider = ({ children }: StoreProviderProps) => {
   useEffect(() => {
     if (stores && supabase && session) {
       // Warm up store data
-      stores.sync.sync$.peek()
-      stores.version.version$.peek()
-      stores.profile.profile$.peek()
+      stores.sync.data$.peek()
+      stores.version.data$.peek()
+      stores.profile.data$.peek()
       // Start cascading sync mechanism
       const stop = startSyncCoordinator(stores)
       return () => stop?.()

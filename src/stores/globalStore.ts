@@ -1,25 +1,18 @@
-import { computed, observable, syncState, when } from '@legendapp/state'
-import { configureSynced } from '@legendapp/state/sync'
-import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
+import { computed, observable } from '@legendapp/state'
 import { Session } from '@supabase/auth-js'
 import { SupabaseClient } from '@supabase/supabase-js'
-import { v4 as uuid4 } from 'uuid'
 
 import { StoreCache, StoreContextType } from '@/contexts/legendstate'
+import {
+  attachSyncLogger,
+  attachUpdateLogger,
+  clearCacheStore,
+  customSynced,
+  syncStore,
+} from '@/services/createStore'
 import { Database } from '@/types/database.types'
 
-const generateId = () => uuid4()
-
-const customSynced = configureSynced(syncedSupabase, {
-  fieldId: 'id',
-  generateId,
-  fieldCreatedAt: 'created_at',
-  fieldUpdatedAt: 'updated_at',
-  fieldDeleted: 'deleted',
-  realtime: false,
-})
-
-// create gl_sync store
+// --- create gl_sync store --------------------------------------
 export function createStoreSync(supabase: SupabaseClient<Database>) {
   const tableName = 'gl_sync'
   const sync$ = observable(
@@ -34,40 +27,23 @@ export function createStoreSync(supabase: SupabaseClient<Database>) {
       persist: { name: tableName },
     }),
   )
-  // Attach sync listener on the lastSync state for logging
-  const state = syncState(sync$)
-  state.lastSync?.onChange?.(({ value }) => {
-    if (!value) {
-      console.log(`LegendState: No lastSync of ${tableName}`)
-    } else {
-      const iso = new Date(value).toISOString()
-      console.log(`LegendState: LastSync of ${tableName} changed to ${iso}-UTC`)
-    }
+  // Computed for the singleton sync row (sync_id: 1)
+  const updatedAt$ = computed(() => {
+    const data = sync$.get()
+    const rows = data ? Object.values(data) : []
+    const row = rows.find(r => r?.sync_id === 1) ?? rows[0]
+    return row?.updated_at ?? '---'
   })
-  // Function to trigger a local first sync
-  const syncSync = async () => {
-    await when(syncState(sync$).isPersistLoaded)
-    try {
-      await syncState(sync$).sync()
-    } catch (err) {
-      console.error(`LegendState: Sync ${tableName} failed:`, err)
-    }
+
+  attachSyncLogger(sync$, tableName)
+
+  // noinspection JSUnusedGlobalSymbols // clearCacheSync is currently not used
+  return {
+    data$: sync$,
+    updatedAt$: updatedAt$,
+    syncSync: () => syncStore(sync$, tableName),
+    clearCacheSync: () => clearCacheStore(sync$, tableName),
   }
-  // Function to reset the cache and call a sync
-  const clearCacheSync = async () => {
-    try {
-      // Clear the physical file from AsyncStorage
-      await syncState(sync$).clearPersist()
-      // Reset metadata (syncCount, error, lastSync) to prevent stale state
-      syncState(sync$).reset?.()
-      console.log(`LegendState: ${tableName} cache cleared.`)
-    } catch (err) {
-      console.warn(`LegendState: Failed to clear ${tableName} cache:`, err)
-    } finally {
-      await syncSync()
-    }
-  }
-  return { sync$: sync$, syncSync: syncSync, clearCacheSync }
 }
 
 // Define getter for storeSyncInstance
@@ -80,7 +56,7 @@ export const getStoreSync = (
   return StoreCache.sync
 }
 
-// create gl_versions store
+// --- create gl_versions store --------------------------------------
 export function createStoreVersion(supabase: SupabaseClient<Database>) {
   const tableName = 'gl_versions'
   const version$ = observable(
@@ -105,42 +81,14 @@ export function createStoreVersion(supabase: SupabaseClient<Database>) {
     })
     return latestEntry.version
   })
-  // Attach sync listener on the lastSync state for logging
-  const state = syncState(version$)
-  state.lastSync?.onChange?.(({ value }) => {
-    if (!value) {
-      console.log(`LegendState: No lastSync of ${tableName}`)
-    } else {
-      const iso = new Date(value).toISOString()
-      console.log(`LegendState: LastSync of ${tableName} changed to ${iso}-UTC`)
-    }
-  })
-  // Function to trigger a local first sync
-  const syncVersion = async () => {
-    await when(syncState(version$).isPersistLoaded)
-    try {
-      await syncState(version$).sync()
-      console.log(`LegendState: Sync for ${tableName} called`)
-    } catch (err) {
-      console.error(`LegendState: Sync ${tableName} failed:`, err)
-    }
+  attachSyncLogger(version$, tableName)
+
+  return {
+    data$: version$,
+    dbVersion$: dbVersion$,
+    syncVersion: () => syncStore(version$, tableName),
+    clearCacheVersion: () => clearCacheStore(version$, tableName),
   }
-  // Function to reset the cache and call a sync
-  const clearCacheVersion = async () => {
-    try {
-      // Clear the physical file from AsyncStorage
-      await syncState(version$).clearPersist()
-      // Reset metadata (syncCount, error, lastSync) to prevent stale state
-      syncState(version$).reset?.()
-      console.log(`LegendState: ${tableName} cache cleared.`)
-    } catch (err) {
-      console.log(`LegendState: Failed to clear ${tableName} cache:`, err)
-    } finally {
-      // Call sync
-      await syncVersion()
-    }
-  }
-  return { version$, dbVersion$, syncVersion, clearCacheVersion }
 }
 
 // Define getter for storeVersionInstance
@@ -153,7 +101,7 @@ export const getStoreVersion = (
   return StoreCache.version
 }
 
-// create gl_profiles store
+// --- create gl_profiles store --------------------------------------
 export function createStoreProfile(
   supabase: SupabaseClient<Database>,
   session: Session,
@@ -179,60 +127,16 @@ export function createStoreProfile(
     const profileArray = profile ? Object.values(profile) : []
     return profileArray?.[0]?.user_name ?? '' // Used for TextInput in UI
   })
-  // Attach sync listener on the lastSync state for logging
-  const state = syncState(profile$)
-  state.lastSync?.onChange?.(({ value }) => {
-    if (!value) {
-      console.log(`LegendState: No lastSync of ${tableName}`)
-    } else {
-      const iso = new Date(value).toISOString()
-      console.log(`LegendState: LastSync of ${tableName} changed to ${iso}-UTC`)
-    }
-  })
-  // Attach update listener
-  const state$ = syncState(profile$)
-  state$.onChange(({ value, getPrevious }) => {
-    const prev = getPrevious()
-    // 1. We only care about updates happening AFTER an initial load
-    if (!value.isLoaded) return
-    // 2. Detect the transition from 'Setting' to 'Idle'
-    const wasSetting = prev?.isSetting === true
-    const isNotSetting = value.isSetting === false
-    // 3. Ensure there are no more changes waiting in the queue
-    const nothingPending = value.numPendingSets === 0
 
-    if (wasSetting && isNotSetting && nothingPending) {
-      console.log(
-        `LegendState: ${tableName} update successfully and confirmed by Supabase!`,
-      )
-    }
-  })
-  // Function to trigger a local first sync
-  const syncProfile = async () => {
-    await when(syncState(profile$).isPersistLoaded)
-    try {
-      await syncState(profile$).sync()
-      console.log(`LegendState: Sync for ${tableName} called`)
-    } catch (err) {
-      console.error(`LegendState: Sync ${tableName} failed:`, err)
-    }
-  }
-  // Function to reset the cache and call a sync
-  const clearCacheProfile = async () => {
-    try {
-      // Clear the physical file from AsyncStorage
-      await syncState(profile$).clearPersist()
-      // Reset metadata (syncCount, error, lastSync) to prevent stale state
-      syncState(profile$).reset?.()
-      console.log(`LegendState: ${tableName} cache cleared.`)
-    } catch (err) {
-      console.warn(`LegendState: Failed to clear ${tableName} cache:`, err)
-    } finally {
-      await syncProfile()
-    }
-  }
+  attachSyncLogger(profile$, tableName)
+  attachUpdateLogger(profile$, tableName)
 
-  return { profile$, userName$, syncProfile, clearCacheProfile }
+  return {
+    data$: profile$,
+    userName$: userName$,
+    syncProfile: () => syncStore(profile$, tableName),
+    clearCacheProfile: () => clearCacheStore(profile$, tableName),
+  }
 }
 
 // Define singleton for storeProfileInstance
