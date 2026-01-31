@@ -1,7 +1,7 @@
 import { useValue } from '@legendapp/state/react'
-// import { useObserve, useValue } from '@legendapp/state/react'
-// import { useState } from 'react'
-import { Platform, StyleSheet } from 'react-native'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useRef, useState } from 'react'
+import { Platform, StyleSheet, TextInput, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { AppButton } from '@/components/AppButton'
@@ -20,7 +20,8 @@ export default function ProfileScreen() {
   const { showAlert } = useAlert()
   const { updatedAt$ } = useStoreSync()
   const { dbVersion$, syncVersion, clearCacheVersion } = useStoreVersion()
-  const { userName$, syncProfile, clearCacheProfile } = useStoreProfile()
+  const { userName$, setUserName, syncProfile, clearCacheProfile } =
+    useStoreProfile()
   const syncUpdated = useValue(updatedAt$)
   const dbVersion = useValue(dbVersion$)
   const name = useValue(userName$)
@@ -32,11 +33,33 @@ export default function ProfileScreen() {
 
     expiryLabel = `${date.getFullYear()}/${pad(date.getMonth() + 1)}/${pad(date.getDate())} at ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
   }
+  // Explicitly blur the input whenever the user navigates away from this screen
+  const inputRef = useRef<TextInput>(null)
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        // This runs when the screen is blurred/unfocused (navigating away)
+        inputRef.current?.blur()
+      }
+    }, []),
+  )
+  const [isTextChange, setTextChange] = useState(false)
+  const [text, setText] = useState('')
+  const handleChangeText = (value: string) => {
+    setText(value)
+    setTextChange(true)
+  }
+  const handleSetText = () => {
+    if (isTextChange) {
+      console.log('handleSetText: ' + text)
+      setTextChange(false)
+      setUserName(text.trim())
+    }
+  }
+
   const handleDeleteVersion = async () => {
-    // await clearCacheSync()
     await clearCacheVersion()
     await clearCacheProfile()
-    //setLocalName('')
   }
   const handleSync = async () => {
     await syncProfile()
@@ -74,56 +97,53 @@ export default function ProfileScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
-      <AppText>Current App Version: {APP_VERSION}</AppText>
-      <AppText>Available App Version: {dbVersion}</AppText>
-      <AppButton title="Sync" onPress={handleSync} />
-      <AppButton title="Clear Cache" onPress={handleDeleteVersion} />
-      <AppText>Authentication: </AppText>
+      <AppText fontSize={FONT.SIZE.BASE}>App Version: {APP_VERSION}</AppText>
+      <AppText>Available Version in App Store: {dbVersion}</AppText>
+      <AppText fontSize={FONT.SIZE.BASE}>Authentication & Profile: </AppText>
+      <AppText>User Email: {userEmail}</AppText>
+      <View style={styles.inputRow}>
+        <AppText style={styles.inputLabel}>User Name:</AppText>
+        <TextInput
+          ref={inputRef}
+          value={isTextChange ? text : name}
+          onChangeText={handleChangeText}
+          onSubmitEditing={handleSetText}
+          onBlur={handleSetText}
+          placeholder="Enter your Nickname"
+          placeholderTextColor={COLORS.TEXT_MUTED}
+          style={[
+            styles.textInput,
+            { color: isTextChange ? COLORS.BACKGROUND : COLORS.TEXT_MUTED },
+          ]}
+        />
+      </View>
       <AppButton title="Sign Out" onPress={handleSignOut} />
       <AppButton title="Delete Account" onPress={handleDeleteAccount} />
+      <AppText fontSize={FONT.SIZE.BASE}>Manage Datastore&#39;s:</AppText>
+      <AppButton title="Sync" onPress={handleSync} />
+      <AppButton title="Clear Cache" onPress={handleDeleteVersion} />
       <AppText fontSize={FONT.SIZE.BASE}>Debug Info:</AppText>
-      <AppText>User Email: {userEmail}</AppText>
-      <AppText>User Name: {name}</AppText>
-
       <AppText>Next Token Renew on {expiryLabel}</AppText>
-      <AppText>Sync Date: {syncUpdated}</AppText>
+      <AppText>Last Server Change: {syncUpdated}</AppText>
     </KeyboardAwareScrollView>
   )
 }
-/*
 
-  // Use useState and useObserve to keep the local state in sync with external changes
-  const [localName, setLocalName] = useState(userName$.get() ?? '')
-  useObserve(userName$, ({ value }) => {
-    const newValue = value ?? ''
-    if (newValue !== localName) {
-      setLocalName(newValue)
-    }
-  })
-
-  const handleSetName = async () => {
-    const currentProfile = userName$.get()
-    // Only do change when profile$ is loaded and localName has changed
-    if (currentProfile && localName !== currentProfile) {
-      userName$.set(localName)
-    }
-  }
-      <TextInput
-        value={localName}
-        onChangeText={setLocalName}
-        onBlur={handleSetName}
-        placeholder="Enter username"
-        placeholderTextColor={COLORS.TEXT_MUTED}
-        style={styles.textInput}
-      />
- */
 const styles = StyleSheet.create({
+  inputLabel: {
+    flexShrink: 0,
+  },
+  inputRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
   keyboardAwareContentContainer: {
-    gap: LAYOUT.gap,
-    paddingBottom: 24,
+    gap: LAYOUT.gap - 6,
+    paddingBottom: 120,
     paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
-      ios: 180,
+      ios: 160,
       android: 20,
       default: 10,
     }),
@@ -135,7 +155,7 @@ const styles = StyleSheet.create({
   textInput: {
     backgroundColor: COLORS.TEXT_INPUT,
     borderWidth: 1,
-    color: COLORS.BACKGROUND, // Ensure text is visible on the light background used in login styles
+    flex: 2,
     padding: 10,
   },
 })

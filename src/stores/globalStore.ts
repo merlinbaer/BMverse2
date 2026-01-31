@@ -127,13 +127,17 @@ export function createStoreProfile(
     const profileArray = profile ? Object.values(profile) : []
     return profileArray?.[0]?.user_name ?? '' // Used for TextInput in UI
   })
-
+  // Setting username
+  const setUserName = (newName: string) => {
+    profile$[uid].user_name.set(newName)
+  }
   attachSyncLogger(profile$, tableName)
   attachUpdateLogger(profile$, tableName)
 
   return {
     data$: profile$,
     userName$: userName$,
+    setUserName: setUserName,
     syncProfile: () => syncStore(profile$, tableName),
     clearCacheProfile: () => clearCacheStore(profile$, tableName),
   }
