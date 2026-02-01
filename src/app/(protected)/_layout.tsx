@@ -5,13 +5,12 @@ import { StoreProvider } from '@/providers/StoreProvider'
 export default function ProtectedLayout() {
   return (
     <StoreProvider>
-      <Stack>
-        <Stack.Screen
-          name="(tabs)"
-          options={{
-            headerShown: false,
-          }}
-        />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="(global)/player"
           options={{
