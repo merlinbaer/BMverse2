@@ -64,6 +64,16 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
+          name="player"
+          options={{
+            title: 'Player',
+            tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
+            tabBarIcon: ({ color }: { color: string }) => (
+              <Octicons name="play" size={TAB_BAR.ICON_SIZE} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="main"
           options={{
             title: 'Main',
@@ -81,6 +91,16 @@ export default function TabsLayout() {
                 }}
                 resizeMode="contain"
               />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="games"
+          options={{
+            title: 'Games',
+            tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
+            tabBarIcon: ({ color }: { color: string }) => (
+              <Octicons name="rocket" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
         />

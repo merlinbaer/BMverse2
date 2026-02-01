@@ -103,7 +103,7 @@ const createTabBarConstants = (posY: number) =>
     ICON_IMAGE_SIZE: 80,
     ICON_IMAGE_POSY: posY - 5,
     ICON_MARGIN_TOP: 8,
-    ICON_SIZE: 30,
+    ICON_SIZE: 28,
     LABEL_POSY: posY - 24,
   }) as const
 

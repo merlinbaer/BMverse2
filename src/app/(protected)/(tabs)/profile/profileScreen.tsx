@@ -139,11 +139,11 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   keyboardAwareContentContainer: {
-    gap: LAYOUT.gap - 6,
+    gap: LAYOUT.gap,
     paddingBottom: 120,
     paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
-      ios: 160,
+      ios: 170,
       android: 20,
       default: 10,
     }),
