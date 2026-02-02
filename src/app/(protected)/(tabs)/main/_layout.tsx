@@ -7,8 +7,7 @@ export default function Layout() {
     <Stack
       initialRouteName="mainScreen"
       screenOptions={{
-        headerBackButtonDisplayMode: 'minimal',
-        headerTitle: '',
+        headerShown: false,
       }}
     >
       <Stack.Screen

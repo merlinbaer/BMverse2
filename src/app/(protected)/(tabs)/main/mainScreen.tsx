@@ -199,9 +199,10 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
     paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
-      ios: 180,
-      android: 20,
-      default: 10,
+      ios: 160,
+      android: 150,
+      web: 120,
+      default: 50,
     }),
   },
   keyboardAwareScrollView: {
@@ -244,7 +245,7 @@ const styles = StyleSheet.create({
   },
   suAreaContainer: {
     alignItems: 'center',
-    height: 220, // Reserves space for bubble
+    height: 200, // Reserves space for bubble
     width: '100%',
     zIndex: 10,
   },
