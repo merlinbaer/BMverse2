@@ -1,36 +1,14 @@
-import { useMemo } from 'react'
+import { useValue } from '@legendapp/state/react'
 import { FlatList, StyleSheet, View } from 'react-native'
 import Markdown from 'react-native-markdown-display'
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { useStoreNews } from '@/hooks/useStore'
 
 export default function NewsScreen() {
-  // mock data, removed later
-  const data = useMemo(() => {
-    return Array.from({ length: 20 }, (_, index) => {
-      const messages = [
-        'Welcome to the **news feed**!',
-        'This is a sample message to demonstrate the **WhatsApp-style** bubble layout.',
-        'News updates will appear here [regularly](https://bmverse.bruu.eu).',
-        'You can scroll through the list to see older updates.',
-        'Check out our website: https://bmverse.bruu.eu',
-        'The bubbles are limited\n- in width\n- and align\n- to the left.',
-        '**React Native FlatList** is used for efficient rendering.',
-        '## This looks much better\n than random characters_!',
-        'Stay tuned for *more updates* from BMverse.',
-        'Enjoy the [new design](https://bmverse.bruu.eu)!',
-      ]
-      const randomText = messages[index % messages.length]
-      // eslint-disable-next-line react-hooks/purity
-      const date = new Date(Date.now() - index * 3600000 * (Math.random() * 5))
-      return {
-        id: index.toString(),
-        text: randomText,
-        date: date,
-      }
-    }).sort((a, b) => b.date.getTime() - a.date.getTime())
-  }, [])
+  const { news$ } = useStoreNews()
+  const data = useValue(news$)
 
   return (
     <FlatList
@@ -43,17 +21,9 @@ export default function NewsScreen() {
       scrollEventThrottle={16}
       renderItem={({ item }) => (
         <View style={styles.itemContainer}>
-          <Markdown style={markdownStyles}>{item.text}</Markdown>
+          <Markdown style={markdownStyles}>{item.news_info}</Markdown>
           <View style={styles.footer}>
-            <AppText style={styles.dateText}>
-              {item.date.toLocaleDateString([], {
-                day: '2-digit',
-                month: '2-digit',
-                year: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </AppText>
+            <AppText style={styles.dateText}>{item.displayDate}</AppText>
           </View>
         </View>
       )}

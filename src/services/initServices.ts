@@ -61,7 +61,7 @@ export const initializeLocalStates = () => {
 
 // Used in StoreProvider
 export const startSyncCoordinator = (stores: StoreContextType) => {
-  const { sync, version, profile } = stores
+  const { sync, version, profile, news } = stores
 
   type SyncRow = Database['public']['Tables']['gl_sync']['Row']
   type SyncCollection = Record<string, SyncRow>
@@ -90,6 +90,9 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
 
         await when(syncState(profile.data$).isPersistLoaded)
         await profile.syncProfile()
+
+        await when(syncState(news.data$).isPersistLoaded)
+        await news.syncNews()
 
         localStore$.lastSync.set(serverUpdatedAt)
         console.log('LegendState: Cascade sync successful.')

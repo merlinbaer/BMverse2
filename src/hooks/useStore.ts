@@ -25,3 +25,11 @@ export const useStoreProfile = () => {
     throw new Error('useStoreProfile must be used within GlobalStoreProvider')
   return context.profile
 }
+
+// Define hook for storeNewsInstance
+export const useStoreNews = () => {
+  const context = useContext(StoreContext)
+  if (!context)
+    throw new Error('useStoreNews must be used within GlobalStoreProvider')
+  return context.news
+}

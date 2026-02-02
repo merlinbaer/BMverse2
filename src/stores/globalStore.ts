@@ -15,7 +15,7 @@ import { Database } from '@/types/database.types'
 // --- create gl_sync store --------------------------------------
 export function createStoreSync(supabase: SupabaseClient<Database>) {
   const tableName = 'gl_sync'
-  const sync$ = observable(
+  const data$ = observable(
     customSynced({
       supabase,
       collection: tableName,
@@ -29,20 +29,20 @@ export function createStoreSync(supabase: SupabaseClient<Database>) {
   )
   // Computed for the singleton sync row (sync_id: 1)
   const updatedAt$ = computed(() => {
-    const data = sync$.get()
+    const data = data$.get()
     const rows = data ? Object.values(data) : []
     const row = rows.find(r => r?.sync_id === 1) ?? rows[0]
     return row?.updated_at ?? '---'
   })
 
-  attachSyncLogger(sync$, tableName)
+  attachSyncLogger(data$, tableName)
 
   // noinspection JSUnusedGlobalSymbols // clearCacheSync is currently not used
   return {
-    data$: sync$,
+    data$: data$,
     updatedAt$: updatedAt$,
-    syncSync: () => syncStore(sync$, tableName),
-    clearCacheSync: () => clearCacheStore(sync$, tableName),
+    syncSync: () => syncStore(data$, tableName),
+    clearCacheSync: () => clearCacheStore(data$, tableName),
   }
 }
 
@@ -59,7 +59,7 @@ export const getStoreSync = (
 // --- create gl_versions store --------------------------------------
 export function createStoreVersion(supabase: SupabaseClient<Database>) {
   const tableName = 'gl_versions'
-  const version$ = observable(
+  const data$ = observable(
     customSynced({
       supabase,
       collection: tableName,
@@ -73,21 +73,22 @@ export function createStoreVersion(supabase: SupabaseClient<Database>) {
   )
   // Computed observable for the latest version string
   const dbVersion$ = computed(() => {
-    const versions = version$.get()
-    const versionArray = versions ? Object.values(versions) : []
-    if (versionArray.length === 0) return '---' // Used for Display in UI
-    const latestEntry = versionArray.reduce((prev, current) => {
+    const data = data$.get()
+    const dataArray = data ? Object.values(data) : []
+    if (dataArray.length === 0) return '---' // Used for Display in UI
+    // searching for der version with the highest version_id (column sequence)
+    const latestEntry = dataArray.reduce((prev, current) => {
       return prev.version_id > current.version_id ? prev : current
     })
     return latestEntry.version
   })
-  attachSyncLogger(version$, tableName)
+  attachSyncLogger(data$, tableName)
 
   return {
-    data$: version$,
+    data$: data$,
     dbVersion$: dbVersion$,
-    syncVersion: () => syncStore(version$, tableName),
-    clearCacheVersion: () => clearCacheStore(version$, tableName),
+    syncVersion: () => syncStore(data$, tableName),
+    clearCacheVersion: () => clearCacheStore(data$, tableName),
   }
 }
 
@@ -108,7 +109,7 @@ export function createStoreProfile(
 ) {
   const tableName = 'gl_profiles'
   const uid = session?.user?.id ?? '00000000-0000-0000-0000-000000000000'
-  const profile$ = observable(
+  const data$ = observable(
     customSynced({
       supabase,
       collection: tableName,
@@ -123,23 +124,23 @@ export function createStoreProfile(
   )
   // Computed observable for the latest version string
   const userName$ = computed(() => {
-    const profile = profile$.get()
-    const profileArray = profile ? Object.values(profile) : []
-    return profileArray?.[0]?.user_name ?? '' // Used for TextInput in UI
+    const data = data$.get()
+    const dataArray = data ? Object.values(data) : []
+    return dataArray?.[0]?.user_name ?? '' // Used for TextInput in UI
   })
   // Setting username
   const setUserName = (newName: string) => {
-    profile$[uid].user_name.set(newName)
+    data$[uid].user_name.set(newName)
   }
-  attachSyncLogger(profile$, tableName)
-  attachUpdateLogger(profile$, tableName)
+  attachSyncLogger(data$, tableName)
+  attachUpdateLogger(data$, tableName)
 
   return {
-    data$: profile$,
+    data$: data$,
     userName$: userName$,
     setUserName: setUserName,
-    syncProfile: () => syncStore(profile$, tableName),
-    clearCacheProfile: () => clearCacheStore(profile$, tableName),
+    syncProfile: () => syncStore(data$, tableName),
+    clearCacheProfile: () => clearCacheStore(data$, tableName),
   }
 }
 

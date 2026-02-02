@@ -34,6 +34,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      bm_news: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          news_info: string
+          news_update: string
+          news_updater: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          news_info: string
+          news_update?: string
+          news_updater: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          news_info?: string
+          news_update?: string
+          news_updater?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bm_songs: {
         Row: {
           created_at: string

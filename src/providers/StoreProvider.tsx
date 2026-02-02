@@ -8,6 +8,7 @@ import {
   getStoreSync,
   getStoreVersion,
 } from '@/stores/globalStore'
+import { getStoreNews } from '@/stores/newsStore'
 
 /* ---------------------------- Types ---------------------------- */
 interface StoreProviderProps {
@@ -26,6 +27,7 @@ export const StoreProvider = ({ children }: StoreProviderProps) => {
         sync: getStoreSync(supabase),
         version: getStoreVersion(supabase),
         profile: getStoreProfile(supabase, session),
+        news: getStoreNews(supabase),
       }
     }, [supabase, session])
 
@@ -35,6 +37,7 @@ export const StoreProvider = ({ children }: StoreProviderProps) => {
       stores.sync.data$.peek()
       stores.version.data$.peek()
       stores.profile.data$.peek()
+      stores.news.data$.peek()
       // Start cascading sync mechanism
       const stop = startSyncCoordinator(stores)
       return () => stop?.()
