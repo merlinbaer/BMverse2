@@ -41,9 +41,9 @@ CREATE POLICY users_can_update_own_profile
     USING (id = auth.uid())
     WITH CHECK (
     id = auth.uid() AND
-    created_at = gl_profiles.created_at AND
-    deleted = gl_profiles.deleted AND
-    user_email = gl_profiles.user_email AND
-    user_role = gl_profiles.user_role AND
-    last_seen_at = gl_profiles.last_seen_at
+    created_at = public.gl_profiles.created_at AND
+    deleted = public.gl_profiles.deleted AND
+    user_email = public.gl_profiles.user_email AND
+    user_role = public.gl_profiles.user_role AND
+    last_seen_at = public.gl_profiles.last_seen_at
     );

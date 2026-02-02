@@ -38,16 +38,16 @@ CREATE POLICY allow_moderator_to_edit
     using (public.is_moderator())
     with check (
     -- Only song_info and updated_at are allowed to be updated by moderators.
-    id = bm_songs.id AND
-    created_at = bm_songs.created_at AND
-    deleted = bm_songs.deleted AND
-    song_id = bm_songs.song_id AND
-    song_title = bm_songs.song_title AND
-    song_title_jp = bm_songs.song_title_jp AND
-    song_artist = bm_songs.song_artist AND
-    song_first_appearance = bm_songs.song_first_appearance AND
-    song_release_type = bm_songs.song_release_type AND
-    song_default_media = bm_songs.song_default_media
+    id = public.bm_songs.id AND
+    created_at = public.bm_songs.created_at AND
+    deleted = public.bm_songs.deleted AND
+    song_id = public.bm_songs.song_id AND
+    song_title = public.bm_songs.song_title AND
+    song_title_jp = public.bm_songs.song_title_jp AND
+    song_artist = public.bm_songs.song_artist AND
+    song_first_appearance = public.bm_songs.song_first_appearance AND
+    song_release_type = public.bm_songs.song_release_type AND
+    song_default_media = public.bm_songs.song_default_media
     );
 
 CREATE POLICY allow_admin_all
