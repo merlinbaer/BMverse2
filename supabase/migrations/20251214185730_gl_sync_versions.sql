@@ -7,7 +7,7 @@ CREATE TABLE
     updated_at timestamp with time zone not null default now(),
     deleted    boolean                  null     default false,
     sync_id    smallint                 not null default 1,
-    updater    text                     not null,
+    updater    text                     not null default 'postgres',
     constraint gl_sync_pkey primary key (id),
     constraint gl_sync_sync_id_key unique (sync_id),
     constraint gl_sync_is_singleton check (sync_id = 1)
@@ -16,6 +16,11 @@ CREATE TABLE
 ALTER TABLE public.gl_sync
     ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY allow_all_users_to_select
+    ON public.gl_sync
+    FOR SELECT
+    using (auth.role() in ('anon', 'authenticated'));
+
 CREATE TRIGGER handle_times
     BEFORE INSERT
         OR
@@ -23,11 +28,6 @@ CREATE TRIGGER handle_times
     ON gl_sync
     FOR each row
 execute function handle_times();
-
-CREATE POLICY allow_public_users_to_select
-    ON public.gl_sync
-    FOR SELECT
-    using (public.is_public_user());
 
 -- App version table --
 CREATE TABLE
@@ -47,6 +47,11 @@ CREATE TABLE
 ALTER TABLE public.gl_versions
     ENABLE ROW LEVEL SECURITY;
 
+CREATE POLICY allow_all_users_to_select
+    ON public.gl_versions
+    FOR SELECT
+    using (auth.role() in ('anon', 'authenticated'));
+
 CREATE TRIGGER handle_times
     BEFORE INSERT
         OR
@@ -54,9 +59,3 @@ CREATE TRIGGER handle_times
     ON gl_versions
     FOR each row
 execute function handle_times();
-
-CREATE POLICY allow_public_users_to_select
-    ON public.gl_versions
-    FOR SELECT
-    using (public.is_public_user());
-

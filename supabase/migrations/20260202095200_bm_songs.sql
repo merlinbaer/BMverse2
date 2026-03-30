@@ -27,10 +27,10 @@ CREATE TRIGGER handle_times
     FOR each row
 execute function handle_times();
 
-CREATE POLICY allow_public_users_to_select
+CREATE POLICY allow_all_users_to_select
     ON public.bm_songs
     FOR SELECT
-    using (public.is_public_user());
+    using (auth.role() in ('anon', 'authenticated'));
 
 CREATE POLICY allow_moderator_to_edit
     ON public.bm_songs
@@ -50,8 +50,8 @@ CREATE POLICY allow_moderator_to_edit
     song_default_media = public.bm_songs.song_default_media
     );
 
-CREATE POLICY allow_admin_all
-    ON public.bm_songs
-    FOR all
-    using (public.is_admin())
-    with check (public.is_admin());
+--CREATE POLICY allow_admin_all
+--    ON public.bm_songs
+--    FOR all
+--    using (public.is_admin())
+--    with check (public.is_admin());

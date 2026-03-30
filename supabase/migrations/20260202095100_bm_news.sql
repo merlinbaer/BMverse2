@@ -22,15 +22,10 @@ CREATE TRIGGER handle_times
     FOR each row
 execute function handle_times();
 
-CREATE POLICY allow_anon_users_to_select
+CREATE POLICY allow_all_users_to_select
     ON public.bm_news
     FOR SELECT
-    USING (auth.role() = 'anon');
-
-CREATE POLICY allow_public_users_to_select
-    ON public.bm_news
-    FOR SELECT
-    using (public.is_public_user());
+    USING (auth.role() in ('anon', 'authenticated'));
 
 CREATE POLICY allow_moderator_to_insert
     ON public.bm_news

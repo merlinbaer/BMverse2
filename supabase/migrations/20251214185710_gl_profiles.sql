@@ -15,20 +15,11 @@ CREATE TABLE
     user_email   text                     not null,
     user_role    public.user_role         not null default 'user',
     user_name    text                     null,
-    user_country text                     null,
-    last_seen_at timestamp with time zone null     default now()
+    user_country text                     null
 ) tablespace pg_default;
 
 ALTER TABLE public.gl_profiles
     ENABLE ROW LEVEL SECURITY;
-
-CREATE TRIGGER handle_times
-    BEFORE INSERT
-        OR
-        UPDATE
-    ON gl_profiles
-    FOR each row
-execute function handle_times();
 
 CREATE POLICY users_can_read_own_profile
     ON public.gl_profiles
@@ -44,6 +35,13 @@ CREATE POLICY users_can_update_own_profile
     created_at = public.gl_profiles.created_at AND
     deleted = public.gl_profiles.deleted AND
     user_email = public.gl_profiles.user_email AND
-    user_role = public.gl_profiles.user_role AND
-    last_seen_at = public.gl_profiles.last_seen_at
+    user_role = public.gl_profiles.user_role
     );
+
+CREATE TRIGGER handle_times
+    BEFORE INSERT
+        OR
+        UPDATE
+    ON gl_profiles
+    FOR each row
+execute function handle_times();

@@ -9,6 +9,11 @@ BEGIN
     INSERT INTO public.gl_profiles (id, user_email, user_role)
     VALUES (new.id, new.email, 'user')
     ON conflict (id) do nothing;
+
+    INSERT INTO public.gl_users (id, last_seen_at)
+    VALUES (new.id, now())
+    ON conflict (id) do nothing;
+
     RETURN new;
 END;
 $$;
@@ -41,7 +46,7 @@ CREATE OR REPLACE FUNCTION public.update_last_seen()
 AS
 $$
 BEGIN
-    UPDATE public.gl_profiles
+    UPDATE public.gl_users
     SET last_seen_at = now()
     WHERE id = auth.uid();
 END;
