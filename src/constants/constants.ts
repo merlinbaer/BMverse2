@@ -75,7 +75,7 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
       },
       headerTintColor: COLORS.TEXT,
       headerShadowVisible: false,
-      contentStyle: { backgroundColor: COLORS.BACKGROUND },
+      WelcomeContentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     web: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
@@ -85,7 +85,7 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
       },
       headerTintColor: COLORS.TEXT,
       headerShadowVisible: false,
-      contentStyle: { backgroundColor: COLORS.BACKGROUND },
+      WelcomeContentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     default: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND },

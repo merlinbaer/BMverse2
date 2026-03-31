@@ -1,52 +1,26 @@
+import { useValue } from '@legendapp/state/react'
 import { ThemeProvider } from '@react-navigation/native'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 
-import LoadScreen from '@/components/LoadScreen'
 import { AppTheme } from '@/constants/constants'
-import { useSupabase } from '@/hooks/useSupabase'
-import { AuthProvider } from '@/providers/AuthProvider'
+import { initAuth } from '@/services/auth'
 import {
   initializeLocalStates,
   initializeSplashScreen,
-  initializeStateCacheConfig,
 } from '@/services/initServices'
+import { localStore$ } from '@/services/legend/local/primitives'
 
 initializeSplashScreen()
-initializeStateCacheConfig()
 initializeLocalStates()
 
 export default function RootLayout() {
-  return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
-  )
-}
-
-function RootNavigator() {
-  const { session, restoring } = useSupabase()
-
-  // Only hide SplashScreen when the session has been loaded
+  const isFirstCall = useValue(localStore$.isFirstCall)
   useEffect(() => {
-    let mounted = true
-    if (!restoring && mounted) {
-      SplashScreen.hideAsync().catch(() => {})
-    }
-    return () => {
-      mounted = false
-    }
-  }, [restoring])
-
-  // Just in case. Usually the splash screen should be hidden by now
-  if (restoring) {
-    return <LoadScreen />
-  }
-
-  // Guard logic for screens
-  const isProtected = !!session
-  const isPublic = !session
+    initAuth()
+    SplashScreen.hideAsync().catch(() => {})
+  }, [])
 
   return (
     <ThemeProvider value={AppTheme}>
@@ -56,14 +30,14 @@ function RootNavigator() {
           gestureEnabled: false,
         }}
       >
-        {/* Protected Screens: only show if user is logged in  */}
-        <Stack.Protected guard={isProtected}>
-          <Stack.Screen name="(protected)" />
+        {/* First called Screens: only show if is first called */}
+        <Stack.Protected guard={isFirstCall}>
+          <Stack.Screen name="(firstCall)" />
         </Stack.Protected>
 
-        {/* Public Screens: only show if no user */}
-        <Stack.Protected guard={isPublic}>
-          <Stack.Screen name="(public)" />
+        {/* Main Screens: show after App is initialized */}
+        <Stack.Protected guard={!isFirstCall}>
+          <Stack.Screen name="(main)" />
         </Stack.Protected>
       </Stack>
     </ThemeProvider>

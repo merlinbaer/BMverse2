@@ -114,7 +114,6 @@ export type Database = {
           created_at: string
           deleted: boolean | null
           id: string
-          last_seen_at: string | null
           updated_at: string
           user_country: string | null
           user_email: string
@@ -125,7 +124,6 @@ export type Database = {
           created_at?: string
           deleted?: boolean | null
           id: string
-          last_seen_at?: string | null
           updated_at?: string
           user_country?: string | null
           user_email: string
@@ -136,7 +134,6 @@ export type Database = {
           created_at?: string
           deleted?: boolean | null
           id?: string
-          last_seen_at?: string | null
           updated_at?: string
           user_country?: string | null
           user_email?: string
@@ -160,7 +157,7 @@ export type Database = {
           id?: string
           sync_id?: number
           updated_at?: string
-          updater: string
+          updater?: string
         }
         Update: {
           created_at?: string
@@ -169,6 +166,30 @@ export type Database = {
           sync_id?: number
           updated_at?: string
           updater?: string
+        }
+        Relationships: []
+      }
+      gl_users: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          last_seen_at: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id: string
+          last_seen_at?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          last_seen_at?: string
+          updated_at?: string
         }
         Relationships: []
       }

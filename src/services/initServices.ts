@@ -5,8 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { SYNC } from '@/constants/constants'
-import { StoreContextType } from '@/contexts/legendstate'
-import { localStore$ } from '@/stores/localStore'
+import { StoreContextType } from '@/old/contexts/legendstate'
+import { localStore$ } from '@/services/legend/local/primitives'
 import { Database } from '@/types/database.types'
 
 // Used in root _layout
