@@ -4,11 +4,14 @@ import { StyleSheet, TextInput, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
-import { COLORS, LAYOUT } from '@/constants/constants'
-import { authUser$, signOut, startLogin, verifyOtp } from '@/services/auth'
+import { AUTH, COLORS, LAYOUT } from '@/constants/constants'
+import { useAlert } from '@/hooks/useAlert'
+import { deleteAccount, signOut, startLogin, verifyOtp } from '@/services/auth'
+import { authUser$ } from '@/services/legend/memory/variables'
 
 export default function ProfileScreen() {
   const email = 'web@bruu.eu'
+  const { showAlert } = useAlert()
   const [token, setToken] = useState('')
   const user = useValue(authUser$)
 
@@ -33,24 +36,46 @@ export default function ProfileScreen() {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    showAlert(
+      'Delete Account',
+      'Are you sure you want to permanently delete your account with all user data? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteAccount()
+          },
+        },
+      ],
+    )
+  }
+
   return (
     <View style={styles.mainView}>
       <AppButton title={`Request Token`} onPress={() => startLogin(email)} />
       <AppText>Enter the verification code sent to your email:</AppText>
       <TextInput
         value={token}
-        placeholder="Enter 8-digit code"
+        placeholder={`Enter ${AUTH.OTP_LENGTH}-digit code`}
         style={styles.textInput}
         onChangeText={setToken}
         keyboardType="number-pad"
-        maxLength={8}
+        maxLength={AUTH.OTP_LENGTH}
       />
       <AppButton
         title="Verify"
         onPress={onVerifyPress}
-        disabled={token.length !== 8}
+        disabled={token.length !== AUTH.OTP_LENGTH}
       />
       <AppButton title="Logout" onPress={onLogoutPress} disabled={!user} />
+      <AppButton
+        title="Delete Account"
+        onPress={handleDeleteAccount}
+        disabled={!user}
+      />
       <AppText>User: {user ?? 'not logged in'}</AppText>
     </View>
   )

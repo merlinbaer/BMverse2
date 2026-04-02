@@ -5,13 +5,13 @@ import { LayoutScreenHeader } from '@/constants/constants'
 export default function Layout() {
   return (
     <Stack
-      initialRouteName="mainScreen"
+      initialRouteName="foxScreen"
       screenOptions={{
         headerShown: false,
       }}
     >
       <Stack.Screen
-        name="mainScreen"
+        name="foxScreen"
         options={{ ...LayoutScreenHeader, headerTitle: '' }}
       />
     </Stack>

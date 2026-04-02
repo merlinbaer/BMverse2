@@ -23,4 +23,17 @@ export const customSynced = configureSynced(syncedSupabase, {
   fieldCreatedAt: 'created_at',
   fieldUpdatedAt: 'updated_at',
   fieldDeleted: 'deleted',
+  onError: error => {
+    // Check if it's a network failure (common in local-first apps)
+    console.log('LegendState Error:', error?.message)
+    if (
+      error?.message?.includes('Network request failed') ||
+      error?.message?.includes('Fetch')
+    ) {
+      console.log('LegendState: Sync paused (Offline/Network unavailable)')
+    } else {
+      // Log other actual logic errors as errors
+      console.error('LegendState: Synced Supabase error:', error)
+    }
+  },
 })

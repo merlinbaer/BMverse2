@@ -6,7 +6,7 @@ import Markdown from 'react-native-markdown-display'
 
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 
-export default function MainScreen() {
+export default function FoxScreen() {
   const router = useRouter()
   const [visibleCharacter, setVisibleCharacter] = useState<string | null>(null)
 
@@ -52,7 +52,7 @@ export default function MainScreen() {
           <View style={styles.suAreaContainer}>
             <Pressable
               onPress={() =>
-                handlePressCharacter('Su-', '/(main)/(tabs)/main/songs/Songs')
+                handlePressCharacter('Su-', '/(main)/(tabs)/fox/songs/Songs')
               }
               style={styles.suImageTouchTarget}
             >
@@ -67,7 +67,7 @@ export default function MainScreen() {
               <Pressable
                 style={[styles.itemContainer, styles.suBubbleAbsolute]}
                 onPress={() =>
-                  handlePressTextbox('/(main)/(tabs)/main/songs/Songs')
+                  handlePressTextbox('/(main)/(tabs)/fox/songs/Songs')
                 }
               >
                 <Markdown style={markdownStyles}>{suMessage}</Markdown>
@@ -82,7 +82,7 @@ export default function MainScreen() {
                 onPress={() =>
                   handlePressCharacter(
                     'Momo',
-                    '/(main)/(tabs)/main/concerts/Concerts',
+                    '/(main)/(tabs)/fox/concerts/Concerts',
                   )
                 }
               >
@@ -96,7 +96,7 @@ export default function MainScreen() {
                 <Pressable
                   style={[styles.itemContainer, styles.momoBubble]}
                   onPress={() =>
-                    handlePressTextbox('/(main)/(tabs)/main/concerts/Concerts')
+                    handlePressTextbox('/(main)/(tabs)/fox/concerts/Concerts')
                   }
                 >
                   <Markdown style={markdownStyles}>{momoMessage}</Markdown>
@@ -109,7 +109,7 @@ export default function MainScreen() {
                 onPress={() =>
                   handlePressCharacter(
                     'Moa',
-                    '/(main)/(tabs)/main/videos/Videos',
+                    '/(main)/(tabs)/fox/videos/Videos',
                   )
                 }
               >
@@ -123,7 +123,7 @@ export default function MainScreen() {
                 <Pressable
                   style={[styles.itemContainer, styles.moaBubble]}
                   onPress={() =>
-                    handlePressTextbox('/(main)/(tabs)/main/videos/Videos')
+                    handlePressTextbox('/(main)/(tabs)/fox/videos/Videos')
                   }
                 >
                   {/* eslint-disable-next-line react-native/no-raw-text */}

@@ -8,7 +8,7 @@ type News = Database['public']['Tables']['bm_news']['Row']
 const { store$, list$, item$, add, remove, sync, clearCache } =
   createTableStore<News>({
     collection: 'bm_news',
-    actions: ['read'],
+    actions: ['read', 'create', 'update', 'delete'],
     sort: (a, b) =>
       new Date(b.news_update).getTime() - new Date(a.news_update).getTime(),
   })
@@ -22,8 +22,7 @@ export const deleteNews = remove
 export const syncNews = sync
 export const clearCacheNews = clearCache
 
-/*/ Domain-specific functions
-export const toggleDemo = (id: string) => {
-  demo$[id].demo_boolean.set((prev: boolean) => !prev)
+// Domain-specific functions
+export const updateNews = (id: string) => {
+  news$[id].news_info.set('News invalidated')
 }
-*/

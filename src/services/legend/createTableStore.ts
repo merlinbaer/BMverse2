@@ -22,7 +22,7 @@ interface BaseRow {
 // Observable supabase config template
 interface TableConfig<T extends BaseRow> {
   collection: string
-  /** CRUD actions to enable. Default: all four */
+  /** CRUD actions to enable. Default: read-only */
   actions?: ('read' | 'create' | 'update' | 'delete')[]
   /** Incremental sync strategy. Default: 'all' */
   changesSince?: 'all' | 'last-sync'
@@ -106,9 +106,21 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
       await sync()
     }
   }
+  // Sync state logger. Information when the last sync date has changed.
+  const state = syncState(store$)
+  state.lastSync?.onChange?.(({ value }) => {
+    if (!value) {
+      console.log(`LegendState: No lastSync of ${collection}`)
+    } else {
+      const iso = new Date(value).toISOString()
+      console.log(
+        `LegendState: LastSync of ${collection} changed to ${iso}-UTC`,
+      )
+    }
+  })
   // CRUD listener with self-healing. Refetch added rows when sync is stuck.
   // Legend-State bug in sync mechanism
-  syncState(store$).onChange(({ value, getPrevious }) => {
+  state.onChange(({ value, getPrevious }) => {
     const prev = getPrevious()
     if (!value.isLoaded) return
     const wasSetting = prev?.isSetting === true

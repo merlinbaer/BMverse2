@@ -1,12 +1,10 @@
 import { syncState, when } from '@legendapp/state'
-import { ObservablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
-import { configureObservableSync } from '@legendapp/state/sync'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import * as SplashScreen from 'expo-splash-screen'
 
 import { SYNC } from '@/constants/constants'
-import { StoreContextType } from '@/old/contexts/legendstate'
+import { news$, sync$, syncNews, syncSync } from '@/services/legend'
 import { localStore$ } from '@/services/legend/local/primitives'
+import { syncVersion, version$ } from '@/services/legend/tables/versions'
 import { Database } from '@/types/database.types'
 
 // Used in root _layout
@@ -16,36 +14,6 @@ export function initializeSplashScreen(duration = 500) {
     fade: true,
   })
   SplashScreen.preventAutoHideAsync().catch(() => {})
-}
-
-// Used in root _layout
-export function initializeStateCacheConfig() {
-  configureObservableSync({
-    persist: {
-      plugin: new ObservablePersistAsyncStorage({
-        AsyncStorage,
-      }),
-      retrySync: true,
-    },
-    retry: {
-      infinite: true,
-      backoff: 'exponential', //  "constant" | "exponential"
-      delay: SYNC.DELAY, // hopefully ms?
-      maxDelay: SYNC.MAX_DELAY, // approx. 1 hour 14 min
-    },
-    onError: error => {
-      // Check if it's a network failure (common in local-first apps)
-      if (
-        error?.message?.includes('Network request failed') ||
-        error?.message?.includes('Fetch')
-      ) {
-        console.log('LegendState: Sync paused (Offline/Network unavailable)')
-      } else {
-        // Log other actual logic errors as errors
-        console.error('LegendState: Synced Supabase error:', error)
-      }
-    },
-  })
 }
 
 // Used in root _layout
@@ -60,8 +28,10 @@ export const initializeLocalStates = () => {
 }
 
 // Used in StoreProvider
-export const startSyncCoordinator = (stores: StoreContextType) => {
-  const { sync, version, profile, news } = stores
+export const startSyncCoordinator = () => {
+  const news = news$
+  const sync = sync$
+  const version = version$
 
   type SyncRow = Database['public']['Tables']['gl_sync']['Row']
   type SyncCollection = Record<string, SyncRow>
@@ -72,7 +42,7 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
   }
 
   // Cascade on sync marker change
-  const unsubscribeSync = sync.data$.onChange(async ({ value }) => {
+  const unsubscribeSync = sync.onChange(async ({ value }) => {
     const row = getSyncRow(value as SyncCollection | undefined)
     if (!row?.updated_at) return
 
@@ -86,13 +56,10 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
 
       try {
         await when(syncState(version.data$).isPersistLoaded)
-        await version.syncVersion()
-
-        await when(syncState(profile.data$).isPersistLoaded)
-        await profile.syncProfile()
+        await syncVersion()
 
         await when(syncState(news.data$).isPersistLoaded)
-        await news.syncNews()
+        await syncNews()
 
         localStore$.lastSync.set(serverUpdatedAt)
         console.log('LegendState: Cascade sync successful.')
@@ -110,7 +77,7 @@ export const startSyncCoordinator = (stores: StoreContextType) => {
       // console.log('LegendState: Heartbeat trigger - checking for updates...')
       // Above log is not needed "Sync for gl_sync called" is shown in syncSync
       try {
-        await sync.syncSync()
+        await syncSync()
       } catch {
         // Already? handled by global onError and internal syncSync catch
       }

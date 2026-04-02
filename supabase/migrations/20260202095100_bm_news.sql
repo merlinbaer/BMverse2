@@ -6,7 +6,7 @@ CREATE TABLE
     updated_at   timestamp with time zone not null default now(),
     deleted      boolean                  null     default false,
     news_update  timestamp with time zone not null default now(),
-    news_info    text                     not null,
+    news_info    text                     not null default '.'::text,
     news_updater text                     not null,
     constraint bm_news_pkey primary key (id)
 ) tablespace pg_default;
@@ -39,8 +39,8 @@ CREATE POLICY allow_moderator_to_edit
     with check (
     -- Only news_info, news_updater and updated_at are allowed to be updated by moderators.
     id = public.bm_news.id AND
-    created_at = public.bm_news.created_at AND
-    deleted = public.bm_news.deleted
+    created_at = public.bm_news.created_at -- AND
+    -- deleted = public.bm_news.deleted
     );
 
 CREATE OR REPLACE FUNCTION public.sync_bm_news()

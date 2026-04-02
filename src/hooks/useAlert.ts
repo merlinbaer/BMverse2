@@ -1,5 +1,6 @@
 import { Alert, AlertButton, Platform } from 'react-native'
 
+// AI generated with Google Gemini 3 Flash
 export const useAlert = () => {
   const showAlert = (
     title: string,
@@ -7,15 +8,14 @@ export const useAlert = () => {
     options?: AlertButton[],
   ) => {
     if (Platform.OS === 'web') {
-      // Wenn Optionen vorhanden sind, nutzen wir confirm/alert
       if (options && options.length > 0) {
-        // Suche nach der primären Aktion (nicht "cancel")
+        // Search for primary action (not "cancel")
         const primaryAction =
           options.find(opt => opt.style !== 'cancel') || options[0]
         const hasCancel = options.some(opt => opt.style === 'cancel')
 
         if (hasCancel) {
-          // Confirmation-Dialog
+          // Confirmation-dialog
           const confirmed = window.confirm(
             `${title}${message ? `\n\n${message}` : ''}`,
           )
@@ -23,7 +23,7 @@ export const useAlert = () => {
             primaryAction.onPress()
           }
         } else {
-          // Einfacher Hinweis
+          // Simple dialog
           window.alert(`${title}${message ? `\n\n${message}` : ''}`)
           if (primaryAction.onPress) primaryAction.onPress()
         }
@@ -31,7 +31,7 @@ export const useAlert = () => {
         window.alert(`${title}${message ? `\n\n${message}` : ''}`)
       }
     } else {
-      // Mobile: Nutze natives Alert-Modul
+      // Mobile use Alert-Modul
       Alert.alert(title, message, options)
     }
   }
