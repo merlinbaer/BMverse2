@@ -13,4 +13,4 @@ const { store$, sync, clearCache } = createTableStore<Sync>({
 // Add Factory functions
 export const sync$ = store$
 export const syncSync = sync
-export const clearCacheSync = clearCache
+export const syncClearCache = clearCache

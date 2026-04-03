@@ -1,18 +1,25 @@
 import { useValue } from '@legendapp/state/react'
-import { Button, FlatList, StyleSheet, Text, View } from 'react-native'
+import {
+  Button,
+  FlatList,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
 
 import { AppText } from '@/components/AppText'
 import { COLORS } from '@/constants/constants'
 import {
-  addNews,
-  clearCacheNews,
-  deleteNews,
+  authUser$,
+  newsAdd2,
+  newsClearCache,
+  newsDelete,
   newsItem$,
   newsList$,
-  syncNews,
-  updateNews,
+  newsSync,
+  newsUpdate,
 } from '@/services/legend'
-import { authUser$ } from '@/services/legend/memory/variables'
 
 function DemoItem({ id }: { id: string }) {
   const item = useValue(newsItem$(id))
@@ -20,17 +27,21 @@ function DemoItem({ id }: { id: string }) {
 
   return (
     <View style={styles.itemContainer}>
-      <AppText style={styles.Text}>Updater: {item.news_updater}</AppText>
-      <AppText style={styles.Text}>News: {item.news_info}</AppText>
+      <AppText style={styles.Text}>
+        Updater: {item.news_updater || 'Syncing from cloud...'}
+      </AppText>
+      <AppText style={styles.Text}>
+        News: {item.news_info || 'Syncing from cloud...'}
+      </AppText>
       <AppText style={styles.Text}>ID: {item.id}</AppText>
       <AppText style={styles.Text}>
-        Created: {item.created_at ? item.created_at : 'Syncing from cloud...'}
+        Created: {item.created_at || 'Syncing from cloud...'}
       </AppText>
       <AppText style={styles.Text}>
-        Updated: {item.updated_at ? item.updated_at : 'Syncing from cloud...'}
+        Updated: {item.updated_at || 'Syncing from cloud...'}
       </AppText>
-      <Button title="Invalidate News" onPress={() => updateNews(item.id)} />
-      <Button title="Delete Row" onPress={() => deleteNews(item.id)} />
+      <Button title="Invalidate News" onPress={() => newsUpdate(item.id)} />
+      <Button title="Delete Row" onPress={() => newsDelete(item.id)} />
     </View>
   )
 }
@@ -38,6 +49,17 @@ function DemoItem({ id }: { id: string }) {
 export default function HomeScreen() {
   const data = useValue(newsList$)
   const user = useValue(authUser$)
+
+  const onClearCacheAndSyncPress = async () => {
+    try {
+      await newsClearCache()
+      await newsSync()
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Clear cache and sync failed'
+      console.log('Error: ', message)
+    }
+  }
 
   if (!user) {
     return (
@@ -53,10 +75,10 @@ export default function HomeScreen() {
         <Button
           title="Clear Cache and Sync"
           color={'orange'}
-          onPress={() => clearCacheNews()}
+          onPress={() => onClearCacheAndSyncPress()}
         />
-        <Button title="Just Sync" color={'orange'} onPress={() => syncNews()} />
-        <Button title="Add New Row" onPress={() => addNews()} />
+        <Button title="Just Sync" color={'orange'} onPress={() => newsSync()} />
+        <Button title="Add New Row" onPress={() => newsAdd2()} />
       </View>
       {!data || data.length === 0 ? (
         <View style={styles.emptyContainer}>
@@ -85,6 +107,11 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.BACKGROUND,
     flex: 1,
+    paddingTop: Platform.select({
+      ios: 170,
+      android: 20,
+      default: 10,
+    }),
   },
   emptyContainer: {
     alignItems: 'center',

@@ -1,6 +1,6 @@
 import { useValue } from '@legendapp/state/react'
 import { useState } from 'react'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
@@ -87,7 +87,11 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: LAYOUT.gap,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: Platform.select({
+      ios: 170,
+      android: 20,
+      default: 10,
+    }),
   },
   textInput: {
     backgroundColor: COLORS.TEXT_INPUT,

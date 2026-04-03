@@ -12,5 +12,5 @@ const { store$, sync, clearCache } = createTableStore<Versions>({
 
 // Add Factory functions
 export const version$ = store$
-export const syncVersion = sync
-export const clearCacheVersion = clearCache
+export const versionSync = sync
+export const versionClearCache = clearCache

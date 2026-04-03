@@ -102,31 +102,26 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
       console.log(`LegendState: ${collection} cache cleared.`)
     } catch (err) {
       console.warn(`LegendState: Failed to clear ${collection} cache:`, err)
-    } finally {
-      await sync()
     }
   }
-  // Sync state logger. Information when the last sync date has changed.
-  const state = syncState(store$)
-  state.lastSync?.onChange?.(({ value }) => {
-    if (!value) {
-      console.log(`LegendState: No lastSync of ${collection}`)
-    } else {
-      const iso = new Date(value).toISOString()
+
+  // Add a log listener
+  syncState(store$).onChange(({ value, getPrevious }) => {
+    const prev = getPrevious()
+    // 1. Log lastSync changed
+    if (value.lastSync && value.lastSync !== prev?.lastSync) {
+      const iso = new Date(value.lastSync).toISOString()
       console.log(
         `LegendState: LastSync of ${collection} changed to ${iso}-UTC`,
       )
     }
-  })
-  // CRUD listener with self-healing. Refetch added rows when sync is stuck.
-  // Legend-State bug in sync mechanism
-  state.onChange(({ value, getPrevious }) => {
-    const prev = getPrevious()
+
     if (!value.isLoaded) return
     const wasSetting = prev?.isSetting === true
     const isNotSetting = value.isSetting === false
     const nothingPending = value.numPendingSets === 0
 
+    // 2. Log when changes are written into the database
     if (wasSetting && isNotSetting && nothingPending) {
       console.log(`LegendState: Changes of ${collection} synced to database.`)
       const data = store$.peek()
@@ -134,6 +129,7 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
       const hasStaleItems = (Object.values(data) as T[]).some(
         item => item && !item.created_at,
       )
+      // 3. Self-healing logic (Refetch added rows when sync is stuck)
       if (hasStaleItems) {
         console.log(
           `LegendState: Missing values in ${collection} detected. Fetching...`,
@@ -142,5 +138,6 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
       }
     }
   })
+
   return { store$, list$, item$, add, remove, sync, clearCache }
 }

@@ -33,14 +33,14 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-native": "^5.0.0",
     "prettier": "^3.7.4",
-    "supabase": "^2.72.7",
+    "supabase": "^2.84.7",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "@expo/metro-runtime": "^6.1.2",
     "@legendapp/state": "^3.0.0-beta.43",
     "@react-native-async-storage/async-storage": "^2.2.0",
-    "@supabase/supabase-js": "^2.89.0",
+    "@supabase/supabase-js": "^2.101.1",
     "expo": "~54.0.33",
     "expo-blur": "^15.0.8",
     "expo-constants": "^18.0.12",

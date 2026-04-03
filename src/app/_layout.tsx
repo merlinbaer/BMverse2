@@ -6,19 +6,21 @@ import { useEffect } from 'react'
 
 import { AppTheme } from '@/constants/constants'
 import { initAuth } from '@/services/auth'
-import {
-  initializeLocalStates,
-  initializeSplashScreen,
-} from '@/services/initServices'
-import { localStore$ } from '@/services/legend/local/primitives'
+import { localStore$ } from '@/services/legend'
+import { initializeStores } from '@/services/legend/initialiseStores'
+import { startSyncCoordinator } from '@/services/syncCoordinator'
 
-initializeSplashScreen()
-initializeLocalStates()
+SplashScreen.setOptions({
+  duration: 500,
+  fade: true,
+})
 
 export default function RootLayout() {
   const isFirstCall = useValue(localStore$.isFirstCall)
   useEffect(() => {
     initAuth()
+    initializeStores()
+    startSyncCoordinator()
     SplashScreen.hideAsync().catch(() => {})
   }, [])
 
