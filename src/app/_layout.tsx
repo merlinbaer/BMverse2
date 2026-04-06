@@ -7,8 +7,7 @@ import { useEffect } from 'react'
 import { AppTheme } from '@/constants/constants'
 import { initAuth } from '@/services/auth'
 import { localStore$ } from '@/services/legend'
-import { initializeStores } from '@/services/legend/initialiseStores'
-import { startSyncCoordinator } from '@/services/syncCoordinator'
+import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
 
 SplashScreen.setOptions({
   duration: 500,

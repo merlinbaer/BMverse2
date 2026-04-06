@@ -1,23 +1,4 @@
-import { router } from 'expo-router'
-import { useState } from 'react'
-import {
-  Platform,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  useWindowDimensions,
-  View,
-} from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import Markdown from 'react-native-markdown-display'
-
-import { AppButton } from '@/components/AppButton'
-import { AppText } from '@/components/AppText'
-import { COLORS, LAYOUT } from '@/constants/constants'
-import privacyText from '@/constants/privacy'
-import { useAlert } from '@/hooks/useAlert'
-import { useAuth } from '@/old/hooks/useAuth'
-
+/*
 export default function LoginPage() {
   const { restoring, startLogin } = useAuth()
   const [email, setEmail] = useState('')
@@ -127,3 +108,4 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 })
+*/

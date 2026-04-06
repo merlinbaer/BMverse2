@@ -1,11 +1,9 @@
-import { createTableStore } from '../createTableStore'
+import { SyncType } from '@/types/tables'
 
-import type { Database } from '@/types/database.types'
-
-type Sync = Database['public']['Tables']['gl_sync']['Row']
+import { createTableStore } from '../factory'
 
 // Define supabase observable
-const { store$, sync, clearCache } = createTableStore<Sync>({
+const { store$, list$, sync, clearCache } = createTableStore<SyncType>({
   collection: 'gl_sync',
   actions: ['read'],
 })
@@ -14,3 +12,8 @@ const { store$, sync, clearCache } = createTableStore<Sync>({
 export const sync$ = store$
 export const syncSync = sync
 export const syncClearCache = clearCache
+
+// Domain-specific functions
+export const getsSyncUpdatedAt = () => {
+  return list$.get()[0]?.updated_at
+}

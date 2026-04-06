@@ -1,20 +1,4 @@
-import { useValue } from '@legendapp/state/react'
-import { useFocusEffect } from 'expo-router'
-import { useCallback, useRef, useState } from 'react'
-import { Platform, StyleSheet, TextInput, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-
-import { AppButton } from '@/components/AppButton'
-import { AppText } from '@/components/AppText'
-import { APP_VERSION, COLORS, FONT, LAYOUT } from '@/constants/constants'
-import { useAlert } from '@/hooks/useAlert'
-import { useAuth } from '@/old/hooks/useAuth'
-import {
-  useStoreProfile,
-  useStoreSync,
-  useStoreVersion,
-} from '@/old/hooks/useStore'
-
+/*
 export default function ProfileScreen() {
   const { restoring, session, signOut, deleteAccount } = useAuth()
   const { showAlert } = useAlert()
@@ -159,3 +143,4 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 })
+*/

@@ -12,7 +12,7 @@ import { AppText } from '@/components/AppText'
 import { COLORS } from '@/constants/constants'
 import {
   authUser$,
-  newsAdd2,
+  newsAdd,
   newsClearCache,
   newsDelete,
   newsItem$,
@@ -78,7 +78,7 @@ export default function HomeScreen() {
           onPress={() => onClearCacheAndSyncPress()}
         />
         <Button title="Just Sync" color={'orange'} onPress={() => newsSync()} />
-        <Button title="Add New Row" onPress={() => newsAdd2()} />
+        <Button title="Add New Row" onPress={() => newsAdd()} />
       </View>
       {!data || data.length === 0 ? (
         <View style={styles.emptyContainer}>

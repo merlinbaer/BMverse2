@@ -1,17 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { createClient, Session } from '@supabase/supabase-js'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
-
-import { AUTH } from '@/constants/constants'
-import { SupabaseContext } from '@/old/contexts/supabase'
-import { Database } from '@/types/database.types'
-
-/* ---------------------------- Types ---------------------------- */
-interface SupabaseProviderProps {
-  children: ReactNode
-}
-
-/* ------------------------ Auth Provider ------------------------ */
+/*
+//------------------------ Auth Provider ------------------------
 export const AuthProvider = ({ children }: SupabaseProviderProps) => {
   const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
   const supabaseKey = process.env.EXPO_PUBLIC_SUPABASE_KEY!
@@ -24,7 +12,7 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
     return await fn()
   }
 
-  /* ------------------ Supabase Client ------------------ */
+  //------------------ Supabase Client ------------------
   const supabase = useMemo(
     () =>
       createClient<Database>(supabaseUrl, supabaseKey, {
@@ -40,11 +28,11 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
     [supabaseKey, supabaseUrl],
   )
 
-  /* ------------------ State ------------------ */
+  // ------------------ State ------------------
   const [session, setSession] = useState<Session | null>(null)
   const [restoring, setRestoring] = useState(true)
 
-  /* ------------------ Session Restore ------------------ */
+  // ------------------ Session Restore ------------------
   useEffect(() => {
     let mounted = true // avoid race conditions
     let restored = false // Ensures that getSession only runs once
@@ -77,7 +65,7 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
 
     void restoreSession()
 
-    /* ------------------ Auth-Updates ------------------ */
+    // ------------------ Auth-Updates ------------------
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, newSession) => {
@@ -104,11 +92,4 @@ export const AuthProvider = ({ children }: SupabaseProviderProps) => {
       subscription.unsubscribe()
     }
   }, [supabase])
-
-  /* ------------------ Render ------------------ */
-  return (
-    <SupabaseContext.Provider value={{ supabase, session, restoring }}>
-      {children}
-    </SupabaseContext.Provider>
-  )
-}
+*/

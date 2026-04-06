@@ -1,16 +1,4 @@
-import { computed, observable } from '@legendapp/state'
-import { Session } from '@supabase/auth-js'
-import { SupabaseClient } from '@supabase/supabase-js'
-
-import { StoreCache, StoreContextType } from '@/old/contexts/legendstate'
-import {
-  attachSyncLogger,
-  attachUpdateLogger,
-  clearCacheStore,
-  customSynced,
-  syncStore,
-} from '@/old/services/createStore'
-import { Database } from '@/types/database.types'
+/*
 
 // --- create gl_sync store --------------------------------------
 export function createStoreSync(supabase: SupabaseClient<Database>) {
@@ -154,3 +142,5 @@ export const getStoreProfile = (
   }
   return StoreCache.profile
 }
+
+*/

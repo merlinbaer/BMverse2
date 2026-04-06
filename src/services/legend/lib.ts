@@ -2,29 +2,45 @@ import { syncState } from '@legendapp/state'
 
 import { SYNC } from '@/constants/constants'
 import {
+  getsSyncUpdatedAt,
   localStore$,
+  news$,
   newsSync,
   sync$,
   syncSync,
+  version$,
   versionSync,
 } from '@/services/legend'
-import { Database } from '@/types/database.types'
+
+export const initializeStores = () => {
+  // Wake up local-only persisted stores
+  try {
+    localStore$.peek()
+    console.log('LegendState: Local states initialized.')
+  } catch (error) {
+    console.log('LegendState: Failed to initialize local states:', error)
+  }
+  // Wake up table stores
+  try {
+    sync$.peek()
+    version$.peek()
+    news$.peek()
+    console.log('LegendState: Table stores initialized.')
+  } catch (error) {
+    console.log('LegendState: Failed to initialize table stores:', error)
+  }
+}
+
+export const syncAll = async () => {
+  await Promise.all([versionSync(), newsSync()])
+}
 
 export const startSyncCoordinator = () => {
-  type SyncRow = Database['public']['Tables']['gl_sync']['Row']
-  type SyncCollection = Record<string, SyncRow>
-
-  const getSyncRow = (value?: SyncCollection) => {
-    const rows = Object.values(value ?? {})
-    return rows.find(row => row?.sync_id === 1) ?? rows[0]
-  }
-
   // Cascade on sync marker change
-  const unsubscribeSync = sync$.onChange(async ({ value }) => {
-    const row = getSyncRow(value as SyncCollection | undefined)
-    if (!row?.updated_at) return
+  const unsubscribeSync = sync$.onChange(async () => {
+    const serverUpdatedAt = getsSyncUpdatedAt()
+    if (!serverUpdatedAt) return
 
-    const serverUpdatedAt = row.updated_at
     const lastLocalSync = localStore$.lastSync.get()
 
     if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
@@ -32,8 +48,7 @@ export const startSyncCoordinator = () => {
         `LegendState: Last server update at ${serverUpdatedAt}. Start syncing tables...`,
       )
       try {
-        await versionSync()
-        await newsSync()
+        await syncAll()
         localStore$.lastSync.set(String(serverUpdatedAt))
         console.log('LegendState: Cascade sync successful.')
       } catch (err) {
@@ -47,13 +62,7 @@ export const startSyncCoordinator = () => {
     const isReady = state$.isLoaded.get() && !state$.error.get()
 
     if (isReady) {
-      // console.log('LegendState: Heartbeat trigger - checking for updates...')
-      // Above log is not needed "Sync for gl_sync called" is shown in syncSync
-      try {
-        await syncSync()
-      } catch {
-        // Already? handled by global onError and internal syncSync catch
-      }
+      void syncSync() // Async call
     }
   }, SYNC.REFRESH_INTERVAL)
 

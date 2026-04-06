@@ -1,11 +1,9 @@
-import { createTableStore } from '../createTableStore'
+import { VersionsType } from '@/types/tables'
 
-import type { Database } from '@/types/database.types'
-
-type Versions = Database['public']['Tables']['gl_versions']['Row']
+import { createTableStore } from '../factory'
 
 // Define supabase observable
-const { store$, sync, clearCache } = createTableStore<Versions>({
+const { store$, sync, clearCache } = createTableStore<VersionsType>({
   collection: 'gl_versions',
   actions: ['read'],
 })
@@ -14,3 +12,5 @@ const { store$, sync, clearCache } = createTableStore<Versions>({
 export const version$ = store$
 export const versionSync = sync
 export const versionClearCache = clearCache
+
+// Domain-specific functions
