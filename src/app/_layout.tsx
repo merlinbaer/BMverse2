@@ -15,7 +15,7 @@ SplashScreen.setOptions({
 })
 
 export default function RootLayout() {
-  const isFirstCall = useValue(localStore$.isFirstCall)
+  const isOnboarding = useValue(localStore$.isOnboarding)
   useEffect(() => {
     initAuth()
     initializeStores()
@@ -32,12 +32,12 @@ export default function RootLayout() {
         }}
       >
         {/* First called Screens: only show if is first called */}
-        <Stack.Protected guard={isFirstCall}>
-          <Stack.Screen name="(firstCall)" />
+        <Stack.Protected guard={isOnboarding}>
+          <Stack.Screen name="(onboarding)" />
         </Stack.Protected>
 
         {/* Main Screens: show after App is initialized */}
-        <Stack.Protected guard={!isFirstCall}>
+        <Stack.Protected guard={!isOnboarding}>
           <Stack.Screen name="(main)" />
         </Stack.Protected>
       </Stack>

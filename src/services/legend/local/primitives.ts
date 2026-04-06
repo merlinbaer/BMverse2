@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 // Store for local-only persisted data
 export const localStore$ = observable({
   lastSync: null as string | null,
-  isFirstCall: true,
+  isOnboarding: true,
 })
 
 // By providing only 'persist' and no sync plugin, it remains local-only.

@@ -28,8 +28,8 @@ export default function TermsPage() {
     210
 
   const onPress = () => {
-    localStore$.isFirstCall.set(false)
-    router.replace(`/(firstCall)/welcome`)
+    localStore$.isOnboarding.set(false)
+    router.replace(`/(onboarding)/welcome`)
   }
 
   return (

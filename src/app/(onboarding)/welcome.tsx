@@ -21,7 +21,7 @@ export default function WelcomePage() {
     210
 
   const onAcceptPress = () => {
-    localStore$.isFirstCall.set(false)
+    localStore$.isOnboarding.set(false)
     router.replace(`/(main)/(tabs)/news/newsScreen`)
   }
   return (

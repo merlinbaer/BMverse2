@@ -29,8 +29,8 @@ export default function LoginPage() {
     275
 
   const onPress = () => {
-    localStore$.isFirstCall.set(false)
-    router.replace(`/(firstCall)/welcome`)
+    localStore$.isOnboarding.set(false)
+    router.replace(`/(onboarding)/welcome`)
   }
 
   return (

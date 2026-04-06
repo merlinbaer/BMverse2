@@ -31,7 +31,7 @@ export default function LoginPage() {
       await startLogin(email)
       const normalizedEmail = email.trim().toLowerCase()
       setEmail('')
-      router.push(`/(firstCall)/welcome?email=${normalizedEmail}`)
+      router.push(`/(onboarding)/welcome?email=${normalizedEmail}`)
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Failed to send email.'
