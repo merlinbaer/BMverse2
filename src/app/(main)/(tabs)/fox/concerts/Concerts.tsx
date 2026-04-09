@@ -8,9 +8,9 @@ import {
   View,
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import Markdown from 'react-native-markdown-display'
 
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { MomoSpeaks } from '@/components/CharacterSpeaks'
+import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function ConcertsScreen() {
   const router = useRouter()
@@ -23,9 +23,6 @@ export default function ConcertsScreen() {
   }
 
   // Calculate maxButtonHeight dynamically based on screen height
-  // Calculate maxButtonHeight dynamically based on screen height
-  // Using interpolation: at height 852px -> buttonHeight 200px, at height 956px -> buttonHeight 240px
-  // Exception: at height 667px (iPhone SE II/III) -> buttonHeight 120px
   const interpolationPoint1 = { height: 852, buttonHeight: 200 }
   const interpolationPoint2 = { height: 956, buttonHeight: 240 }
   const seHeight = 667
@@ -84,17 +81,7 @@ export default function ConcertsScreen() {
       extraScrollHeight={100}
     >
       <View style={styles.container}>
-        {/* Left section: Momo image and text */}
-        <View style={styles.leftSection}>
-          <Image
-            source={require('@/../assets/images/Momo.png')}
-            style={styles.momoImage}
-            resizeMode="contain"
-          />
-          <View style={styles.textBubble}>
-            <Markdown style={markdownStyles}>{momoMessage}</Markdown>
-          </View>
-        </View>
+        <MomoSpeaks markup={momoMessage} />
 
         {/* Button Grid 2x2 - below Momo */}
         <View style={styles.gridContainer}>
@@ -151,32 +138,6 @@ export default function ConcertsScreen() {
   )
 }
 
-const markdownStyles = {
-  body: {
-    fontSize: FONT.SIZE.SM,
-    color: COLORS.TEXT,
-    fontWeight: '400' as const,
-  },
-  paragraph: {
-    marginTop: 0,
-    marginBottom: 0,
-    flexWrap: 'wrap' as const,
-    flexDirection: 'row' as const,
-    alignItems: 'flex-start' as const,
-    justifyContent: 'flex-start' as const,
-  },
-  link: {
-    color: '#34b7f1',
-    textDecorationLine: 'underline' as const,
-  },
-  strong: {
-    fontWeight: 'bold' as const,
-  },
-  em: {
-    fontStyle: 'italic' as const,
-  },
-}
-
 const styles = StyleSheet.create({
   button: {
     alignItems: 'center',
@@ -216,28 +177,8 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.BACKGROUND,
     flex: 1,
   },
-  leftSection: {
-    alignItems: 'center',
-    gap: 12,
-  },
-  momoImage: {
-    height: 80,
-    width: 80,
-  },
   row: {
     flexDirection: 'row',
     gap: 20,
-  },
-  textBubble: {
-    backgroundColor: COLORS.MESSAGE_BUBBLE,
-    borderRadius: 12,
-    borderTopLeftRadius: 2,
-    elevation: 1,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    shadowColor: COLORS.BACKGROUND,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
   },
 })
