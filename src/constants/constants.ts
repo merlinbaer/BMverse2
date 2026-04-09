@@ -9,6 +9,7 @@ export const APP_VERSION = appJson.expo.version
 export const COLORS = {
   PRIMARY: '#db1b1a',
   BACKGROUND: '#000',
+  BG_GREY: '#262626',
   SCROLL_VIEW: '#e3dfd3',
   TEXT: '#fff',
   TEXT_MUTED: '#a4a09d',
