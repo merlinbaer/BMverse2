@@ -105,6 +105,11 @@ export default function ConcertsScreen() {
                 >
                   <View style={styles.button}>
                     <Image
+                      source={require('@/../assets/images/icon_background_blur.png')}
+                      style={styles.blurBackground}
+                      resizeMode="cover"
+                    />
+                    <Image
                       source={btn.image}
                       style={styles.buttonImage}
                       resizeMode="contain"
@@ -139,6 +144,11 @@ export default function ConcertsScreen() {
                 >
                   <View style={styles.button}>
                     <Image
+                      source={require('@/../assets/images/icon_background_blur.png')}
+                      style={styles.blurBackground}
+                      resizeMode="cover"
+                    />
+                    <Image
                       source={btn.image}
                       style={styles.buttonImage}
                       resizeMode="contain"
@@ -164,6 +174,12 @@ export default function ConcertsScreen() {
 }
 
 const styles = StyleSheet.create({
+  blurBackground: {
+    ...StyleSheet.absoluteFillObject,
+    height: '100%',
+    opacity: 0.8,
+    width: '100%',
+  },
   button: {
     alignItems: 'center',
     backgroundColor: COLORS.BG_GREY,
