@@ -2,7 +2,7 @@ import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { AppMarkup } from '@/components/AppMarkup'
+import { AppMarkdown } from '@/components/AppMarkdown'
 import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function PlayerScreen() {
@@ -16,7 +16,7 @@ export default function PlayerScreen() {
     >
       <Stack.Screen options={{ title: 'Music Player' }} />
       <View style={styles.characterContainer}>
-        <AppMarkup
+        <AppMarkdown
           markup={'Only in IOS and Android when logged in.'}
           orientation={'center'}
         />

@@ -7,7 +7,7 @@ import {
   ViewStyle,
 } from 'react-native'
 
-import { AppMarkup } from '@/components/AppMarkup'
+import { AppMarkdown } from '@/components/AppMarkdown'
 
 interface CharacterSpeaksProps {
   markup: string
@@ -46,7 +46,11 @@ function CharacterSpeaks({
         resizeMode="contain"
       />
       <View style={styles.markupWrapper}>
-        <AppMarkup markup={markup} footer={footer} orientation={orientation} />
+        <AppMarkdown
+          markup={markup}
+          footer={footer}
+          orientation={orientation}
+        />
       </View>
     </View>
   )

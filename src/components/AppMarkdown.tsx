@@ -11,7 +11,7 @@ interface AppMarkupProps {
   orientation?: 'left' | 'right' | 'center'
 }
 
-export function AppMarkup({
+export function AppMarkdown({
   markup,
   footer,
   orientation = 'left',
@@ -25,6 +25,8 @@ export function AppMarkup({
           : 'flex-end',
     borderTopLeftRadius: orientation === 'left' ? 2 : 12,
     borderTopRightRadius: orientation === 'right' ? 2 : 12,
+    borderWidth: 2,
+    borderColor: COLORS.PRIMARY,
   }
 
   return (
@@ -43,7 +45,7 @@ const markdownStyles = {
   body: {
     fontSize: FONT.SIZE.SM,
     color: COLORS.TEXT,
-    fontWeight: '400' as const,
+    fontWeight: 300 as const,
   },
   paragraph: {
     marginTop: 0,

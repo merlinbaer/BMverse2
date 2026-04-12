@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { AppMarkup } from '@/components/AppMarkup'
+import { AppMarkdown } from '@/components/AppMarkdown'
 import { AppText } from '@/components/AppText'
 import { COLORS, LAYOUT } from '@/constants/constants'
 import {
@@ -75,7 +75,7 @@ export default function HomeScreen() {
       >
         <Stack.Screen options={{ title: 'Music Player' }} />
         <View style={styles.characterContainer}>
-          <AppMarkup
+          <AppMarkdown
             markup={'Only in IOS and Android when logged in.'}
             orientation={'center'}
           />

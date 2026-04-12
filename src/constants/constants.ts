@@ -21,7 +21,8 @@ export const COLORS = {
   BM_DARK_RED: '#5f0a06',
   BM_VERY_DARK_RED: '#310a03',
   TEXT_INPUT: '#fff',
-  MESSAGE_BUBBLE: '#202c33',
+  //MESSAGE_BUBBLE: '#202c33',
+  MESSAGE_BUBBLE: '#1a1a1a',
 }
 
 export const AppTheme = {

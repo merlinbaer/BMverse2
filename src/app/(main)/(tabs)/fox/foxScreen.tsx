@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { Image, Platform, Pressable, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { AppMarkup } from '@/components/AppMarkup'
+import { AppMarkdown } from '@/components/AppMarkdown'
 import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function FoxScreen() {
@@ -70,7 +70,7 @@ export default function FoxScreen() {
                   handlePressTextbox('/(main)/(tabs)/fox/songs/Songs')
                 }
               >
-                <AppMarkup markup={suMessage} orientation={'center'} />
+                <AppMarkdown markup={suMessage} orientation={'center'} />
               </Pressable>
             )}
           </View>
@@ -99,7 +99,7 @@ export default function FoxScreen() {
                     handlePressTextbox('/(main)/(tabs)/fox/concerts/Concerts')
                   }
                 >
-                  <AppMarkup markup={momoMessage} orientation={'left'} />
+                  <AppMarkdown markup={momoMessage} orientation={'left'} />
                 </Pressable>
               )}
             </View>
@@ -126,7 +126,7 @@ export default function FoxScreen() {
                     handlePressTextbox('/(main)/(tabs)/fox/videos/Videos')
                   }
                 >
-                  <AppMarkup markup={moaMessage} orientation={'right'} />
+                  <AppMarkdown markup={moaMessage} orientation={'right'} />
                 </Pressable>
               )}
             </View>
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     alignSelf: 'center',
-    backgroundColor: COLORS.MESSAGE_BUBBLE,
+    backgroundColor: COLORS.BACKGROUND,
     borderRadius: 12,
     borderTopLeftRadius: 2,
     elevation: 1,
@@ -213,13 +213,13 @@ const styles = StyleSheet.create({
   },
   suAreaContainer: {
     alignItems: 'center',
-    height: 200, // Reserves space for bubble
+    height: 210, // Reserves space for bubble
     width: '100%',
     zIndex: 10,
   },
   suBubbleAbsolute: {
     borderTopLeftRadius: 12,
-    maxWidth: '90%',
+    maxWidth: '95%',
     position: 'absolute',
     top: 150,
     zIndex: 11,

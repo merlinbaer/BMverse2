@@ -1,7 +1,7 @@
 import { useValue } from '@legendapp/state/react'
 import { FlatList, StyleSheet } from 'react-native'
 
-import { AppMarkup } from '@/components/AppMarkup'
+import { AppMarkdown } from '@/components/AppMarkdown'
 import { COLORS, LAYOUT } from '@/constants/constants'
 import { newsItem$, newsList$ } from '@/services/legend'
 
@@ -16,7 +16,11 @@ function NewsItem({ id }: { id: string }) {
       })
     : ''
   return (
-    <AppMarkup markup={item.news_info} footer={footerText} orientation="left" />
+    <AppMarkdown
+      markup={item.news_info}
+      footer={footerText}
+      orientation="left"
+    />
   )
 }
 
