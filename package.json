@@ -45,6 +45,7 @@
     "expo-blur": "^15.0.8",
     "expo-constants": "^18.0.12",
     "expo-dev-client": "^6.0.20",
+    "expo-font": "^55.0.6",
     "expo-linking": "^8.0.11",
     "expo-router": "^6.0.23",
     "expo-secure-store": "^15.0.8",

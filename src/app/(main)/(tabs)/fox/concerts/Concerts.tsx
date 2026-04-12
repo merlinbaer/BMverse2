@@ -9,8 +9,9 @@ import {
 } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
+import { AppText } from '@/components/AppText'
 import { MomoSpeaks } from '@/components/CharacterSpeaks'
-import { COLORS, LAYOUT } from '@/constants/constants'
+import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 
 export default function ConcertsScreen() {
   const router = useRouter()
@@ -51,24 +52,28 @@ export default function ConcertsScreen() {
       image: require('@/../assets/images/concert_box_year.png'),
       screen: '/(main)/(tabs)/fox/concerts/year' as Href,
       position: 'top-left',
+      label: 'Year',
     },
     {
       id: 'country',
       image: require('@/../assets/images/concert_box_country.png'),
       screen: '/(main)/(tabs)/fox/concerts/country' as Href,
       position: 'top-right',
+      label: 'Country',
     },
     {
       id: 'tour',
       image: require('@/../assets/images/concert_box_tour.png'),
       screen: '/(main)/(tabs)/fox/concerts/tour' as Href,
       position: 'bottom-left',
+      label: 'Tour',
     },
     {
       id: 'upcoming',
       image: require('@/../assets/images/concert_box_upcoming.png'),
       screen: '/(main)/(tabs)/fox/concerts/upcoming' as Href,
       position: 'bottom-right',
+      label: 'Upcoming',
     },
   ]
 
@@ -104,6 +109,16 @@ export default function ConcertsScreen() {
                       style={styles.buttonImage}
                       resizeMode="contain"
                     />
+                    <AppText
+                      style={{
+                        marginTop: -10,
+                        color: COLORS.TEXT_MUTED,
+                        fontSize: FONT.SIZE.BASE,
+                      }}
+                    >
+                      {' '}
+                      {btn.label}{' '}
+                    </AppText>
                   </View>
                 </Pressable>
               ))}
@@ -128,6 +143,16 @@ export default function ConcertsScreen() {
                       style={styles.buttonImage}
                       resizeMode="contain"
                     />
+                    <AppText
+                      style={{
+                        marginTop: -10,
+                        color: COLORS.TEXT_MUTED,
+                        fontSize: FONT.SIZE.BASE,
+                      }}
+                    >
+                      {' '}
+                      {btn.label}{' '}
+                    </AppText>
                   </View>
                 </Pressable>
               ))}
@@ -149,8 +174,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttonImage: {
-    height: '100%',
-    width: '100%',
+    height: '80%',
+    width: '80%',
   },
   buttonWrapper: {
     borderRadius: 20,

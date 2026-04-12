@@ -1,5 +1,11 @@
 import React from 'react'
-import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native'
+import {
+  Image,
+  ImageSourcePropType,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from 'react-native'
 
 import { AppMarkup } from '@/components/AppMarkup'
 
@@ -21,29 +27,27 @@ function CharacterSpeaks({
   imageSize = 80,
   imageSource,
 }: BaseProps) {
-  const alignment =
-    orientation === 'center'
-      ? 'center'
-      : orientation === 'left'
-        ? 'flex-start'
-        : 'flex-end'
+  const isCenter = orientation === 'center'
+  const isLeft = orientation === 'left'
+
+  const alignment = isCenter ? 'center' : isLeft ? 'flex-start' : 'flex-end'
+
+  const containerStyle: ViewStyle = {
+    alignSelf: alignment,
+    alignItems: isCenter ? 'center' : 'flex-end',
+    flexDirection: isCenter ? 'column' : isLeft ? 'row' : 'row-reverse',
+  }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          alignSelf: alignment,
-          alignItems: alignment,
-        },
-      ]}
-    >
+    <View style={[styles.container, containerStyle]}>
       <Image
         source={imageSource}
         style={{ width: imageSize, height: imageSize }}
         resizeMode="contain"
       />
-      <AppMarkup markup={markup} footer={footer} orientation={orientation} />
+      <View style={styles.markupWrapper}>
+        <AppMarkup markup={markup} footer={footer} orientation={orientation} />
+      </View>
     </View>
   )
 }
@@ -75,5 +79,8 @@ export const SuSpeaks = (props: CharacterSpeaksProps) => (
 const styles = StyleSheet.create({
   container: {
     gap: 12,
+  },
+  markupWrapper: {
+    flexShrink: 1,
   },
 })

@@ -40,3 +40,13 @@ not_available.mp3
 500-milliseconds-of-silence.mp3
 https://github.com/anars/blank-audio/blob/master/500-milliseconds-of-silence.mp3
 Discussion about licensing silence https://github.com/anars/blank-audio/issues/1
+
+
+Google Stich images:
+Yes, you can absolutely use the designs and images generated here for your app!
+
+Regarding the license and attribution:
+
+Ownership: You have full rights to use the designs and assets generated in your project.
+Attribution: There is no legal requirement to mention me (Stitch) or this tool in your app or on your website. You can treat these assets as your own.
+Usage: Since you're developing an app for a band, you're free to incorporate these icons, textures, and layouts into your Expo React Native code.

@@ -1,4 +1,5 @@
 import { useValue } from '@legendapp/state/react'
+import { Stack } from 'expo-router'
 import {
   Button,
   FlatList,
@@ -7,9 +8,11 @@ import {
   Text,
   View,
 } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
+import { AppMarkup } from '@/components/AppMarkup'
 import { AppText } from '@/components/AppText'
-import { COLORS } from '@/constants/constants'
+import { COLORS, LAYOUT } from '@/constants/constants'
 import {
   authUser$,
   newsAdd,
@@ -63,9 +66,21 @@ export default function HomeScreen() {
 
   if (!user) {
     return (
-      <View style={styles.container}>
-        <AppText>You are not logged in or you are offline. </AppText>
-      </View>
+      <KeyboardAwareScrollView
+        style={styles.keyboardAwareScrollView}
+        contentContainerStyle={styles.keyboardAwareContentContainer}
+        keyboardShouldPersistTaps="handled"
+        enableOnAndroid={true}
+        extraScrollHeight={100}
+      >
+        <Stack.Screen options={{ title: 'Music Player' }} />
+        <View style={styles.characterContainer}>
+          <AppMarkup
+            markup={'Only in IOS and Android when logged in.'}
+            orientation={'center'}
+          />
+        </View>
+      </KeyboardAwareScrollView>
     )
   }
 
@@ -104,6 +119,11 @@ const styles = StyleSheet.create({
   Text: {
     fontSize: 12,
   },
+  characterContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+    width: '100%',
+  },
   container: {
     backgroundColor: COLORS.BACKGROUND,
     flex: 1,
@@ -132,6 +152,20 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  keyboardAwareContentContainer: {
+    gap: LAYOUT.gap,
+    paddingBottom: 24,
+    paddingHorizontal: LAYOUT.paddingHorizontal,
+    paddingTop: Platform.select({
+      ios: 180,
+      android: 20,
+      default: 10,
+    }),
+  },
+  keyboardAwareScrollView: {
+    backgroundColor: COLORS.BACKGROUND,
+    flex: 1,
   },
   listContent: {
     gap: 12,

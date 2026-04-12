@@ -1,11 +1,11 @@
+import { Stack } from 'expo-router'
 import { Platform, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import Markdown from 'react-native-markdown-display'
 
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { AppMarkup } from '@/components/AppMarkup'
+import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function PlayerScreen() {
-  const aMessage = 'Only in IOS and Android when logged in.'
   return (
     <KeyboardAwareScrollView
       style={styles.keyboardAwareScrollView}
@@ -14,38 +14,15 @@ export default function PlayerScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
+      <Stack.Screen options={{ title: 'Music Player' }} />
       <View style={styles.characterContainer}>
-        {/* Su- at the top center */}
-        <Markdown style={markdownStyles}>{aMessage}</Markdown>
+        <AppMarkup
+          markup={'Only in IOS and Android when logged in.'}
+          orientation={'center'}
+        />
       </View>
     </KeyboardAwareScrollView>
   )
-}
-
-const markdownStyles = {
-  body: {
-    fontSize: FONT.SIZE.SM,
-    color: COLORS.TEXT,
-    fontWeight: '400' as const,
-  },
-  paragraph: {
-    marginTop: 0,
-    marginBottom: 0,
-    flexWrap: 'wrap' as const,
-    flexDirection: 'row' as const,
-    alignItems: 'flex-start' as const,
-    justifyContent: 'flex-start' as const,
-  },
-  link: {
-    color: '#34b7f1',
-    textDecorationLine: 'underline' as const,
-  },
-  strong: {
-    fontWeight: 'bold' as const,
-  },
-  em: {
-    fontStyle: 'italic' as const,
-  },
 }
 
 const styles = StyleSheet.create({

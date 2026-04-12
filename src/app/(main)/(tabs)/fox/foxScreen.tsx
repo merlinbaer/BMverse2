@@ -2,9 +2,9 @@ import { Href, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
 import { Image, Platform, Pressable, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import Markdown from 'react-native-markdown-display'
 
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { AppMarkup } from '@/components/AppMarkup'
+import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function FoxScreen() {
   const router = useRouter()
@@ -70,7 +70,7 @@ export default function FoxScreen() {
                   handlePressTextbox('/(main)/(tabs)/fox/songs/Songs')
                 }
               >
-                <Markdown style={markdownStyles}>{suMessage}</Markdown>
+                <AppMarkup markup={suMessage} orientation={'center'} />
               </Pressable>
             )}
           </View>
@@ -99,7 +99,7 @@ export default function FoxScreen() {
                     handlePressTextbox('/(main)/(tabs)/fox/concerts/Concerts')
                   }
                 >
-                  <Markdown style={markdownStyles}>{momoMessage}</Markdown>
+                  <AppMarkup markup={momoMessage} orientation={'left'} />
                 </Pressable>
               )}
             </View>
@@ -126,8 +126,7 @@ export default function FoxScreen() {
                     handlePressTextbox('/(main)/(tabs)/fox/videos/Videos')
                   }
                 >
-                  {/* eslint-disable-next-line react-native/no-raw-text */}
-                  <Markdown style={markdownStyles}>{moaMessage}</Markdown>
+                  <AppMarkup markup={moaMessage} orientation={'right'} />
                 </Pressable>
               )}
             </View>
@@ -136,32 +135,6 @@ export default function FoxScreen() {
       </Pressable>
     </KeyboardAwareScrollView>
   )
-}
-
-const markdownStyles = {
-  body: {
-    fontSize: FONT.SIZE.SM,
-    color: COLORS.TEXT,
-    fontWeight: '400' as const,
-  },
-  paragraph: {
-    marginTop: 0,
-    marginBottom: 0,
-    flexWrap: 'wrap' as const,
-    flexDirection: 'row' as const,
-    alignItems: 'flex-start' as const,
-    justifyContent: 'flex-start' as const,
-  },
-  link: {
-    color: '#34b7f1',
-    textDecorationLine: 'underline' as const,
-  },
-  strong: {
-    fontWeight: 'bold' as const,
-  },
-  em: {
-    fontStyle: 'italic' as const,
-  },
 }
 
 const styles = StyleSheet.create({
