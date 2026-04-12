@@ -42,7 +42,7 @@ export const FONT = {
     LG: 24,
   },
   WEIGHT: {
-    BASE: '600',
+    BASE: '500',
   },
 } as const
 

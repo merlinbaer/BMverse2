@@ -1,5 +1,5 @@
 import { useValue } from '@legendapp/state/react'
-import { FlatList, StyleSheet } from 'react-native'
+import { FlatList, Platform, StyleSheet } from 'react-native'
 
 import { AppMarkdown } from '@/components/AppMarkdown'
 import { COLORS, LAYOUT } from '@/constants/constants'
@@ -50,5 +50,10 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingBottom: 80,
     paddingHorizontal: LAYOUT.paddingHorizontal,
+    paddingTop: Platform.select({
+      ios: 25,
+      android: 20,
+      default: 10,
+    }),
   },
 })
