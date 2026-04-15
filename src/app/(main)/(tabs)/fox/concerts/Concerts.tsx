@@ -50,7 +50,7 @@ export default function ConcertsScreen() {
     {
       id: 'year',
       image: require('@/../assets/images/concert_box_year.png'),
-      screen: '/(main)/(tabs)/fox/concerts/year' as Href,
+      screen: '/(main)/(tabs)/fox/concerts/ConcertsYear' as Href,
       position: 'top-left',
       label: 'Year',
     },
@@ -182,7 +182,6 @@ const styles = StyleSheet.create({
   },
   button: {
     alignItems: 'center',
-    backgroundColor: COLORS.BG_GREY,
     borderRadius: 20,
     height: '100%',
     justifyContent: 'center',

@@ -11,6 +11,7 @@ import {
   version$,
   versionSync,
 } from '@/services/legend'
+import { concerts$, concertsSync } from '@/services/legend/tables/concerts'
 
 export const initializeStores = () => {
   // Wake up local-only persisted stores
@@ -25,6 +26,7 @@ export const initializeStores = () => {
     sync$.peek()
     version$.peek()
     news$.peek()
+    concerts$.peek()
     console.log('LegendState: Table stores initialized.')
   } catch (error) {
     console.log('LegendState: Failed to initialize table stores:', error)
@@ -32,7 +34,7 @@ export const initializeStores = () => {
 }
 
 export const syncAll = async () => {
-  await Promise.all([versionSync(), newsSync()])
+  await Promise.all([versionSync(), newsSync(), concertsSync()])
 }
 
 export const startSyncCoordinator = () => {

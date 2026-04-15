@@ -1,6 +1,7 @@
 export * from './tables/sync'
 export * from './tables/versions'
 export * from './tables/news'
+export * from './tables/concerts'
 export * from './local/primitives'
 export * from './memory/variables'
 //export * from './tables/songs'

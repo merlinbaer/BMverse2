@@ -47,7 +47,8 @@
           "enableFullScreenImage_legacy": true,
           "backgroundColor": "#000000"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,
