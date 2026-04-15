@@ -1,8 +1,9 @@
 import { computed } from '@legendapp/state'
+import { Href } from 'expo-router'
 
 import concertBoxTour from '@/../assets/images/concert_box_tour.png'
 import concertBoxYear from '@/../assets/images/concert_box_year.png'
-import { ListItem } from '@/types/list'
+import { ListItem, ListType } from '@/types/list'
 import { ConcertsType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -18,12 +19,12 @@ const { store$, item$, sync, clearCache } = createTableStore<ConcertsType>({
 
 // Add Factory functions
 export const concerts$ = store$
-export const concertsItem$ = item$
-export const concertsSync = sync
-export const concertsClearCache = clearCache
+export const concertItem$ = item$
+export const concertSync = sync
+export const concertClearCache = clearCache
 
 // Domain-specific functions
-export const concertsYearsList$ = computed(() => {
+export const concertsYearList$ = computed(() => {
   const data = store$.get()
   if (!data) return []
 
@@ -43,13 +44,16 @@ export const concertsYearsList$ = computed(() => {
         line1: year,
         line2: String(count) + ' concerts performed',
         sorted: year,
-        icon: concertBoxYear, //'https://flagsapi.com/JP/shiny/64.png',
-        route: '/(main)/(tabs)/fox/concerts/ConcertsYear',
+        icon: concertBoxYear,
+        route: {
+          pathname: '/(main)/(tabs)/fox/concerts/ConcertsVenue',
+          params: { type: 'Year', id: year },
+        } as Href,
       }),
     )
 })
 
-export const concertsCountriesList$ = computed(() => {
+export const concertsCountryList$ = computed(() => {
   const data = store$.get()
   if (!data) return []
 
@@ -75,17 +79,20 @@ export const concertsCountriesList$ = computed(() => {
         id: code,
         line1: details.name,
         line2: Array.from(details.years)
-          .sort((a, b) => a.localeCompare(b))
+          .sort((a, b) => b.localeCompare(a))
           .join(', '),
         sorted: details.name,
         icon: 'https://flagsapi.com/' + code + '/shiny/64.png',
-        route: '/(main)/(tabs)/fox/concerts/ConcertsYear',
+        route: {
+          pathname: '/(main)/(tabs)/fox/concerts/ConcertsVenue',
+          params: { type: 'Country', id: code },
+        } as Href,
       }),
     )
     .sort((a, b) => a.line1.localeCompare(b.line1))
 })
 
-export const concertsToursList$ = computed(() => {
+export const concertsTourList$ = computed(() => {
   const data = store$.get()
   if (!data) return []
 
@@ -113,19 +120,19 @@ export const concertsToursList$ = computed(() => {
         line2: sortedYears.join(', '),
         sorted: sortedYears[sortedYears.length - 1] || '',
         icon: concertBoxTour,
-        route: '/(main)/(tabs)/fox/concerts/ConcertsYear',
+        route: {
+          pathname: '/(main)/(tabs)/fox/concerts/ConcertsVenue',
+          params: { type: 'Tour', id: name },
+        } as Href,
       }
     })
     .sort((a, b) => b.sorted.localeCompare(a.sorted))
 })
 
-export const concertsList$ = (
-  type?: 'year' | 'code' | 'tour',
-  value?: string,
-) =>
+export const concertsVenueList$ = (type?: ListType, value?: string) =>
   computed(() => {
     const data = store$.get()
-    if (!data) return []
+    if (!data || !type || !value) return []
 
     return Object.values(data)
       .filter(item => {
@@ -133,19 +140,31 @@ export const concertsList$ = (
         if (!type || !value) return true
 
         switch (type) {
-          case 'year':
+          case 'Year':
             return String(item.setlist_eventyear) === value
-          case 'code':
+          case 'Country':
             return item.setlist_venue_city_country_code === value
-          case 'tour':
+          case 'Tour':
             return item.setlist_tour_name === value
           default:
-            return true
+            console.log(`[concertsVenueList$] Unhandled ListType: ${type}`)
+            return false
         }
       })
       .sort(
         (a, b) =>
-          new Date(a.setlist_eventdate).getTime() -
-          new Date(b.setlist_eventdate).getTime(),
+          new Date(b.setlist_eventdate).getTime() -
+          new Date(a.setlist_eventdate).getTime(),
       )
+      .map(item => ({
+        id: item.id,
+        line1: item.setlist_venue_city_name + ' - ' + item.setlist_venue_name,
+        line2: item.setlist_eventdate + ' - ' + item.setlist_tour_name,
+        sorted: item.setlist_eventdate,
+        icon: item.setlist_artwork,
+        route: {
+          pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
+          params: { id: item.id },
+        } as Href,
+      }))
   })

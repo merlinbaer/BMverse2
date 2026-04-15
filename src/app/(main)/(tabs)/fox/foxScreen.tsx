@@ -82,7 +82,7 @@ export default function FoxScreen() {
                 onPress={() =>
                   handlePressCharacter(
                     'Momo',
-                    '/(main)/(tabs)/fox/concerts/Concerts',
+                    '/(main)/(tabs)/fox/concerts/ConcertSelection',
                   )
                 }
               >
@@ -96,7 +96,9 @@ export default function FoxScreen() {
                 <Pressable
                   style={[styles.itemContainer, styles.momoBubble]}
                   onPress={() =>
-                    handlePressTextbox('/(main)/(tabs)/fox/concerts/Concerts')
+                    handlePressTextbox(
+                      '/(main)/(tabs)/fox/concerts/ConcertSelection',
+                    )
                   }
                 >
                   <AppMarkdown markup={momoMessage} orientation={'left'} />

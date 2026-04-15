@@ -3,13 +3,13 @@ import { Stack } from 'expo-router'
 import React from 'react'
 
 import { AppFlatList } from '@/components/AppFlatList'
-import { concertsYearList$ } from '@/services/legend'
+import { concertsTourList$ } from '@/services/legend'
 
-export default function ConcertsYearScreen() {
-  const data = useValue(concertsYearList$)
+export default function ConcertsCountryScreen() {
+  const data = useValue(concertsTourList$)
   return (
     <React.Fragment>
-      <Stack.Screen options={{ title: 'Concerts by Year' }} />
+      <Stack.Screen options={{ title: 'Concerts by Tour' }} />
       <AppFlatList data={data} />
     </React.Fragment>
   )

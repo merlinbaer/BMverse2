@@ -1,4 +1,5 @@
-import { Href, useRouter } from 'expo-router'
+import { Href, Stack, useRouter } from 'expo-router'
+import React from 'react'
 import {
   Image,
   Platform,
@@ -13,7 +14,7 @@ import { AppText } from '@/components/AppText'
 import { MomoSpeaks } from '@/components/CharacterSpeaks'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 
-export default function ConcertsScreen() {
+export default function ConcertSelectionScreen() {
   const router = useRouter()
   const { width, height } = useWindowDimensions()
 
@@ -57,21 +58,21 @@ export default function ConcertsScreen() {
     {
       id: 'country',
       image: require('@/../assets/images/concert_box_country.png'),
-      screen: '/(main)/(tabs)/fox/concerts/country' as Href,
+      screen: '/(main)/(tabs)/fox/concerts/ConcertsCountry' as Href,
       position: 'top-right',
       label: 'Country',
     },
     {
       id: 'tour',
       image: require('@/../assets/images/concert_box_tour.png'),
-      screen: '/(main)/(tabs)/fox/concerts/tour' as Href,
+      screen: '/(main)/(tabs)/fox/concerts/ConcertsTour' as Href,
       position: 'bottom-left',
       label: 'Tour',
     },
     {
       id: 'upcoming',
       image: require('@/../assets/images/concert_box_upcoming.png'),
-      screen: '/(main)/(tabs)/fox/concerts/upcoming' as Href,
+      screen: '/(main)/(tabs)/fox/concerts/ConcertsUpcoming' as Href,
       position: 'bottom-right',
       label: 'Upcoming',
     },
@@ -85,6 +86,7 @@ export default function ConcertsScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
+      <Stack.Screen options={{ title: 'Concerts' }} />
       <View style={styles.container}>
         <MomoSpeaks markup={momoMessage} />
 

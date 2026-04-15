@@ -1,5 +1,8 @@
 import { Href } from 'expo-router'
 
+export const LIST_TYPES = ['Year', 'Country', 'Tour'] as const
+export type ListType = (typeof LIST_TYPES)[number]
+
 export type ListItem = {
   id: string
   line1: string

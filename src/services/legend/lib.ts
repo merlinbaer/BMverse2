@@ -8,10 +8,10 @@ import {
   newsSync,
   sync$,
   syncSync,
-  version$,
+  versions$,
   versionSync,
 } from '@/services/legend'
-import { concerts$, concertsSync } from '@/services/legend/tables/concerts'
+import { concerts$, concertSync } from '@/services/legend/tables/concerts'
 
 export const initializeStores = () => {
   // Wake up local-only persisted stores
@@ -24,7 +24,7 @@ export const initializeStores = () => {
   // Wake up table stores
   try {
     sync$.peek()
-    version$.peek()
+    versions$.peek()
     news$.peek()
     concerts$.peek()
     console.log('LegendState: Table stores initialized.')
@@ -34,7 +34,7 @@ export const initializeStores = () => {
 }
 
 export const syncAll = async () => {
-  await Promise.all([versionSync(), newsSync(), concertsSync()])
+  await Promise.all([versionSync(), newsSync(), concertSync()])
 }
 
 export const startSyncCoordinator = () => {
