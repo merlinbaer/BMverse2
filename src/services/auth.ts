@@ -14,7 +14,14 @@ import { supabase } from './supabase'
  */
 export function initAuth() {
   supabase.auth.getSession().then(({ data }) => {
-    authUser$.set(data.session?.user?.email ?? null)
+    if (data.session?.user?.email) {
+      authUser$.set(data.session?.user?.email)
+      console.log('Auth: User logged in.')
+    } else {
+      authUser$.set(null)
+      console.log('Auth: No user session found.')
+      // localStore$.isOnboarding.set(true)
+    }
   })
 
   // Add listener

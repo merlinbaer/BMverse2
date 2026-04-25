@@ -127,6 +127,144 @@ export type Database = {
         }
         Relationships: []
       }
+      bm_event_concert_songs: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          setlist_id: string
+          setlist_versionid: string
+          song_artwork: string | null
+          song_encore: boolean
+          song_info: string | null
+          song_name: string | null
+          song_name_original: string
+          song_nr: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_id: string
+          setlist_versionid: string
+          song_artwork?: string | null
+          song_encore: boolean
+          song_info?: string | null
+          song_name?: string | null
+          song_name_original: string
+          song_nr: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_id?: string
+          setlist_versionid?: string
+          song_artwork?: string | null
+          song_encore?: boolean
+          song_info?: string | null
+          song_name?: string | null
+          song_name_original?: string
+          song_nr?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      bm_event_concert_upcoming: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          setlist_artist_mbid: string
+          setlist_artist_name: string
+          setlist_artist_sortname: string | null
+          setlist_artist_url: string | null
+          setlist_artwork: string
+          setlist_eventdate: string
+          setlist_eventyear: number
+          setlist_id: string
+          setlist_info: string | null
+          setlist_lastupdated: string | null
+          setlist_tour_name: string | null
+          setlist_url: string | null
+          setlist_venue_city_coords_lat: number | null
+          setlist_venue_city_coords_long: number | null
+          setlist_venue_city_country_code: string
+          setlist_venue_city_country_name: string
+          setlist_venue_city_id: string | null
+          setlist_venue_city_name: string
+          setlist_venue_city_state: string | null
+          setlist_venue_city_statecode: string | null
+          setlist_venue_id: string | null
+          setlist_venue_name: string | null
+          setlist_venue_url: string | null
+          setlist_versionid: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_artist_mbid: string
+          setlist_artist_name: string
+          setlist_artist_sortname?: string | null
+          setlist_artist_url?: string | null
+          setlist_artwork: string
+          setlist_eventdate: string
+          setlist_eventyear: number
+          setlist_id: string
+          setlist_info?: string | null
+          setlist_lastupdated?: string | null
+          setlist_tour_name?: string | null
+          setlist_url?: string | null
+          setlist_venue_city_coords_lat?: number | null
+          setlist_venue_city_coords_long?: number | null
+          setlist_venue_city_country_code: string
+          setlist_venue_city_country_name: string
+          setlist_venue_city_id?: string | null
+          setlist_venue_city_name: string
+          setlist_venue_city_state?: string | null
+          setlist_venue_city_statecode?: string | null
+          setlist_venue_id?: string | null
+          setlist_venue_name?: string | null
+          setlist_venue_url?: string | null
+          setlist_versionid?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_artist_mbid?: string
+          setlist_artist_name?: string
+          setlist_artist_sortname?: string | null
+          setlist_artist_url?: string | null
+          setlist_artwork?: string
+          setlist_eventdate?: string
+          setlist_eventyear?: number
+          setlist_id?: string
+          setlist_info?: string | null
+          setlist_lastupdated?: string | null
+          setlist_tour_name?: string | null
+          setlist_url?: string | null
+          setlist_venue_city_coords_lat?: number | null
+          setlist_venue_city_coords_long?: number | null
+          setlist_venue_city_country_code?: string
+          setlist_venue_city_country_name?: string
+          setlist_venue_city_id?: string | null
+          setlist_venue_city_name?: string
+          setlist_venue_city_state?: string | null
+          setlist_venue_city_statecode?: string | null
+          setlist_venue_id?: string | null
+          setlist_venue_name?: string | null
+          setlist_venue_url?: string | null
+          setlist_versionid?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bm_news: {
         Row: {
           created_at: string

@@ -5,3 +5,5 @@ export type NewsType = Database['public']['Tables']['bm_news']['Row']
 export type SyncType = Database['public']['Tables']['gl_sync']['Row']
 export type ConcertsType =
   Database['public']['Tables']['bm_event_concert']['Row']
+export type SetlistType =
+  Database['public']['Tables']['bm_event_concert_songs']['Row']

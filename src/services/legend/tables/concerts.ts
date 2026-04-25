@@ -164,7 +164,7 @@ export const concertsVenueList$ = (type?: ListType, value?: string) =>
         icon: item.setlist_artwork,
         route: {
           pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
-          params: { id: item.id },
+          params: { id: item.id, setlistId: item.setlist_id },
         } as Href,
       }))
   })

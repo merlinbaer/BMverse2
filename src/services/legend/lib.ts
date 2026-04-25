@@ -6,6 +6,8 @@ import {
   localStore$,
   news$,
   newsSync,
+  setlists$,
+  setlistSync,
   sync$,
   syncSync,
   versions$,
@@ -27,6 +29,7 @@ export const initializeStores = () => {
     versions$.peek()
     news$.peek()
     concerts$.peek()
+    setlists$.peek()
     console.log('LegendState: Table stores initialized.')
   } catch (error) {
     console.log('LegendState: Failed to initialize table stores:', error)
@@ -34,7 +37,7 @@ export const initializeStores = () => {
 }
 
 export const syncAll = async () => {
-  await Promise.all([versionSync(), newsSync(), concertSync()])
+  await Promise.all([versionSync(), newsSync(), concertSync(), setlistSync()])
 }
 
 export const startSyncCoordinator = () => {
