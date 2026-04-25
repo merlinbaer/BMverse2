@@ -2,7 +2,7 @@ import { useValue } from '@legendapp/state/react'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React, { useMemo } from 'react'
 
-import { AppFlatList } from '@/components/AppFlatList'
+import { AppListScreen } from '@/components/AppListScreen'
 import { concertsVenueList$ } from '@/services/legend'
 import { LIST_TYPES, ListType } from '@/types/list'
 
@@ -22,9 +22,8 @@ export default function ConcertsVenueScreen() {
   const data = useValue(list$)
 
   return (
-    <React.Fragment>
+    <AppListScreen data={data}>
       <Stack.Screen options={{ title: getTitle() }} />
-      <AppFlatList data={data} />
-    </React.Fragment>
+    </AppListScreen>
   )
 }

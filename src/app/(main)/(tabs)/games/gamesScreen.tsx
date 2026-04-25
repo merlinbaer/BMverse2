@@ -1,18 +1,11 @@
 import { useValue } from '@legendapp/state/react'
 import { Stack } from 'expo-router'
-import {
-  Button,
-  FlatList,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { Button, FlatList, StyleSheet, Text, View } from 'react-native'
 
 import { AppMarkdown } from '@/components/AppMarkdown'
+import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
-import { COLORS, LAYOUT } from '@/constants/constants'
+import { COLORS } from '@/constants/constants'
 import {
   authUser$,
   newsAdd,
@@ -49,7 +42,7 @@ function DemoItem({ id }: { id: string }) {
   )
 }
 
-export default function HomeScreen() {
+export default function GamesScreen() {
   const data = useValue(newsList$)
   const user = useValue(authUser$)
 
@@ -66,13 +59,7 @@ export default function HomeScreen() {
 
   if (!user) {
     return (
-      <KeyboardAwareScrollView
-        style={styles.keyboardAwareScrollView}
-        contentContainerStyle={styles.keyboardAwareContentContainer}
-        keyboardShouldPersistTaps="handled"
-        enableOnAndroid={true}
-        extraScrollHeight={100}
-      >
+      <AppScreen>
         <Stack.Screen options={{ title: 'Music Player' }} />
         <View style={styles.characterContainer}>
           <AppMarkdown
@@ -80,12 +67,13 @@ export default function HomeScreen() {
             orientation={'center'}
           />
         </View>
-      </KeyboardAwareScrollView>
+      </AppScreen>
     )
   }
 
   return (
-    <View style={styles.container}>
+    <AppScreen>
+      <Stack.Screen options={{ title: 'Games & Admin' }} />
       <View style={styles.header}>
         <Button
           title="Clear Cache and Sync"
@@ -108,10 +96,11 @@ export default function HomeScreen() {
           contentContainerStyle={styles.listContent}
           contentInsetAdjustmentBehavior="automatic"
           scrollEventThrottle={16}
+          scrollEnabled={false}
           renderItem={({ item }) => <DemoItem id={item.id} />}
         />
       )}
-    </View>
+    </AppScreen>
   )
 }
 
@@ -124,15 +113,6 @@ const styles = StyleSheet.create({
     marginVertical: 20,
     width: '100%',
   },
-  container: {
-    backgroundColor: COLORS.BACKGROUND,
-    flex: 1,
-    paddingTop: Platform.select({
-      ios: 170,
-      android: 20,
-      default: 10,
-    }),
-  },
   emptyContainer: {
     alignItems: 'center',
     flex: 1,
@@ -142,6 +122,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    borderBottomColor: COLORS.PRIMARY,
     borderBottomWidth: 1,
     gap: 12,
     padding: 10,
@@ -152,20 +133,6 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 8,
-  },
-  keyboardAwareContentContainer: {
-    gap: LAYOUT.gap,
-    paddingBottom: 24,
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingTop: Platform.select({
-      ios: 180,
-      android: 20,
-      default: 10,
-    }),
-  },
-  keyboardAwareScrollView: {
-    backgroundColor: COLORS.BACKGROUND,
-    flex: 1,
   },
   listContent: {
     gap: 12,

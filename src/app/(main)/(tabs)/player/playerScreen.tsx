@@ -1,19 +1,12 @@
 import { Stack } from 'expo-router'
-import { Platform, StyleSheet, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { StyleSheet, View } from 'react-native'
 
 import { AppMarkdown } from '@/components/AppMarkdown'
-import { COLORS, LAYOUT } from '@/constants/constants'
+import { AppScreen } from '@/components/AppScreen'
 
 export default function PlayerScreen() {
   return (
-    <KeyboardAwareScrollView
-      style={styles.keyboardAwareScrollView}
-      contentContainerStyle={styles.keyboardAwareContentContainer}
-      keyboardShouldPersistTaps="handled"
-      enableOnAndroid={true}
-      extraScrollHeight={100}
-    >
+    <AppScreen>
       <Stack.Screen options={{ title: 'Music Player' }} />
       <View style={styles.characterContainer}>
         <AppMarkdown
@@ -21,7 +14,7 @@ export default function PlayerScreen() {
           orientation={'center'}
         />
       </View>
-    </KeyboardAwareScrollView>
+    </AppScreen>
   )
 }
 
@@ -30,19 +23,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 20,
     width: '100%',
-  },
-  keyboardAwareContentContainer: {
-    gap: LAYOUT.gap,
-    paddingBottom: 24,
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingTop: Platform.select({
-      ios: 180,
-      android: 20,
-      default: 10,
-    }),
-  },
-  keyboardAwareScrollView: {
-    backgroundColor: COLORS.BACKGROUND,
-    flex: 1,
   },
 })

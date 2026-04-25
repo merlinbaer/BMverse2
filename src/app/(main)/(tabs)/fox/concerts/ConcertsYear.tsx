@@ -2,15 +2,14 @@ import { useValue } from '@legendapp/state/react'
 import { Stack } from 'expo-router'
 import React from 'react'
 
-import { AppFlatList } from '@/components/AppFlatList'
+import { AppListScreen } from '@/components/AppListScreen'
 import { concertsYearList$ } from '@/services/legend'
 
 export default function ConcertsYearScreen() {
   const data = useValue(concertsYearList$)
   return (
-    <React.Fragment>
+    <AppListScreen data={data}>
       <Stack.Screen options={{ title: 'Concerts by Year' }} />
-      <AppFlatList data={data} />
-    </React.Fragment>
+    </AppListScreen>
   )
 }

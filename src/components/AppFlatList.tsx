@@ -1,13 +1,19 @@
 import { Image } from 'expo-image'
 import { useRouter } from 'expo-router'
 import React from 'react'
-import { FlatList, Platform, Pressable, StyleSheet, View } from 'react-native'
+import {
+  FlatList,
+  FlatListProps,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native'
 
 import { AppText } from '@/components/AppText'
-import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { COLORS, FONT } from '@/constants/constants'
 import { ListItem } from '@/types/list'
 
-interface AppFlatListProps {
+interface AppFlatListProps extends Partial<FlatListProps<ListItem>> {
   data: ListItem[]
 }
 
@@ -39,20 +45,21 @@ function Item({ item }: { item: ListItem }) {
   )
 }
 
-export function AppFlatList({ data }: AppFlatListProps) {
+export function AppFlatList({ data, ...props }: AppFlatListProps) {
   const renderSeparator = () => <View style={styles.divider} />
 
   return (
     <FlatList
       style={styles.flatList}
       data={data}
-      keyExtractor={item => item.id}
-      contentContainerStyle={styles.listContent}
+      keyExtractor={(item: ListItem) => item.id}
       ItemSeparatorComponent={renderSeparator}
-      renderItem={({ item }) => <Item item={item} />}
+      renderItem={({ item }: { item: ListItem }) => <Item item={item} />}
       automaticallyAdjustsScrollIndicatorInsets
       contentInsetAdjustmentBehavior="automatic"
       scrollEventThrottle={16}
+      scrollEnabled={false} // Default to false for Detail screens
+      {...props}
     />
   )
 }
@@ -80,15 +87,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 50,
     width: 50,
-  },
-  listContent: {
-    paddingBottom: 80,
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingTop: Platform.select({
-      ios: 25,
-      android: 20,
-      default: 10,
-    }),
   },
   pressable: {
     alignItems: 'center',
