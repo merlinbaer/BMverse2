@@ -90,22 +90,21 @@ export default function ConcertDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  // ... existing styles ...
   listHeaderContainer: {
     marginTop: 8,
     paddingVertical: 12,
   },
   mapContainer: {
     alignItems: 'center',
-    backgroundColor: '#000',
+    backgroundColor: COLORS.BG_GREY,
     borderRadius: 12,
     marginVertical: 10,
     overflow: 'hidden',
-    width: '100%', // placeholder background
+    width: '100%',
   },
   mapImage: {
     height: 200,
-    width: '100%', // Adjust height as needed
+    width: '100%',
   },
   mapPressed: {
     opacity: 0.7,

@@ -28,7 +28,9 @@ export function AppBox({ children, style }: AppBoxProps) {
 
 const styles = StyleSheet.create({
   backgroundImage: {
-    opacity: 0.5, // Adjust transparency of the blur image if needed
+    height: '100%', // Fix for Web: ensures image fills the vertical space
+    opacity: 0.5,
+    width: '100%', // Fix for Web: ensures image fills the horizontal space
   },
   container: {
     borderRadius: 8,
