@@ -15,9 +15,16 @@ import { ListItem } from '@/types/list'
 
 interface AppFlatListProps extends Partial<FlatListProps<ListItem>> {
   data: ListItem[]
+  displayIconAsText?: boolean
 }
 
-function Item({ item }: { item: ListItem }) {
+function Item({
+  item,
+  displayIconAsText,
+}: {
+  item: ListItem
+  displayIconAsText?: boolean
+}) {
   const router = useRouter()
   return (
     <Pressable
@@ -27,7 +34,18 @@ function Item({ item }: { item: ListItem }) {
         pressed && styles.pressablePressed,
       ]}
     >
-      <Image source={item.icon} style={styles.image} />
+      {displayIconAsText ? (
+        <View style={styles.textIconContainer}>
+          <AppText
+            fontSize={FONT.SIZE.SM}
+            style={{ color: COLORS.PRIMARY, fontWeight: '400' }}
+          >
+            {item.icon as string}
+          </AppText>
+        </View>
+      ) : (
+        <Image source={item.icon} style={styles.image} />
+      )}
       <View style={styles.textContainer}>
         <AppText fontSize={FONT.SIZE.BASE} numberOfLines={1}>
           {item.line1}
@@ -45,7 +63,11 @@ function Item({ item }: { item: ListItem }) {
   )
 }
 
-export function AppFlatList({ data, ...props }: AppFlatListProps) {
+export function AppFlatList({
+  data,
+  displayIconAsText = false,
+  ...props
+}: AppFlatListProps) {
   const renderSeparator = () => <View style={styles.divider} />
 
   return (
@@ -54,7 +76,9 @@ export function AppFlatList({ data, ...props }: AppFlatListProps) {
       data={data}
       keyExtractor={(item: ListItem) => item.id}
       ItemSeparatorComponent={renderSeparator}
-      renderItem={({ item }: { item: ListItem }) => <Item item={item} />}
+      renderItem={({ item }: { item: ListItem }) => (
+        <Item item={item} displayIconAsText={displayIconAsText} />
+      )}
       automaticallyAdjustsScrollIndicatorInsets
       contentInsetAdjustmentBehavior="automatic"
       scrollEventThrottle={16}
@@ -103,5 +127,11 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 10,
+  },
+  textIconContainer: {
+    alignItems: 'center',
+    height: 50,
+    justifyContent: 'center',
+    width: 50,
   },
 })

@@ -3,8 +3,8 @@ import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { AppButton } from '@/components/AppButton'
+import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppText } from '@/components/AppText'
-import { TextHyperlink } from '@/components/TextHyperlink'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 import { localStore$ } from '@/services/legend/local/primitives'
 
@@ -47,14 +47,14 @@ export default function WelcomePage() {
           Apple Music. Youtube Videos and thumbnail images are under the license
           terms of YouTube.
         </AppText>
-        <TextHyperlink
+        <AppHyperlink
           description={'Read Terms'}
           hyperlink={'https://bmverse.bruu.eu/privacy_and_terms'}
           type={'intern'}
           color={COLORS.TEXT_MUTED}
           size={FONT.SIZE.SM}
         />
-        <TextHyperlink
+        <AppHyperlink
           description={'Read Privacy'}
           hyperlink={'https://bmverse.bruu.eu/privacy_and_terms'}
           type={'intern'}

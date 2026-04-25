@@ -13,7 +13,7 @@ type TextHyperlinkProps = {
   size?: number
 }
 
-export const TextHyperlink = ({
+export const AppHyperlink = ({
   description,
   hyperlink,
   type,

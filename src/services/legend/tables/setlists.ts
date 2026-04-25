@@ -1,7 +1,6 @@
 import { computed } from '@legendapp/state'
 import { Href } from 'expo-router'
 
-import coverSingle from '@/../assets/images/Single_200.png'
 import { SetlistType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -35,7 +34,7 @@ export const setlistsList$ = (setlistId?: string) =>
         line1: item.song_name ?? '',
         line2: item.song_info ?? '',
         sorted: item.song_nr.toString(),
-        icon: item.song_artwork ?? coverSingle,
+        icon: item.song_nr + 1,
         route: {
           pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
           params: { id: item.song_name ?? '' },

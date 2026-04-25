@@ -36,7 +36,7 @@ export default function ConcertDetailScreen() {
       <AppText>{'Tourname: ' + (detail?.setlist_tour_name ?? '')}</AppText>
       <AppText fontSize={FONT.SIZE.LG}> </AppText>
       <AppText fontSize={FONT.SIZE.LG}>{'Setlist'}</AppText>
-      <AppFlatList data={data} />
+      <AppFlatList data={data} displayIconAsText={true} />
     </AppScreen>
   )
 }
