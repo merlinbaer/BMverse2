@@ -34,7 +34,7 @@ export const setlistsList$ = (setlistId?: string) =>
         line1: item.song_name ?? '',
         line2: item.song_info ?? '',
         sorted: item.song_nr.toString(),
-        icon: item.song_nr + 1,
+        icon: item.song_nr + 1, // using song_nr as text instead of icons
         route: {
           pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
           params: { id: item.song_name ?? '' },
