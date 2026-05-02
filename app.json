@@ -8,11 +8,7 @@
     "scheme": "bmverse2",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "eu.bruu.bmverse2",
@@ -48,7 +44,18 @@
           "backgroundColor": "#000000"
         }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-web-browser",
+      "expo-image",
+      "expo-secure-store",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "extraLines": ["AsyncStorage_db_size_in_MB=10"]
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

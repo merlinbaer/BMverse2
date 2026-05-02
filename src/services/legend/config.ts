@@ -1,7 +1,11 @@
 import { observablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
 import { configureSynced } from '@legendapp/state/sync'
 import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import AsyncStorage, {
+  AsyncStorageStatic,
+} from '@react-native-async-storage/async-storage'
+import { del, get, getMany, keys, set, setMany } from 'idb-keyval'
+import { Platform } from 'react-native'
 
 import { supabase } from '@/services/supabase'
 
@@ -13,9 +17,37 @@ export const generateId = () =>
     return v.toString(16)
   })
 
+// Simple wrapper to make IndexedDB look like AsyncStorage
+const indexedDBStorage: Partial<AsyncStorageStatic> = {
+  getItem: async (key: string) => {
+    const value = await get<string>(key)
+    return value ?? null
+  },
+  setItem: (key: string, value: string) => set(key, value),
+  removeItem: (key: string) => del(key),
+  getAllKeys: () => keys() as Promise<string[]>,
+  multiGet: async (keys: readonly string[]) => {
+    const values = await getMany([...keys])
+    return keys.map((key, index) => [key, values[index] ?? null]) as [
+      string,
+      string | null,
+    ][]
+  },
+  multiSet: (entries: readonly (readonly [string, string])[]) =>
+    setMany([...entries] as [IDBValidKey, string][]),
+  multiRemove: (keys: readonly string[]) =>
+    Promise.all(keys.map(key => del(key))) as unknown as Promise<void>,
+}
+
 export const customSynced = configureSynced(syncedSupabase, {
   persist: {
-    plugin: observablePersistAsyncStorage({ AsyncStorage }),
+    plugin: observablePersistAsyncStorage({
+      // Web uses our custom IndexedDB wrapper
+      // Android/iOS uses the native AsyncStorage (Expo Go compatible)
+      AsyncStorage: (Platform.OS === 'web'
+        ? indexedDBStorage
+        : AsyncStorage) as AsyncStorageStatic,
+    }),
   },
   generateId,
   supabase,
