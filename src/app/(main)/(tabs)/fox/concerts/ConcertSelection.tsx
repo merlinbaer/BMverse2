@@ -86,7 +86,7 @@ export default function ConcertSelectionScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
-      <Stack.Screen options={{ title: 'Concerts' }} />
+      <Stack.Screen options={{ title: '' }} />
       <View style={styles.container}>
         <MomoSpeaks markup={momoMessage} />
 
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     paddingBottom: 80,
     paddingHorizontal: LAYOUT.paddingHorizontal,
     paddingTop: Platform.select({
-      ios: 160,
+      ios: 170,
       android: 20,
       default: 10,
     }),

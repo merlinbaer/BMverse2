@@ -1,5 +1,6 @@
 import { DarkTheme } from '@react-navigation/native'
 import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import { isLiquidGlassAvailable } from 'expo-glass-effect'
 import { Platform } from 'react-native'
 
 import appJson from '../../app.json'
@@ -55,19 +56,19 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
   {
     ios: {
       headerLargeTitle: true,
+      headerTransparent: true,
+      headerBlurEffect: !isLiquidGlassAvailable() ? 'dark' : 'none',
+      headerLargeStyle: !isLiquidGlassAvailable()
+        ? { backgroundColor: COLORS.BACKGROUND }
+        : {},
+      headerBackButtonDisplayMode: 'minimal',
       headerLargeTitleStyle: {
         color: COLORS.TEXT,
       },
       headerTitleStyle: {
         color: COLORS.TEXT,
       },
-      headerStyle: { backgroundColor: 'transparent' },
-      headerLargeStyle: { backgroundColor: COLORS.BACKGROUND },
       headerTintColor: COLORS.TEXT,
-      headerTransparent: true,
-      headerBlurEffect: 'dark',
-      headerBackButtonDisplayMode: 'minimal',
-      contentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     android: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND },
