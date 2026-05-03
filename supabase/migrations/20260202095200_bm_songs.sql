@@ -10,9 +10,17 @@ CREATE TABLE
     song_title_jp         text                     null,
     song_artist           text                     not null,
     song_first_appearance date                     not null,
-    song_release_type     text                     not null,
-    song_default_media    text                     null,
+    song_album_type       text                     not null default 'M', -- M = Main Release, R = Release, N = Never released
+    song_album_name       text                     null,
+    song_release_year     text                     null,
+    song_default_cover    text                     not null,
+    song_preview          text                     null,
+    song_preview_artwork  text                     null,
+    song_preview_uri      text                     null,
     song_info             text                     null,
+    song_lyrics_jp        text                     null,
+    song_lyrics_en        text                     null,
+    song_lyrics_rom       text                     null,
     constraint bm_songs_pkey primary key (id)
 ) tablespace pg_default;
 
@@ -46,8 +54,16 @@ CREATE POLICY allow_moderator_to_edit
     song_title_jp = public.bm_songs.song_title_jp AND
     song_artist = public.bm_songs.song_artist AND
     song_first_appearance = public.bm_songs.song_first_appearance AND
-    song_release_type = public.bm_songs.song_release_type AND
-    song_default_media = public.bm_songs.song_default_media
+    song_album_type = public.bm_songs.song_album_type AND
+    song_album_name = public.bm_songs.song_album_name AND
+    song_release_year = public.bm_songs.song_release_year AND
+    song_default_cover = public.bm_songs.song_default_cover AND
+    song_preview = public.bm_songs.song_preview AND
+    song_preview_artwork = public.bm_songs.song_preview_artwork AND
+    song_preview_uri = public.bm_songs.song_preview_uri AND
+    song_lyrics_jp = public.bm_songs.song_lyrics_jp AND
+    song_lyrics_en = public.bm_songs.song_lyrics_en AND
+    song_lyrics_rom = public.bm_songs.song_lyrics_rom
     );
 
 --CREATE POLICY allow_admin_all
