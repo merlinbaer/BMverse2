@@ -1,9 +1,9 @@
 import { observablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
+import { observablePersistSqlite } from '@legendapp/state/persist-plugins/expo-sqlite'
 import { configureSynced } from '@legendapp/state/sync'
 import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
-import AsyncStorage, {
-  AsyncStorageStatic,
-} from '@react-native-async-storage/async-storage'
+import { AsyncStorageStatic } from '@react-native-async-storage/async-storage'
+import Storage from 'expo-sqlite/kv-store'
 import { del, get, getMany, keys, set, setMany } from 'idb-keyval'
 import { Platform } from 'react-native'
 
@@ -41,13 +41,20 @@ const indexedDBStorage: Partial<AsyncStorageStatic> = {
 
 export const customSynced = configureSynced(syncedSupabase, {
   persist: {
+    plugin:
+      Platform.OS === 'web'
+        ? observablePersistAsyncStorage({
+            AsyncStorage: indexedDBStorage as AsyncStorageStatic,
+          })
+        : observablePersistSqlite(Storage),
+    /* Version with all AsyncStorage
     plugin: observablePersistAsyncStorage({
-      // Web uses our custom IndexedDB wrapper
-      // Android/iOS uses the native AsyncStorage (Expo Go compatible)
       AsyncStorage: (Platform.OS === 'web'
         ? indexedDBStorage
         : AsyncStorage) as AsyncStorageStatic,
-    }),
+
+      }),
+    */
   },
   generateId,
   supabase,
