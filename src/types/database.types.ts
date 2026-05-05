@@ -300,12 +300,20 @@ export type Database = {
           created_at: string
           deleted: boolean | null
           id: string
+          song_album_name: string | null
+          song_album_type: string
           song_artist: string
-          song_default_media: string | null
+          song_default_cover: string
           song_first_appearance: string
           song_id: string
           song_info: string | null
-          song_release_type: string
+          song_lyrics_en: string | null
+          song_lyrics_jp: string | null
+          song_lyrics_rom: string | null
+          song_preview: string | null
+          song_preview_artwork: string | null
+          song_preview_uri: string | null
+          song_release_year: string | null
           song_title: string
           song_title_jp: string | null
           updated_at: string
@@ -314,12 +322,20 @@ export type Database = {
           created_at?: string
           deleted?: boolean | null
           id?: string
+          song_album_name?: string | null
+          song_album_type?: string
           song_artist: string
-          song_default_media?: string | null
+          song_default_cover: string
           song_first_appearance: string
           song_id: string
           song_info?: string | null
-          song_release_type: string
+          song_lyrics_en?: string | null
+          song_lyrics_jp?: string | null
+          song_lyrics_rom?: string | null
+          song_preview?: string | null
+          song_preview_artwork?: string | null
+          song_preview_uri?: string | null
+          song_release_year?: string | null
           song_title: string
           song_title_jp?: string | null
           updated_at?: string
@@ -328,12 +344,20 @@ export type Database = {
           created_at?: string
           deleted?: boolean | null
           id?: string
+          song_album_name?: string | null
+          song_album_type?: string
           song_artist?: string
-          song_default_media?: string | null
+          song_default_cover?: string
           song_first_appearance?: string
           song_id?: string
           song_info?: string | null
-          song_release_type?: string
+          song_lyrics_en?: string | null
+          song_lyrics_jp?: string | null
+          song_lyrics_rom?: string | null
+          song_preview?: string | null
+          song_preview_artwork?: string | null
+          song_preview_uri?: string | null
+          song_release_year?: string | null
           song_title?: string
           song_title_jp?: string | null
           updated_at?: string

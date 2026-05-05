@@ -7,3 +7,6 @@ export type ConcertsType =
   Database['public']['Tables']['bm_event_concert']['Row']
 export type SetlistType =
   Database['public']['Tables']['bm_event_concert_songs']['Row']
+export type UpcomingType =
+  Database['public']['Tables']['bm_event_concert_upcoming']['Row']
+export type SongType = Database['public']['Tables']['bm_songs']['Row']

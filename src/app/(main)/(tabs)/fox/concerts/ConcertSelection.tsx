@@ -72,7 +72,7 @@ export default function ConcertSelectionScreen() {
     {
       id: 'upcoming',
       image: require('@/../assets/images/concert_box_upcoming.png'),
-      screen: '/(main)/(tabs)/fox/concerts/ConcertsUpcoming' as Href,
+      screen: '/(main)/(tabs)/fox/concerts/Upcoming' as Href,
       position: 'bottom-right',
       label: 'Upcoming',
     },
