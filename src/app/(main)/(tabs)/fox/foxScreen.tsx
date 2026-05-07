@@ -1,6 +1,7 @@
+import { Image } from 'expo-image'
 import { Href, useFocusEffect, useRouter } from 'expo-router'
 import { useCallback, useState } from 'react'
-import { Image, Platform, Pressable, StyleSheet, View } from 'react-native'
+import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 import { AppMarkdown } from '@/components/AppMarkdown'
@@ -59,7 +60,7 @@ export default function FoxScreen() {
               <Image
                 source={require('@/../assets/images/Su-.png')}
                 style={styles.suImage}
-                resizeMode="contain"
+                contentFit="contain"
               />
             </Pressable>
 
@@ -89,7 +90,7 @@ export default function FoxScreen() {
                 <Image
                   source={require('@/../assets/images/Momo.png')}
                   style={styles.sideImage}
-                  resizeMode="contain"
+                  contentFit="contain"
                 />
               </Pressable>
               {visibleCharacter === 'Momo' && (
@@ -118,7 +119,7 @@ export default function FoxScreen() {
                 <Image
                   source={require('@/../assets/images/Moa.png')}
                   style={styles.sideImage}
-                  resizeMode="contain"
+                  contentFit="contain"
                 />
               </Pressable>
               {visibleCharacter === 'Moa' && (

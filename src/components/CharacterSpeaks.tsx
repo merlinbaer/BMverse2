@@ -1,11 +1,6 @@
+import { Image } from 'expo-image'
 import React from 'react'
-import {
-  Image,
-  ImageSourcePropType,
-  StyleSheet,
-  View,
-  ViewStyle,
-} from 'react-native'
+import { ImageSourcePropType, StyleSheet, View, ViewStyle } from 'react-native'
 
 import { AppMarkdown } from '@/components/AppMarkdown'
 
@@ -43,7 +38,7 @@ function CharacterSpeaks({
       <Image
         source={imageSource}
         style={{ width: imageSize, height: imageSize }}
-        resizeMode="contain"
+        contentFit="contain"
       />
       <View style={styles.markupWrapper}>
         <AppMarkdown

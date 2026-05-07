@@ -1,7 +1,8 @@
 import { useValue } from '@legendapp/state/react'
+import { Image } from 'expo-image'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React from 'react'
-import { Image, Linking, Pressable, StyleSheet } from 'react-native'
+import { Linking, Pressable, StyleSheet } from 'react-native'
 
 import { AppBox } from '@/components/AppBox'
 import { AppHyperlink } from '@/components/AppHyperlink'
@@ -57,7 +58,7 @@ export default function UpComingDetailScreen() {
         >
           <Image
             source={require('@/../assets/images/sample_map.png')}
-            resizeMode="stretch"
+            contentFit="fill"
             style={styles.mapImage}
           />
         </Pressable>

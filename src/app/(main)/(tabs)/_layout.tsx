@@ -1,8 +1,9 @@
 import Octicons from '@expo/vector-icons/Octicons'
 import { BlurView } from 'expo-blur'
+import { Image } from 'expo-image'
 import { Tabs } from 'expo-router'
 import React from 'react'
-import { Image, Platform, StyleSheet, View } from 'react-native'
+import { Platform, View } from 'react-native'
 
 import { COLORS, TAB_BAR } from '@/constants/constants'
 import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
@@ -31,7 +32,11 @@ export default function TabsLayout() {
                 intensity={TAB_BAR.BLUR_INTENSITY}
                 tint="dark" // "light", "dark" or "default"
                 style={{
-                  ...StyleSheet.absoluteFillObject,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
                   overflow: 'hidden',
                   borderTopLeftRadius: insets.corner, // Corners vary by device
                   borderTopRightRadius: insets.corner, // Corners vary by device
@@ -40,15 +45,17 @@ export default function TabsLayout() {
             ) : (
               // Android Fallback
               <View
-                style={[
-                  StyleSheet.absoluteFill,
-                  {
-                    backgroundColor: COLORS.BACKGROUND,
-                    overflow: 'hidden',
-                    borderTopLeftRadius: insets.corner, // Corners vary by device
-                    borderTopRightRadius: insets.corner, // Corners vary by device
-                  },
-                ]}
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: COLORS.BACKGROUND,
+                  overflow: 'hidden',
+                  borderTopLeftRadius: insets.corner, // Corners vary by device
+                  borderTopRightRadius: insets.corner, // Corners vary by device
+                }}
               />
             ),
         }}
@@ -89,7 +96,7 @@ export default function TabsLayout() {
                   height: TAB_BAR.ICON_IMAGE_SIZE,
                   bottom: TAB_BAR.ICON_IMAGE_POSY,
                 }}
-                resizeMode="contain"
+                contentFit="contain"
               />
             ),
           }}

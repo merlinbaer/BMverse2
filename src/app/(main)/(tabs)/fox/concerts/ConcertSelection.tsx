@@ -1,7 +1,7 @@
+import { Image } from 'expo-image'
 import { Href, Stack, useRouter } from 'expo-router'
 import React from 'react'
 import {
-  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -109,12 +109,12 @@ export default function ConcertSelectionScreen() {
                     <Image
                       source={require('@/../assets/images/icon_background_blur.png')}
                       style={styles.blurBackground}
-                      resizeMode="cover"
+                      contentFit="cover"
                     />
                     <Image
                       source={btn.image}
                       style={styles.buttonImage}
-                      resizeMode="contain"
+                      contentFit="contain"
                     />
                     <AppText
                       style={{
@@ -148,12 +148,12 @@ export default function ConcertSelectionScreen() {
                     <Image
                       source={require('@/../assets/images/icon_background_blur.png')}
                       style={styles.blurBackground}
-                      resizeMode="cover"
+                      contentFit="cover"
                     />
                     <Image
                       source={btn.image}
                       style={styles.buttonImage}
-                      resizeMode="contain"
+                      contentFit="contain"
                     />
                     <AppText
                       style={{

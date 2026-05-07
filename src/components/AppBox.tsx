@@ -1,5 +1,6 @@
+import { Image } from 'expo-image'
 import React, { ReactNode } from 'react'
-import { ImageBackground, StyleSheet, View, ViewStyle } from 'react-native'
+import { StyleSheet, View, ViewStyle } from 'react-native'
 
 import { COLORS } from '@/constants/constants'
 
@@ -11,44 +12,47 @@ interface AppBoxProps {
 export function AppBox({ children, style }: AppBoxProps) {
   return (
     <View style={[styles.container, style]}>
-      {/* The Red Line on the left */}
-      <View style={styles.redLine} />
-
-      <ImageBackground
+      <Image
         source={require('@/../assets/images/icon_background_blur.png')}
-        style={styles.imageBackground}
-        imageStyle={styles.backgroundImage}
-        resizeMode="cover"
-      >
-        <View style={styles.contentContainer}>{children}</View>
-      </ImageBackground>
+        style={styles.blurBackground}
+        contentFit="cover"
+      />
+      <View style={styles.contentContainer}>
+        <View style={styles.redLine} />
+        <View style={styles.textWrapper}>{children}</View>
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    height: '100%', // Fix for Web: ensures image fills the vertical space
-    opacity: 0.5,
-    width: '100%', // Fix for Web: ensures image fills the horizontal space
+  blurBackground: {
+    bottom: 0,
+    left: 0,
+    opacity: 0.8,
+    position: 'absolute',
+    right: 0,
+    top: 0, // This only affects the image now
   },
   container: {
+    backgroundColor: COLORS.BACKGROUND,
     borderRadius: 8,
     flexDirection: 'row',
-    marginVertical: 10,
-    overflow: 'hidden', // Ensures background and red line respect border radius
+    marginVertical: 8,
+    overflow: 'hidden',
     width: '100%',
   },
   contentContainer: {
-    gap: 8,
-    padding: 16,
-  },
-  imageBackground: {
-    backgroundColor: COLORS.BG_GREY, // Fallback background color
+    flexDirection: 'row',
     flex: 1,
   },
   redLine: {
-    backgroundColor: COLORS.PRIMARY, // Assumes red is your primary color
+    backgroundColor: COLORS.PRIMARY,
+    opacity: 1,
     width: 4,
+  },
+  textWrapper: {
+    flex: 1,
+    padding: 16,
   },
 })
