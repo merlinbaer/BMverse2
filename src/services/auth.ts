@@ -4,7 +4,7 @@ import * as Updates from 'expo-updates'
 import { DevSettings, Platform } from 'react-native'
 
 import { AUTH } from '@/constants/constants'
-import { authUser$ } from '@/services/legend/memory/variables'
+import { authUser$, isAuthLoaded$ } from '@/services/legend/memory/variables'
 
 import { supabase } from './supabase'
 
@@ -17,6 +17,7 @@ export function initAuth() {
     if (error) {
       console.error('Session restore error:', error.message)
       if (
+        error.message.includes('Invalid Refresh Token') ||
         error.message.includes('Refresh Token Not Found') ||
         error.message.includes('invalid_grant') ||
         error.message.includes('expired')
@@ -32,12 +33,14 @@ export function initAuth() {
       authUser$.set(null)
       console.log('Auth: No user session found.')
     }
+    isAuthLoaded$.set(true) // Mark as finished
   })
 
   // Add listener
   supabase.auth.onAuthStateChange((event, session) => {
     //debug: console.log('supabase auth state change:', event, session)
     authUser$.set(session?.user?.email ?? null) // important setting authUser$
+    isAuthLoaded$.set(true) // Ensure it's true if a listener event happens first
     if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
       ;(async () => {
         try {

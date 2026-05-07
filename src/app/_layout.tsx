@@ -9,7 +9,7 @@ import { useEffect } from 'react'
 import { AppTheme } from '@/constants/constants'
 import { bmFonts } from '@/layout/fonts'
 import { initAuth } from '@/services/auth'
-import { localStore$ } from '@/services/legend'
+import { isAuthLoaded$, localStore$ } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
 
 SplashScreen.setOptions({
@@ -19,31 +19,33 @@ SplashScreen.setOptions({
 void SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
-  // 1. Monitor hydration status for local only
+  // 1. Monitor hydration status for the local store
   const localSyncStatus = useValue(syncState(localStore$))
   const isHydrated = localSyncStatus.isPersistLoaded
 
-  // 2. Once hydrated, get the actual value from the disk
+  // 2. Startup authentication is done (check due to async operation)
+  const isAuthLoaded = useValue(isAuthLoaded$)
+
+  // 3. Once hydrated, get the actual value from the disk
   const isOnboarding = useValue(localStore$.isOnboarding)
   const [loaded, error] = useFonts(bmFonts)
 
-  // 3. One time tasks, this runs once
+  // 4. One time tasks, this runs once
   useEffect(() => {
     initAuth()
-    initializeStores()
+    initializeStores() // Starting warming up table stores
     startSyncCoordinator()
   }, [])
 
-  // 4. Can run several times
+  // 5. Can run several times
   useEffect(() => {
     // Hide the splash screen ONLY when fonts AND local data are ready
-    if ((loaded || error) && isHydrated) {
+    if ((loaded || error) && isHydrated && isAuthLoaded) {
       void SplashScreen.hideAsync()
     }
-  }, [loaded, error, isHydrated])
+  }, [loaded, error, isHydrated, isAuthLoaded])
 
-  // 5. Stay null (Splash Screen visible) until ready
-  if ((!loaded && !error) || !isHydrated) {
+  if ((!loaded && !error) || !isHydrated || !isAuthLoaded) {
     return null
   }
 
@@ -55,7 +57,7 @@ export default function RootLayout() {
           gestureEnabled: false,
         }}
       >
-        {/* First called Screens: only show if is first called */}
+        {/* First called Screens: only show if is called first */}
         <Stack.Protected guard={isOnboarding}>
           <Stack.Screen name="(onboarding)" />
         </Stack.Protected>
