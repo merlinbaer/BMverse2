@@ -1,3 +1,4 @@
+import { syncState } from '@legendapp/state'
 import { useValue } from '@legendapp/state/react'
 import { ThemeProvider } from '@react-navigation/native'
 import { useFonts } from 'expo-font'
@@ -18,24 +19,31 @@ SplashScreen.setOptions({
 void SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+  // 1. Monitor hydration status for local only
+  const localSyncStatus = useValue(syncState(localStore$))
+  const isHydrated = localSyncStatus.isPersistLoaded
+
+  // 2. Once hydrated, get the actual value from the disk
   const isOnboarding = useValue(localStore$.isOnboarding)
   const [loaded, error] = useFonts(bmFonts)
 
+  // 3. One time tasks, this runs once
   useEffect(() => {
-    // Run core initialization once
     initAuth()
     initializeStores()
     startSyncCoordinator()
-  }, []) // Empty dependency array for one-time init
+  }, [])
 
+  // 4. Can run several times
   useEffect(() => {
-    // Hide splash screen only when fonts are ready (or failed)
-    if (loaded || error) {
+    // Hide the splash screen ONLY when fonts AND local data are ready
+    if ((loaded || error) && isHydrated) {
       void SplashScreen.hideAsync()
     }
-  }, [loaded, error])
+  }, [loaded, error, isHydrated])
 
-  if (!loaded && !error) {
+  // 5. Stay null (Splash Screen visible) until ready
+  if ((!loaded && !error) || !isHydrated) {
     return null
   }
 

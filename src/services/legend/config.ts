@@ -39,22 +39,16 @@ const indexedDBStorage: Partial<AsyncStorageStatic> = {
     Promise.all(keys.map(key => del(key))) as unknown as Promise<void>,
 }
 
+export const persistLargeStore =
+  Platform.OS === 'web'
+    ? observablePersistAsyncStorage({
+        AsyncStorage: indexedDBStorage as AsyncStorageStatic,
+      })
+    : observablePersistSqlite(Storage)
+
 export const customSynced = configureSynced(syncedSupabase, {
   persist: {
-    plugin:
-      Platform.OS === 'web'
-        ? observablePersistAsyncStorage({
-            AsyncStorage: indexedDBStorage as AsyncStorageStatic,
-          })
-        : observablePersistSqlite(Storage),
-    /* Version with all AsyncStorage
-    plugin: observablePersistAsyncStorage({
-      AsyncStorage: (Platform.OS === 'web'
-        ? indexedDBStorage
-        : AsyncStorage) as AsyncStorageStatic,
-
-      }),
-    */
+    plugin: persistLargeStore,
   },
   generateId,
   supabase,

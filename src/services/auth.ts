@@ -13,14 +13,24 @@ import { supabase } from './supabase'
  * Call once at app startup in _layout.tsx
  */
 export function initAuth() {
-  supabase.auth.getSession().then(({ data }) => {
+  supabase.auth.getSession().then(({ data, error }) => {
+    if (error) {
+      console.error('Session restore error:', error.message)
+      if (
+        error.message.includes('Refresh Token Not Found') ||
+        error.message.includes('invalid_grant') ||
+        error.message.includes('expired')
+      ) {
+        console.log('Auth: Token expired or invalid - clearing session')
+        supabase.auth.signOut({ scope: 'local' }).then() // Only clear locally
+      }
+    }
     if (data.session?.user?.email) {
       authUser$.set(data.session?.user?.email)
       console.log('Auth: User logged in.')
     } else {
       authUser$.set(null)
       console.log('Auth: No user session found.')
-      // localStore$.isOnboarding.set(true)
     }
   })
 

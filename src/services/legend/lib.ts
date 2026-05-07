@@ -21,13 +21,6 @@ import {
 } from '@/services/legend'
 
 export const initializeStores = () => {
-  // Wake up local-only persisted stores
-  try {
-    localStore$.peek()
-    console.log('LegendState: Local states initialized.')
-  } catch (error) {
-    console.log('LegendState: Failed to initialize local states:', error)
-  }
   // Wake up table stores
   try {
     sync$.peek()
@@ -60,7 +53,7 @@ export const startSyncCoordinator = () => {
     const serverUpdatedAt = getsSyncUpdatedAt()
     if (!serverUpdatedAt) return
 
-    const lastLocalSync = localStore$.lastSync.get()
+    const lastLocalSync = localStore$.lastSyncTime.get()
 
     if (!lastLocalSync || new Date(serverUpdatedAt) > new Date(lastLocalSync)) {
       console.log(
@@ -68,7 +61,7 @@ export const startSyncCoordinator = () => {
       )
       try {
         await syncAll()
-        localStore$.lastSync.set(String(serverUpdatedAt))
+        localStore$.lastSyncTime.set(String(serverUpdatedAt))
         console.log('LegendState: Cascade sync successful.')
       } catch (err) {
         console.error('LegendState: Cascade sync failed:', err)

@@ -1,20 +1,21 @@
 import { observable } from '@legendapp/state'
-import { ObservablePersistAsyncStorage } from '@legendapp/state/persist-plugins/async-storage'
 import { syncObservable } from '@legendapp/state/sync'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import { persistLargeStore } from '@/services/legend/config'
 
 // Store for local-only persisted data
 export const localStore$ = observable({
-  lastSync: null as string | null,
+  lastSyncTime: null as string | null,
   isOnboarding: true,
 })
 
-// By providing only 'persist' and no sync plugin, it remains local-only.
+// Use the same 'persistLargeStore' (IndexedDB/SQLite) as your tables
 syncObservable(localStore$, {
   persist: {
     name: 'localStore',
-    plugin: new ObservablePersistAsyncStorage({
-      AsyncStorage,
-    }),
+    plugin: persistLargeStore,
+    retrySync: true,
   },
 })
+
+console.log('LegendState: Local store initialized.')
