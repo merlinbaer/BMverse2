@@ -1,9 +1,9 @@
 import { Href } from 'expo-router'
 
-export const LIST_TYPES = ['Year', 'Country', 'Tour', 'Setlist'] as const
-export type ListType = (typeof LIST_TYPES)[number]
+export const CONCERT_LIST_TYPES = ['Year', 'Country', 'Tour'] as const
+export type ConcertListType = (typeof CONCERT_LIST_TYPES)[number]
 
-export type ListItem = {
+export type ListItemType = {
   id: string
   line1: string
   line2: string

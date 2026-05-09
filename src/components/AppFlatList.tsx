@@ -11,10 +11,10 @@ import {
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
-import { ListItem } from '@/types/list'
+import { ListItemType } from '@/types/list'
 
-interface AppFlatListProps extends Partial<FlatListProps<ListItem>> {
-  data: ListItem[]
+interface AppFlatListProps extends Partial<FlatListProps<ListItemType>> {
+  data: ListItemType[]
   displayIconAsText?: boolean
 }
 
@@ -22,7 +22,7 @@ function Item({
   item,
   displayIconAsText,
 }: {
-  item: ListItem
+  item: ListItemType
   displayIconAsText?: boolean
 }) {
   const router = useRouter()
@@ -78,9 +78,9 @@ export function AppFlatList({
     <FlatList
       style={styles.flatList}
       data={data}
-      keyExtractor={(item: ListItem) => item.id}
+      keyExtractor={(item: ListItemType) => item.id}
       ItemSeparatorComponent={renderSeparator}
-      renderItem={({ item }: { item: ListItem }) => (
+      renderItem={({ item }: { item: ListItemType }) => (
         <Item item={item} displayIconAsText={displayIconAsText} />
       )}
       automaticallyAdjustsScrollIndicatorInsets

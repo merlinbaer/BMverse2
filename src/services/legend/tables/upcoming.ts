@@ -1,7 +1,7 @@
 import { computed } from '@legendapp/state'
 import { Href } from 'expo-router'
 
-import { ListItem } from '@/types/list'
+import { ListItemType } from '@/types/list'
 import { UpcomingType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -23,7 +23,7 @@ export const upcomingClearCache = clearCache
 
 // Domain-specific functions
 export const upcomingList$ = () =>
-  computed<ListItem[]>(() => {
+  computed<ListItemType[]>(() => {
     const data = store$.get()
     if (!data) return []
 
@@ -37,11 +37,13 @@ export const upcomingList$ = () =>
           new Date(b.setlist_eventdate).getTime(),
       )
       .map(
-        (item): ListItem => ({
+        (item): ListItemType => ({
           id: item.id,
-          line1: item.setlist_venue_city_name + ' - ' + item.setlist_venue_name,
+          line1:
+            item.setlist_venue_city_name +
+            (item.setlist_venue_name ? ' - ' + item.setlist_venue_name : ''),
           line2: item.setlist_eventdate,
-          icon: item.setlist_artwork ?? '',
+          icon: item.setlist_artwork,
           route: {
             pathname: '/(main)/(tabs)/fox/concerts/UpcomingDetail',
             params: { id: item.id },

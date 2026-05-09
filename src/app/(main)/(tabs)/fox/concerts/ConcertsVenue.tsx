@@ -4,17 +4,17 @@ import React, { useMemo } from 'react'
 
 import { AppListScreen } from '@/components/AppListScreen'
 import { concertsVenueList$ } from '@/services/legend'
-import { LIST_TYPES, ListType } from '@/types/list'
+import { CONCERT_LIST_TYPES, ConcertListType } from '@/types/list'
 
 export default function ConcertsVenueScreen() {
   const { type, id } = useLocalSearchParams<{
-    type: ListType
+    type: ConcertListType
     id: string
   }>()
 
   const getTitle = () => {
     // Check if 'type' (which is a string at runtime) is in our source-of-truth array
-    return (LIST_TYPES as readonly string[]).includes(type)
+    return (CONCERT_LIST_TYPES as readonly string[]).includes(type)
       ? `Venues by ${type}`
       : 'Venues'
   }

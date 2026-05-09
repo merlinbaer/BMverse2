@@ -8,7 +8,7 @@ import coverTHEONE from '@/../assets/images/One_Splatter_200.png'
 import coverMETALRESISTANCE from '@/../assets/images/Resistance_Splatter_200.png'
 import coverSINGLE from '@/../assets/images/Single_200.png'
 import coverNotFound from '@/../assets/images/unknown_track.png'
-import { ListItem } from '@/types/list'
+import { ListItemType } from '@/types/list'
 import { SongType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -47,7 +47,7 @@ const getSongCover = (coverName: string | null) => {
 }
 
 export const songList$ = () =>
-  computed<ListItem[]>(() => {
+  computed<ListItemType[]>(() => {
     const data = store$.get()
     if (!data) return []
 
@@ -57,10 +57,10 @@ export const songList$ = () =>
       })
       .sort((a, b) => a.song_id.localeCompare(b.song_id))
       .map(
-        (item): ListItem => ({
+        (item): ListItemType => ({
           id: item.id,
-          line1: item.song_title ?? '',
-          line2: item.song_artist ?? '',
+          line1: item.song_title,
+          line2: item.song_artist,
           icon: getSongCover(item.song_default_cover),
           route: {
             pathname: '/(main)/(tabs)/fox/songs/SongDetail',

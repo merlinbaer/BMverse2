@@ -1,6 +1,6 @@
 import { computed } from '@legendapp/state'
 
-import { ListItem } from '@/types/list'
+import { ListItemType } from '@/types/list'
 import { SetlistType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -20,7 +20,7 @@ export const setlistClearCache = clearCache
 
 // Domain-specific functions
 export const setlistsList$ = (setlistId?: string) =>
-  computed<ListItem[]>(() => {
+  computed<ListItemType[]>(() => {
     const data = store$.get()
     if (!data || !setlistId) return []
     return Object.values(data)
@@ -30,7 +30,7 @@ export const setlistsList$ = (setlistId?: string) =>
       })
       .sort((a, b) => a.song_nr - b.song_nr)
       .map(
-        (item): ListItem => ({
+        (item): ListItemType => ({
           id: item.song_name ?? '',
           line1: item.song_name ?? '',
           line2: item.song_info ?? '',

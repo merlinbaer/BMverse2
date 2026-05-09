@@ -3,7 +3,7 @@ import { Href } from 'expo-router'
 
 import concertBoxTour from '@/../assets/images/concert_box_tour.png'
 import concertBoxYear from '@/../assets/images/concert_box_year.png'
-import { ListItem, ListType } from '@/types/list'
+import { ConcertListType, ListItemType } from '@/types/list'
 import { ConcertsType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -24,7 +24,7 @@ export const concertSync = sync
 export const concertClearCache = clearCache
 
 // Domain-specific functions
-export const concertsYearList$ = computed<ListItem[]>(() => {
+export const concertsYearList$ = computed<ListItemType[]>(() => {
   const data = store$.get()
   if (!data) return []
   // 1. Filter and 2. Group (Aggregation by year is needed)
@@ -42,7 +42,7 @@ export const concertsYearList$ = computed<ListItem[]>(() => {
   return Array.from(yearsMap.entries())
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(
-      ([year, count]): ListItem => ({
+      ([year, count]): ListItemType => ({
         id: year,
         line1: year,
         line2: `${count} concerts performed`,
@@ -55,7 +55,7 @@ export const concertsYearList$ = computed<ListItem[]>(() => {
     )
 })
 
-export const concertsCountryList$ = computed<ListItem[]>(() => {
+export const concertsCountryList$ = computed<ListItemType[]>(() => {
   const data = store$.get()
   if (!data) return []
   // 1. Filter and Group (Aggregation by country is needed)
@@ -78,7 +78,7 @@ export const concertsCountryList$ = computed<ListItem[]>(() => {
   return Array.from(countriesMap.entries())
     .sort((a, b) => a[1].name.localeCompare(b[1].name))
     .map(
-      ([code, details]): ListItem => ({
+      ([code, details]): ListItemType => ({
         id: code,
         line1: details.name,
         line2: Array.from(details.years)
@@ -93,7 +93,7 @@ export const concertsCountryList$ = computed<ListItem[]>(() => {
     )
 })
 
-export const concertsTourList$ = computed<ListItem[]>(() => {
+export const concertsTourList$ = computed<ListItemType[]>(() => {
   const data = store$.get()
   if (!data) return []
   // 1. Filter and Group (Aggregation by tour and year is needed)
@@ -120,7 +120,7 @@ export const concertsTourList$ = computed<ListItem[]>(() => {
       )
     })
     .map(
-      ([name, yearsSet]): ListItem => ({
+      ([name, yearsSet]): ListItemType => ({
         id: name,
         line1: name,
         line2: Array.from(yearsSet).sort().join(', '),
@@ -133,8 +133,8 @@ export const concertsTourList$ = computed<ListItem[]>(() => {
     )
 })
 
-export const concertsVenueList$ = (type?: ListType, value?: string) =>
-  computed<ListItem[]>(() => {
+export const concertsVenueList$ = (type?: ConcertListType, value?: string) =>
+  computed<ListItemType[]>(() => {
     const data = store$.get()
     if (!data || !type || !value) return []
 
@@ -159,11 +159,15 @@ export const concertsVenueList$ = (type?: ListType, value?: string) =>
           new Date(a.setlist_eventdate).getTime(),
       )
       .map(
-        (item): ListItem => ({
+        (item): ListItemType => ({
           id: item.id,
-          line1: item.setlist_venue_city_name + ' - ' + item.setlist_venue_name,
-          line2: item.setlist_eventdate + ' - ' + item.setlist_tour_name,
-          icon: item.setlist_artwork ?? '',
+          line1:
+            item.setlist_venue_city_name +
+            (item.setlist_venue_name ? ' - ' + item.setlist_venue_name : ''),
+          line2:
+            item.setlist_eventdate +
+            (item.setlist_tour_name ? ' - ' + item.setlist_tour_name : ''),
+          icon: item.setlist_artwork,
           route: {
             pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
             params: { id: item.id, setlistId: item.setlist_id },

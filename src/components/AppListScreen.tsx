@@ -2,12 +2,12 @@ import React from 'react'
 import { Platform, StyleSheet } from 'react-native'
 
 import { LAYOUT } from '@/constants/constants'
-import { ListItem } from '@/types/list'
+import { ListItemType } from '@/types/list'
 
 import { AppFlatList } from './AppFlatList'
 
 interface AppListScreenProps {
-  data: ListItem[]
+  data: ListItemType[]
   children?: React.ReactNode // For Stack.Screen
 }
 
