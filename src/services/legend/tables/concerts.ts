@@ -24,7 +24,7 @@ export const concertSync = sync
 export const concertClearCache = clearCache
 
 // Domain-specific functions
-export const concertsYearList$ = computed(() => {
+export const concertsYearList$ = computed<ListItem[]>(() => {
   const data = store$.get()
   if (!data) return []
 
@@ -53,7 +53,7 @@ export const concertsYearList$ = computed(() => {
     )
 })
 
-export const concertsCountryList$ = computed(() => {
+export const concertsCountryList$ = computed<ListItem[]>(() => {
   const data = store$.get()
   if (!data) return []
 
@@ -92,7 +92,7 @@ export const concertsCountryList$ = computed(() => {
     .sort((a, b) => a.line1.localeCompare(b.line1))
 })
 
-export const concertsTourList$ = computed(() => {
+export const concertsTourList$ = computed<ListItem[]>(() => {
   const data = store$.get()
   if (!data) return []
 
@@ -130,14 +130,13 @@ export const concertsTourList$ = computed(() => {
 })
 
 export const concertsVenueList$ = (type?: ListType, value?: string) =>
-  computed(() => {
+  computed<ListItem[]>(() => {
     const data = store$.get()
     if (!data || !type || !value) return []
 
     return Object.values(data)
-      .filter(item => {
+      .filter((item): item is ConcertsType & { deleted: false } => {
         if (!item || item.deleted) return false
-        if (!type || !value) return true
 
         switch (type) {
           case 'Year':
@@ -147,7 +146,6 @@ export const concertsVenueList$ = (type?: ListType, value?: string) =>
           case 'Tour':
             return item.setlist_tour_name === value
           default:
-            console.log(`[concertsVenueList$] Unhandled ListType: ${type}`)
             return false
         }
       })
@@ -156,15 +154,17 @@ export const concertsVenueList$ = (type?: ListType, value?: string) =>
           new Date(b.setlist_eventdate).getTime() -
           new Date(a.setlist_eventdate).getTime(),
       )
-      .map(item => ({
-        id: item.id,
-        line1: item.setlist_venue_city_name + ' - ' + item.setlist_venue_name,
-        line2: item.setlist_eventdate + ' - ' + item.setlist_tour_name,
-        sorted: item.setlist_eventdate,
-        icon: item.setlist_artwork,
-        route: {
-          pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
-          params: { id: item.id, setlistId: item.setlist_id },
-        } as Href,
-      }))
+      .map(
+        (item): ListItem => ({
+          id: item.id,
+          line1: item.setlist_venue_city_name + ' - ' + item.setlist_venue_name,
+          line2: item.setlist_eventdate + ' - ' + item.setlist_tour_name,
+          sorted: item.setlist_eventdate,
+          icon: item.setlist_artwork ?? '',
+          route: {
+            pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',
+            params: { id: item.id, setlistId: item.setlist_id },
+          } as Href,
+        }),
+      )
   })

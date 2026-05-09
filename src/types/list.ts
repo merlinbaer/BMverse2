@@ -9,5 +9,5 @@ export type ListItem = {
   line2: string
   sorted: string
   icon: string | number // for uri and assets
-  route: Href
+  route: Href | null
 }

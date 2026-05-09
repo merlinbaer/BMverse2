@@ -8,7 +8,7 @@ import { AppBox } from '@/components/AppBox'
 import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
-import { COLORS, FONT } from '@/constants/constants'
+import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
 import { upcomingItem$ } from '@/services/legend'
 
 export default function UpComingDetailScreen() {
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   mapImage: {
-    height: 200,
+    height: MAP_HEIGHT,
     width: '100%',
   },
   mapPressed: {

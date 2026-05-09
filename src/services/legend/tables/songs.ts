@@ -8,6 +8,7 @@ import coverTHEONE from '@/../assets/images/One_Splatter_200.png'
 import coverMETALRESISTANCE from '@/../assets/images/Resistance_Splatter_200.png'
 import coverSINGLE from '@/../assets/images/Single_200.png'
 import coverNotFound from '@/../assets/images/unknown_track.png'
+import { ListItem } from '@/types/list'
 import { SongType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -46,24 +47,26 @@ const getSongCover = (coverName: string | null) => {
 }
 
 export const songList$ = () =>
-  computed(() => {
+  computed<ListItem[]>(() => {
     const data = store$.get()
     if (!data) return []
 
     return Object.values(data)
-      .filter(item => {
+      .filter((item): item is SongType & { deleted: false } => {
         return !(!item || item.deleted)
       })
       .sort((a, b) => a.song_id.localeCompare(b.song_id))
-      .map(item => ({
-        id: item.id,
-        line1: item.song_title,
-        line2: item.song_artist,
-        sorted: item.song_id,
-        icon: getSongCover(item.song_default_cover),
-        route: {
-          pathname: '/(main)/(tabs)/fox/songs/SongDetail',
-          params: { id: item.id },
-        } as Href,
-      }))
+      .map(
+        (item): ListItem => ({
+          id: item.id,
+          line1: item.song_title ?? '',
+          line2: item.song_artist ?? '',
+          sorted: item.song_id,
+          icon: getSongCover(item.song_default_cover),
+          route: {
+            pathname: '/(main)/(tabs)/fox/songs/SongDetail',
+            params: { id: item.id },
+          } as Href,
+        }),
+      )
   })

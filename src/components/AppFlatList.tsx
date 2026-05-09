@@ -26,9 +26,11 @@ function Item({
   displayIconAsText?: boolean
 }) {
   const router = useRouter()
+  const isPressable = !!item.route
+
   return (
     <Pressable
-      onPress={() => router.push(item.route)}
+      onPress={() => item.route && router.push(item.route)}
       style={({ pressed }) => [
         styles.pressable,
         pressed && styles.pressablePressed,
@@ -54,11 +56,13 @@ function Item({
           {item.line2}
         </AppText>
       </View>
-      <View style={styles.chevronContainer}>
-        <AppText fontSize={FONT.SIZE.LG} style={styles.chevron}>
-          ›
-        </AppText>
-      </View>
+      {isPressable && (
+        <View style={styles.chevronContainer}>
+          <AppText fontSize={FONT.SIZE.LG} style={styles.chevron}>
+            ›
+          </AppText>
+        </View>
+      )}
     </Pressable>
   )
 }

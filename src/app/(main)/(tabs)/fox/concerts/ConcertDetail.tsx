@@ -9,7 +9,7 @@ import { AppFlatList } from '@/components/AppFlatList'
 import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
-import { COLORS, FONT } from '@/constants/constants'
+import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
 import { concertItem$, setlistsList$ } from '@/services/legend'
 
 export default function ConcertDetailScreen() {
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   mapImage: {
-    height: 200,
+    height: MAP_HEIGHT,
     width: '100%',
   },
   mapPressed: {
