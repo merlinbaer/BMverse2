@@ -4,7 +4,7 @@ import { useCallback, useState } from 'react'
 import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
-import { AppMarkdown } from '@/components/AppMarkdown'
+import { AppBubbleText } from '@/components/AppBubbleText'
 import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function FoxScreen() {
@@ -71,7 +71,7 @@ export default function FoxScreen() {
                   handlePressTextbox('/(main)/(tabs)/fox/songs/Songs')
                 }
               >
-                <AppMarkdown markup={suMessage} orientation={'center'} />
+                <AppBubbleText markup={suMessage} orientation={'center'} />
               </Pressable>
             )}
           </View>
@@ -102,7 +102,7 @@ export default function FoxScreen() {
                     )
                   }
                 >
-                  <AppMarkdown markup={momoMessage} orientation={'left'} />
+                  <AppBubbleText markup={momoMessage} orientation={'left'} />
                 </Pressable>
               )}
             </View>
@@ -129,7 +129,7 @@ export default function FoxScreen() {
                     handlePressTextbox('/(main)/(tabs)/fox/videos/Videos')
                   }
                 >
-                  <AppMarkdown markup={moaMessage} orientation={'right'} />
+                  <AppBubbleText markup={moaMessage} orientation={'right'} />
                 </Pressable>
               )}
             </View>

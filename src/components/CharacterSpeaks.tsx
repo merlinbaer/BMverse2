@@ -2,7 +2,7 @@ import { Image } from 'expo-image'
 import React from 'react'
 import { ImageSourcePropType, StyleSheet, View, ViewStyle } from 'react-native'
 
-import { AppMarkdown } from '@/components/AppMarkdown'
+import { AppBubbleText } from '@/components/AppBubbleText'
 
 interface CharacterSpeaksProps {
   markup: string
@@ -41,7 +41,7 @@ function CharacterSpeaks({
         contentFit="contain"
       />
       <View style={styles.markupWrapper}>
-        <AppMarkdown
+        <AppBubbleText
           markup={markup}
           footer={footer}
           orientation={orientation}

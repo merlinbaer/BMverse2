@@ -29,10 +29,7 @@ export default function UpComingDetailScreen() {
       </AppBox>
       <AppBox>
         <AppText fontSize={FONT.SIZE.LG}>{'Info:'}</AppText>
-        <AppMarkdown
-          markup={detail?.song_info ?? 'No info available.'}
-          orientation={'center'}
-        />
+        <AppMarkdown markup={detail?.song_info ?? 'No info available.'} />
       </AppBox>
     </AppScreen>
   )

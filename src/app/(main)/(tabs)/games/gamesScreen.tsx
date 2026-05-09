@@ -2,7 +2,7 @@ import { useValue } from '@legendapp/state/react'
 import { Stack } from 'expo-router'
 import { Button, FlatList, StyleSheet, Text, View } from 'react-native'
 
-import { AppMarkdown } from '@/components/AppMarkdown'
+import { AppBubbleText } from '@/components/AppBubbleText'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS } from '@/constants/constants'
@@ -62,7 +62,7 @@ export default function GamesScreen() {
       <AppScreen>
         <Stack.Screen options={{ title: 'Music Player' }} />
         <View style={styles.characterContainer}>
-          <AppMarkdown
+          <AppBubbleText
             markup={'Only in IOS and Android when logged in.'}
             orientation={'center'}
           />

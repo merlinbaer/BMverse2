@@ -53,6 +53,7 @@ const styles = StyleSheet.create({
   },
   textWrapper: {
     flex: 1,
+    gap: 4,
     padding: 16,
   },
 })

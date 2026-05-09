@@ -1,7 +1,8 @@
 import { Stack } from 'expo-router'
+import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
-import { AppMarkdown } from '@/components/AppMarkdown'
+import { AppBubbleText } from '@/components/AppBubbleText'
 import { AppScreen } from '@/components/AppScreen'
 
 export default function PlayerScreen() {
@@ -9,7 +10,7 @@ export default function PlayerScreen() {
     <AppScreen>
       <Stack.Screen options={{ title: 'Music Player' }} />
       <View style={styles.characterContainer}>
-        <AppMarkdown
+        <AppBubbleText
           markup={'Only in IOS and Android when logged in.'}
           orientation={'center'}
         />
