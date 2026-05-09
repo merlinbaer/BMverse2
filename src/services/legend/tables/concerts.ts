@@ -27,23 +27,25 @@ export const concertClearCache = clearCache
 export const concertsYearList$ = computed<ListItem[]>(() => {
   const data = store$.get()
   if (!data) return []
-
-  const yearsMap = Object.values(data).reduce((acc, item) => {
-    if (item && !item.deleted) {
+  // 1. Filter and 2. Group (Aggregation by year is needed)
+  const yearsMap = Object.values(data)
+    .filter(
+      (item): item is ConcertsType & { deleted: false } =>
+        !!item && !item.deleted,
+    )
+    .reduce((acc, item) => {
       const year = String(item.setlist_eventyear)
       acc.set(year, (acc.get(year) || 0) + 1)
-    }
-    return acc
-  }, new Map<string, number>())
-
+      return acc
+    }, new Map<string, number>())
+  // 3. Sort (Years descending) and then 4. construct UI elements with Map
   return Array.from(yearsMap.entries())
     .sort((a, b) => b[0].localeCompare(a[0]))
     .map(
       ([year, count]): ListItem => ({
         id: year,
         line1: year,
-        line2: String(count) + ' concerts performed',
-        sorted: year,
+        line2: `${count} concerts performed`,
         icon: concertBoxYear,
         route: {
           pathname: '/(main)/(tabs)/fox/concerts/ConcertsVenue',
@@ -56,7 +58,7 @@ export const concertsYearList$ = computed<ListItem[]>(() => {
 export const concertsCountryList$ = computed<ListItem[]>(() => {
   const data = store$.get()
   if (!data) return []
-
+  // 1. Filter and Group (Aggregation by country is needed)
   const countriesMap = Object.values(data).reduce((acc, item) => {
     if (item && !item.deleted) {
       const code = item.setlist_venue_city_country_code
@@ -72,8 +74,9 @@ export const concertsCountryList$ = computed<ListItem[]>(() => {
     }
     return acc
   }, new Map<string, { name: string; years: Set<string> }>())
-
+  // 3. Sort (Country Name ascending) and then 4. construct UI elements with Map
   return Array.from(countriesMap.entries())
+    .sort((a, b) => a[1].name.localeCompare(b[1].name))
     .map(
       ([code, details]): ListItem => ({
         id: code,
@@ -81,21 +84,19 @@ export const concertsCountryList$ = computed<ListItem[]>(() => {
         line2: Array.from(details.years)
           .sort((a, b) => b.localeCompare(a))
           .join(', '),
-        sorted: details.name,
-        icon: 'https://flagsapi.com/' + code + '/shiny/64.png',
+        icon: `https://flagsapi.com/${code}/shiny/64.png`,
         route: {
           pathname: '/(main)/(tabs)/fox/concerts/ConcertsVenue',
           params: { type: 'Country', id: code },
         } as Href,
       }),
     )
-    .sort((a, b) => a.line1.localeCompare(b.line1))
 })
 
 export const concertsTourList$ = computed<ListItem[]>(() => {
   const data = store$.get()
   if (!data) return []
-
+  // 1. Filter and Group (Aggregation by tour and year is needed)
   const toursMap = Object.values(data).reduce((acc, item) => {
     if (item && !item.deleted && item.setlist_tour_name) {
       const name = item.setlist_tour_name
@@ -108,25 +109,28 @@ export const concertsTourList$ = computed<ListItem[]>(() => {
     }
     return acc
   }, new Map<string, Set<string>>())
-
+  // 2. Sort the raw data (By last year of tour, then name) and then 4. construct UI elements with Map
   return Array.from(toursMap.entries())
-    .map(([name, yearsSet]): ListItem => {
-      const sortedYears = Array.from(yearsSet).sort((a, b) =>
-        a.localeCompare(b),
+    .sort((a, b) => {
+      const yearsA = Array.from(a[1]).sort()
+      const yearsB = Array.from(b[1]).sort()
+      return (
+        yearsB[yearsB.length - 1].localeCompare(yearsA[yearsA.length - 1]) ||
+        a[0].localeCompare(b[0])
       )
-      return {
+    })
+    .map(
+      ([name, yearsSet]): ListItem => ({
         id: name,
         line1: name,
-        line2: sortedYears.join(', '),
-        sorted: sortedYears[sortedYears.length - 1] || '',
+        line2: Array.from(yearsSet).sort().join(', '),
         icon: concertBoxTour,
         route: {
           pathname: '/(main)/(tabs)/fox/concerts/ConcertsVenue',
           params: { type: 'Tour', id: name },
         } as Href,
-      }
-    })
-    .sort((a, b) => b.sorted.localeCompare(a.sorted))
+      }),
+    )
 })
 
 export const concertsVenueList$ = (type?: ListType, value?: string) =>
@@ -159,7 +163,6 @@ export const concertsVenueList$ = (type?: ListType, value?: string) =>
           id: item.id,
           line1: item.setlist_venue_city_name + ' - ' + item.setlist_venue_name,
           line2: item.setlist_eventdate + ' - ' + item.setlist_tour_name,
-          sorted: item.setlist_eventdate,
           icon: item.setlist_artwork ?? '',
           route: {
             pathname: '/(main)/(tabs)/fox/concerts/ConcertDetail',

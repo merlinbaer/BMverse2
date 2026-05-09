@@ -52,7 +52,7 @@ export const LAYOUT = {
   gap: 24,
 }
 
-export const MAP_HEIGHT = 150
+export const MAP_HEIGHT = 160
 
 export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
   {

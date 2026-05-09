@@ -61,7 +61,6 @@ export const songList$ = () =>
           id: item.id,
           line1: item.song_title ?? '',
           line2: item.song_artist ?? '',
-          sorted: item.song_id,
           icon: getSongCover(item.song_default_cover),
           route: {
             pathname: '/(main)/(tabs)/fox/songs/SongDetail',

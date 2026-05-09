@@ -34,7 +34,6 @@ export const setlistsList$ = (setlistId?: string) =>
           id: item.song_name ?? '',
           line1: item.song_name ?? '',
           line2: item.song_info ?? '',
-          sorted: item.song_nr.toString(),
           icon: (item.song_nr + 1).toString(), // Ensure icon matches string | number
           route: null,
         }),
