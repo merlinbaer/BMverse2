@@ -59,7 +59,7 @@ export default function SongDetailScreen() {
         <AppText fontSize={FONT.SIZE.LG}>{'Info:'}</AppText>
         <AppMarkdown markup={detail?.song_info ?? 'No info available.'} />
       </AppBox>
-      {detail?.song_lyrics_jp && (
+      {!!detail?.song_lyrics_jp && (
         <>
           <View style={styles.tabsContainer}>
             <Pressable

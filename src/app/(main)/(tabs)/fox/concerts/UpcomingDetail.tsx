@@ -65,12 +65,12 @@ export default function UpComingDetailScreen() {
       </AppBox>
       {showTourInfo && (
         <AppBox>
-          {detail?.setlist_tour_name && (
+          {!!detail?.setlist_tour_name && (
             <AppText fontSize={FONT.SIZE.LG}>
               {detail?.setlist_tour_name}
             </AppText>
           )}
-          {detail?.setlist_info && <AppText>{detail.setlist_info}</AppText>}
+          {!!detail?.setlist_info && <AppText>{detail.setlist_info}</AppText>}
         </AppBox>
       )}
       <AppBox>
