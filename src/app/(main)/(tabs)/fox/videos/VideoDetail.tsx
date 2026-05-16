@@ -22,7 +22,7 @@ export default function VideoDetailScreen() {
   }
   return (
     <AppScreen>
-      <Stack.Screen options={{ title: 'Youtube' }} />
+      <Stack.Screen options={{ title: 'Youtube Details' }} />
       <AppBox>
         <AppText fontSize={FONT.SIZE.LG}>
           {detail?.video_title_original}
