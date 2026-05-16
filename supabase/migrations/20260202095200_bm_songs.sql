@@ -24,6 +24,10 @@ CREATE TABLE
     constraint bm_songs_pkey primary key (id)
 ) tablespace pg_default;
 
+GRANT SELECT ON TABLE public.bm_songs TO anon;
+GRANT SELECT, UPDATE ON TABLE public.bm_songs TO authenticated;
+GRANT ALL ON TABLE public.bm_songs TO service_role;
+
 ALTER TABLE public.bm_songs
     ENABLE ROW LEVEL SECURITY;
 

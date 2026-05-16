@@ -18,6 +18,10 @@ CREATE TABLE
     user_country text                     null
 ) tablespace pg_default;
 
+GRANT SELECT ON public.gl_profiles TO anon;
+GRANT SELECT, UPDATE ON TABLE public.gl_profiles TO authenticated;
+GRANT ALL ON TABLE public.gl_profiles TO service_role;
+
 ALTER TABLE public.gl_profiles
     ENABLE ROW LEVEL SECURITY;
 

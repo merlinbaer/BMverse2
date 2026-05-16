@@ -31,6 +31,9 @@ create table public.bm_event_concert
     constraint bm_event_concert_pkey primary key (id)
 ) TABLESPACE pg_default;
 
+GRANT SELECT ON TABLE public.bm_event_concert TO anon, authenticated;
+GRANT ALL ON TABLE public.bm_event_concert TO service_role;
+
 ALTER TABLE public.bm_event_concert
     ENABLE ROW LEVEL SECURITY;
 
@@ -64,6 +67,9 @@ create table
     song_artwork       text                     null,
     constraint bm_event_concert_songs_pkey primary key (id)
 ) tablespace pg_default;
+
+GRANT SELECT ON TABLE public.bm_event_concert_songs TO anon, authenticated;
+GRANT ALL ON TABLE public.bm_event_concert_songs TO service_role;
 
 ALTER TABLE public.bm_event_concert_songs
     ENABLE ROW LEVEL SECURITY;
@@ -117,6 +123,9 @@ create table
     setlist_artwork                 text                     not null,
     constraint bm_event_concert_upcoming_pkey primary key (id)
 ) tablespace pg_default;
+
+GRANT SELECT ON TABLE public.bm_event_concert_upcoming TO anon, authenticated;
+GRANT ALL ON TABLE public.bm_event_concert_upcoming TO service_role;
 
 ALTER TABLE public.bm_event_concert_upcoming
     ENABLE ROW LEVEL SECURITY;

@@ -88,3 +88,10 @@ SELECT EXISTS (SELECT 1
                  AND p.user_role = 'moderator');
 $$;
 
+-- Explicitly grant execute for Data API (RPC and RLS support)
+GRANT EXECUTE ON FUNCTION public.is_admin() TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.is_moderator() TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.is_public_user() TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.update_last_seen() TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.delete_user() TO authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.handle_new_user() TO service_role;

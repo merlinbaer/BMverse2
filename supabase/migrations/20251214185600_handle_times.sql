@@ -16,3 +16,5 @@ BEGIN
     RETURN NEW;
 END;
 $$;
+
+GRANT EXECUTE ON FUNCTION public.handle_times() TO anon, authenticated, service_role;

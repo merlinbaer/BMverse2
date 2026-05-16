@@ -11,6 +11,10 @@ CREATE TABLE
     constraint bm_news_pkey primary key (id)
 ) tablespace pg_default;
 
+GRANT SELECT ON TABLE public.bm_news TO anon;
+GRANT SELECT, UPDATE, INSERT ON TABLE public.bm_news TO authenticated;
+GRANT ALL ON TABLE public.bm_news TO service_role;
+
 ALTER TABLE public.bm_news
     ENABLE ROW LEVEL SECURITY;
 
@@ -68,3 +72,5 @@ CREATE TRIGGER sync_bm_news
     ON public.bm_news
     FOR EACH ROW
 EXECUTE FUNCTION public.sync_bm_news();
+
+GRANT EXECUTE ON FUNCTION public.sync_bm_news() TO authenticated, service_role;

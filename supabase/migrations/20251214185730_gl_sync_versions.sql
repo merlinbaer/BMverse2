@@ -13,6 +13,10 @@ CREATE TABLE
     constraint gl_sync_is_singleton check (sync_id = 1)
 ) TABLESPACE pg_default;
 
+GRANT SELECT ON TABLE public.gl_sync TO anon;
+GRANT SELECT, UPDATE ON TABLE public.gl_sync TO authenticated;
+GRANT ALL ON TABLE public.gl_sync TO service_role;
+
 ALTER TABLE public.gl_sync
     ENABLE ROW LEVEL SECURITY;
 
@@ -43,6 +47,9 @@ CREATE TABLE
     constraint gl_version_pkey primary key (id),
     constraint gl_versions_version_id_key unique (version_id)
 ) tablespace pg_default;
+
+GRANT SELECT ON TABLE public.gl_versions TO anon, authenticated;
+GRANT ALL ON TABLE public.gl_versions TO service_role;
 
 ALTER TABLE public.gl_versions
     ENABLE ROW LEVEL SECURITY;
