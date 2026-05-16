@@ -16,7 +16,15 @@ export default function VideoDetailScreen() {
     id: string
   }>()
   const navigation = useNavigation()
+
   const detail = useValue(videoItem$(id))
+  const formattedDate = detail?.video_publishedat
+    ? new Date(detail.video_publishedat)
+        .toISOString()
+        .replace('T', ' ')
+        .substring(0, 16)
+    : ''
+
   const playerRef = useRef<YoutubeIframeRef>(null)
 
   // Workaround for onFullScreenChange ios problem. But does not work
@@ -69,11 +77,11 @@ export default function VideoDetailScreen() {
       <Stack.Screen options={{ title: 'YouTube Details' }} />
       <AppBox>
         <AppText fontSize={FONT.SIZE.BASE}>{detail?.video_title}</AppText>
-        <View style={styles.mapContainer}>
+        <View style={styles.ytContainer}>
           <YoutubePlayer
             ref={playerRef}
-            height={220}
-            width={400}
+            height={200}
+            width={370}
             videoId={detail?.video_id}
             onChangeState={handleStateChange}
             onFullScreenChange={handleFullScreenChange}
@@ -100,7 +108,7 @@ export default function VideoDetailScreen() {
             {'PUBLISHED at:'}
           </AppText>
           <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {detail?.video_publishedat}
+            {formattedDate}
           </AppText>
         </View>
         <View style={styles.infoRow}>
@@ -146,18 +154,18 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginTop: 4,
   },
-  mapContainer: {
-    alignItems: 'center',
-    backgroundColor: COLORS.BG_GREY,
-    borderRadius: 12,
-    marginVertical: 10,
-    overflow: 'hidden',
-    width: '100%',
-  },
   prompt: {
     color: COLORS.TEXT_MUTED,
   },
   value: {
     color: COLORS.SECONDARY,
+  },
+  ytContainer: {
+    alignItems: 'center',
+    backgroundColor: COLORS.BG_GREY,
+    borderRadius: 2,
+    marginVertical: 16,
+    overflow: 'hidden',
+    width: '100%',
   },
 })
