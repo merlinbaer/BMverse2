@@ -1,46 +1,98 @@
 import { useValue } from '@legendapp/state/react'
-import { Image } from 'expo-image'
-import { Stack, useLocalSearchParams } from 'expo-router'
-import React from 'react'
-import { Linking, Pressable, StyleSheet, View } from 'react-native'
+import { Stack, useLocalSearchParams, useNavigation } from 'expo-router'
+import React, { useRef } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { WebViewMessageEvent } from 'react-native-webview'
+import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe'
 
 import { AppBox } from '@/components/AppBox'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
-import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
+import { COLORS, FONT } from '@/constants/constants'
 import { videoItem$ } from '@/services/legend'
 
 export default function VideoDetailScreen() {
   const { id } = useLocalSearchParams<{
     id: string
   }>()
+  const navigation = useNavigation()
   const detail = useValue(videoItem$(id))
-  const handleOpenMap = () => {
-    Linking.openURL(detail?.video_artwork ? detail?.video_artwork : '').catch(
-      err => console.error('Error opening maps:', err),
-    )
+  const playerRef = useRef<YoutubeIframeRef>(null)
+
+  // Workaround for onFullScreenChange ios problem. But does not work
+  const injectedJavaScript = `
+		// Monitor changes in the fullscreen state of media elements
+		document.addEventListener('fullscreenchange', function() {
+		if (!document.fullscreenElement) {
+			// If the document is no longer in fullscreen mode, notify React Native
+			window.ReactNativeWebView.postMessage('exitFullScreen');
+		}
+		});
+
+		// Also monitor if a video is paused, ended or resumed
+		const videoElement = document.querySelector('video');
+		if (videoElement) {
+		videoElement.addEventListener('pause', () => {
+			window.ReactNativeWebView.postMessage('videoPaused');
+		});
+		videoElement.addEventListener('play', () => {
+			window.ReactNativeWebView.postMessage('videoPlaying');
+		});
+		videoElement.addEventListener('ended', () => {
+			window.ReactNativeWebView.postMessage('videoEnded');
+		});
+		}
+	`
+
+  const handleStateChange = (state: string) => {
+    // Close YouTube player when video ends
+    console.log('VPlayer: ' + state)
+    if (state === 'ended') {
+      navigation.goBack()
+    }
   }
+
+  const handleFullScreenChange = (status: boolean) => {
+    // does not work on IOS. See: https://github.com/LonelyCpp/react-native-youtube-iframe/issues/45
+    // Closing of the Inline Media Player on IOS could not be detected, so the React native screen has to be closed manually,
+    // after the full-screen end button (top left) of the Inline Media Player is pressed.
+    // JavaScript injection and onMessage do not work either. It seems so that the events are fetched by youtube-iframe player
+    console.log('handleFullScreenChange: ' + status)
+  }
+
+  const handleError = (error: string) => {
+    console.log('youtube player error: ' + error)
+  }
+
   return (
     <AppScreen>
-      <Stack.Screen options={{ title: 'Youtube Details' }} />
+      <Stack.Screen options={{ title: 'YouTube Details' }} />
       <AppBox>
-        <AppText fontSize={FONT.SIZE.LG}>
-          {detail?.video_title_original}
-        </AppText>
-        <Pressable
-          onPress={handleOpenMap}
-          style={({ pressed }) => [
-            styles.mapContainer,
-            pressed && styles.mapPressed,
-          ]}
-        >
-          <Image
-            source={detail?.video_artwork}
-            contentFit="fill"
-            style={styles.mapImage}
+        <AppText fontSize={FONT.SIZE.BASE}>{detail?.video_title}</AppText>
+        <View style={styles.mapContainer}>
+          <YoutubePlayer
+            ref={playerRef}
+            height={220}
+            width={400}
+            videoId={detail?.video_id}
+            onChangeState={handleStateChange}
+            onFullScreenChange={handleFullScreenChange}
+            onError={handleError}
+            webViewProps={{
+              allowsInlineMediaPlayback: false,
+              injectedJavaScript: injectedJavaScript,
+              onMessage: (event: WebViewMessageEvent) =>
+                console.log(
+                  'Injection and onMessage does not work:',
+                  event.nativeEvent.data,
+                ),
+            }}
+            play={true}
           />
-        </Pressable>
-        <AppText fontSize={FONT.SIZE.SM}>{detail?.video_duration}</AppText>
+        </View>
+        <AppText fontSize={FONT.SIZE.SM} style={styles.durationText}>
+          {detail?.video_duration}
+        </AppText>
       </AppBox>
       <AppBox>
         <View style={styles.infoRow}>
@@ -84,6 +136,10 @@ export default function VideoDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  durationText: {
+    textAlign: 'right',
+    width: '100%',
+  },
   infoRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -97,13 +153,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     overflow: 'hidden',
     width: '100%',
-  },
-  mapImage: {
-    height: MAP_HEIGHT,
-    width: (MAP_HEIGHT / 3) * 4,
-  },
-  mapPressed: {
-    opacity: 0.7,
   },
   prompt: {
     color: COLORS.TEXT_MUTED,
