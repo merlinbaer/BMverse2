@@ -18,6 +18,8 @@ import {
   upcomingSync,
   versions$,
   versionSync,
+  videos$,
+  videoSync,
 } from '@/services/legend'
 
 export const initializeStores = () => {
@@ -30,6 +32,7 @@ export const initializeStores = () => {
     concerts$.peek()
     setlists$.peek()
     upcoming$.peek()
+    videos$.peek()
     console.log('LegendState: Table stores initialized.')
   } catch (error) {
     console.log('LegendState: Failed to initialize table stores:', error)
@@ -44,6 +47,7 @@ export const syncAll = async () => {
     concertSync(),
     setlistSync(),
     upcomingSync(),
+    videoSync(),
   ])
 }
 

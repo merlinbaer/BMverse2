@@ -364,6 +364,78 @@ export type Database = {
         }
         Relationships: []
       }
+      bm_videos: {
+        Row: {
+          channel_artwork: string
+          channel_customurl: string | null
+          channel_decription: string
+          channel_id: string
+          channel_title: string
+          channel_type: string
+          created_at: string
+          deleted: boolean | null
+          id: string
+          updated_at: string
+          video_artwork: string
+          video_commentcount: number
+          video_description: string | null
+          video_duration: string
+          video_id: string
+          video_likecount: number
+          video_publishedat: string
+          video_song: string | null
+          video_title: string
+          video_title_original: string
+          video_viewcount: number
+        }
+        Insert: {
+          channel_artwork: string
+          channel_customurl?: string | null
+          channel_decription: string
+          channel_id: string
+          channel_title: string
+          channel_type: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          updated_at?: string
+          video_artwork: string
+          video_commentcount: number
+          video_description?: string | null
+          video_duration: string
+          video_id: string
+          video_likecount: number
+          video_publishedat: string
+          video_song?: string | null
+          video_title: string
+          video_title_original: string
+          video_viewcount: number
+        }
+        Update: {
+          channel_artwork?: string
+          channel_customurl?: string | null
+          channel_decription?: string
+          channel_id?: string
+          channel_title?: string
+          channel_type?: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          updated_at?: string
+          video_artwork?: string
+          video_commentcount?: number
+          video_description?: string | null
+          video_duration?: string
+          video_id?: string
+          video_likecount?: number
+          video_publishedat?: string
+          video_song?: string | null
+          video_title?: string
+          video_title_original?: string
+          video_viewcount?: number
+        }
+        Relationships: []
+      }
       gl_profiles: {
         Row: {
           created_at: string
