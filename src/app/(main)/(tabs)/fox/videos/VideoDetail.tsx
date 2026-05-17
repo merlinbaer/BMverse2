@@ -6,6 +6,7 @@ import { WebViewMessageEvent } from 'react-native-webview'
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe'
 
 import { AppBox } from '@/components/AppBox'
+import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
@@ -15,17 +16,26 @@ export default function VideoDetailScreen() {
   const { id } = useLocalSearchParams<{
     id: string
   }>()
+
+  const playerRef = useRef<YoutubeIframeRef>(null)
   const navigation = useNavigation()
 
-  const detail = useValue(videoItem$(id))
+  const detail = useValue(videoItem$(id ?? ''))
+  if (!id || !detail) {
+    return (
+      <AppScreen>
+        <Stack.Screen options={{ title: 'YouTube Details' }} />
+        <AppLoadScreen message="Video not found" />
+      </AppScreen>
+    )
+  }
+
   const formattedDate = detail?.video_publishedat
     ? new Date(detail.video_publishedat)
         .toISOString()
         .replace('T', ' ')
         .substring(0, 16)
     : ''
-
-  const playerRef = useRef<YoutubeIframeRef>(null)
 
   // Workaround for onFullScreenChange ios problem. But does not work
   const injectedJavaScript = `

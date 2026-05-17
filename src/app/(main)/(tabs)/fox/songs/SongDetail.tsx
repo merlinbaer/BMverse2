@@ -5,6 +5,7 @@ import React, { useEffect, useMemo } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 import { AppBox } from '@/components/AppBox'
+import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppMarkdown } from '@/components/AppMarkdown'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
@@ -19,7 +20,8 @@ export default function SongDetailScreen() {
   const { id } = useLocalSearchParams<{
     id: string
   }>()
-  const detail = useValue(songItem$(id))
+
+  const detail = useValue(songItem$(id ?? ''))
   const activeTab = useValue(activeTab$)
 
   useEffect(() => {
@@ -27,6 +29,9 @@ export default function SongDetailScreen() {
   }, [id])
 
   const { lyrics, focusColor } = useMemo(() => {
+    if (!detail) {
+      return { lyrics: '', focusColor: COLORS.PRIMARY }
+    }
     switch (activeTab) {
       case 'rom':
         return { lyrics: detail?.song_lyrics_rom, focusColor: COLORS.SECONDARY }
@@ -37,6 +42,14 @@ export default function SongDetailScreen() {
         return { lyrics: detail?.song_lyrics_jp, focusColor: COLORS.PRIMARY }
     }
   }, [activeTab, detail])
+
+  if (!id || !detail)
+    return (
+      <AppScreen>
+        <Stack.Screen options={{ title: 'Song Details' }} />
+        <AppLoadScreen message="Song not found" />
+      </AppScreen>
+    )
 
   return (
     <AppScreen>
@@ -184,7 +197,7 @@ export default function SongDetailScreen() {
         <MoaSpeaks markup={'Want to see us?'} />
       </View>
       <AppBox>
-        <AppText fontSize={FONT.SIZE.LG}>{'Youtube'}</AppText>
+        <AppText fontSize={FONT.SIZE.LG}>{'YouTube'}</AppText>
         <AppText fontSize={FONT.SIZE.LG}>{'...'}</AppText>
         <AppText fontSize={FONT.SIZE.LG}>{'Viewer'}</AppText>
         <AppText fontSize={FONT.SIZE.XS} style={styles.songTitle_jp}>

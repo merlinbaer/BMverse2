@@ -7,6 +7,7 @@ import { Linking, Pressable, StyleSheet, View } from 'react-native'
 import { AppBox } from '@/components/AppBox'
 import { AppFlatList } from '@/components/AppFlatList'
 import { AppHyperlink } from '@/components/AppHyperlink'
+import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
@@ -17,9 +18,18 @@ export default function ConcertDetailScreen() {
     id: string
     setlistId: string
   }>()
-  const detail = useValue(concertItem$(id))
-  const list$ = useMemo(() => setlistsList$(setlistId), [setlistId])
+  const detail = useValue(concertItem$(id ?? ''))
+  const list$ = useMemo(() => setlistsList$(setlistId ?? ''), [setlistId])
   const data = useValue(list$)
+
+  if (!id || !setlistId || !detail) {
+    return (
+      <AppScreen>
+        <Stack.Screen options={{ title: 'Concert Details' }} />
+        <AppLoadScreen message="Concert not found" />
+      </AppScreen>
+    )
+  }
 
   const showTourInfo = !!(detail?.setlist_tour_name || detail?.setlist_info)
   const googleMapsUri = `https://www.google.com/maps/search/?api=1&query=${detail?.setlist_venue_city_coords_lat},${detail?.setlist_venue_city_coords_long}`

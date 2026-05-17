@@ -6,6 +6,7 @@ import { Linking, Pressable, StyleSheet } from 'react-native'
 
 import { AppBox } from '@/components/AppBox'
 import { AppHyperlink } from '@/components/AppHyperlink'
+import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
@@ -15,7 +16,16 @@ export default function UpComingDetailScreen() {
   const { id } = useLocalSearchParams<{
     id: string
   }>()
-  const detail = useValue(upcomingItem$(id))
+
+  const detail = useValue(upcomingItem$(id ?? ''))
+  if (!id || !detail) {
+    return (
+      <AppScreen>
+        <Stack.Screen options={{ title: 'Upcoming Details' }} />
+        <AppLoadScreen message="Event details not found" />
+      </AppScreen>
+    )
+  }
 
   const showTourInfo = !!(detail?.setlist_tour_name || detail?.setlist_info)
   const googleMapsUri = `https://www.google.com/maps/search/?api=1&query=${detail?.setlist_venue_city_coords_lat},${detail?.setlist_venue_city_coords_long}`

@@ -11,7 +11,7 @@ export default function PlayerScreen() {
       <Stack.Screen options={{ title: 'Music Player' }} />
       <View style={styles.characterContainer}>
         <AppBubbleText
-          markup={'Only in IOS and Android when logged in.'}
+          markup={'Only in IOS and Android available.'}
           orientation={'center'}
         />
       </View>
