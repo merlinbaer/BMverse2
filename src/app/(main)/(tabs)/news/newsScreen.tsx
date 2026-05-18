@@ -1,4 +1,6 @@
 import { useValue } from '@legendapp/state/react'
+import { Stack } from 'expo-router'
+import React from 'react'
 import { FlatList, Platform, StyleSheet } from 'react-native'
 
 import { AppBubbleText } from '@/components/AppBubbleText'
@@ -28,16 +30,19 @@ export default function NewsScreen() {
   const data = useValue(newsList$)
 
   return (
-    <FlatList
-      style={styles.flatList}
-      automaticallyAdjustsScrollIndicatorInsets
-      data={data}
-      keyExtractor={item => item.id}
-      contentContainerStyle={styles.listContent}
-      contentInsetAdjustmentBehavior="automatic"
-      scrollEventThrottle={16}
-      renderItem={({ item }) => <NewsItem id={item.id} />}
-    />
+    <>
+      <Stack.Screen options={{ title: 'News' }} />
+      <FlatList
+        style={styles.flatList}
+        automaticallyAdjustsScrollIndicatorInsets
+        data={data}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContent}
+        contentInsetAdjustmentBehavior="automatic"
+        scrollEventThrottle={16}
+        renderItem={({ item }) => <NewsItem id={item.id} />}
+      />
+    </>
   )
 }
 

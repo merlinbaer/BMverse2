@@ -1,5 +1,6 @@
 import { useValue } from '@legendapp/state/react'
-import { useState } from 'react'
+import { Stack } from 'expo-router'
+import React, { useState } from 'react'
 import { Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
@@ -55,6 +56,7 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.mainView}>
+      <Stack.Screen options={{ title: 'Profile' }} />
       <AppButton title={`Request Token`} onPress={() => startLogin(email)} />
       <AppText>Enter the verification code sent to your email:</AppText>
       <TextInput

@@ -60,7 +60,7 @@ export default function GamesScreen() {
   if (!user) {
     return (
       <AppScreen>
-        <Stack.Screen options={{ title: 'Music Player' }} />
+        <Stack.Screen options={{ title: 'Games' }} />
         <View style={styles.characterContainer}>
           <AppBubbleText
             markup={'Only in IOS and Android when logged in.'}
