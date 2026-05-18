@@ -3,6 +3,8 @@ import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
 import { isLiquidGlassAvailable } from 'expo-glass-effect'
 import { Platform } from 'react-native'
 
+import { AndroidHeaderTitle } from '@/layout/HeaderHelper'
+
 import appJson from '../../app.json'
 
 export const APP_VERSION = appJson.expo.version
@@ -23,8 +25,11 @@ export const COLORS = {
   BM_DARK_RED: '#5f0a06',
   BM_VERY_DARK_RED: '#310a03',
   TEXT_INPUT: '#fff',
-  //MESSAGE_BUBBLE: '#202c33',
   MESSAGE_BUBBLE: '#1a1a1a',
+  TRANSPARENT: 'transparent',
+  MODAL_BACKGROUND: 'rgba(30, 30, 30, 0.9)',
+  MODAL_BORDER: 'rgba(255, 255, 255, 0.1)',
+  BACKDROP: 'rgba(0, 0, 0, 0.7)',
 }
 
 export const AppTheme = {
@@ -55,8 +60,8 @@ export const LAYOUT = {
 
 export const MAP_HEIGHT = 160
 
-export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
-  {
+export const LayoutScreenHeader: NativeStackNavigationOptions =
+  Platform.select<NativeStackNavigationOptions>({
     ios: {
       headerLargeTitle: true,
       headerTransparent: true,
@@ -75,13 +80,11 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
     },
     android: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND },
-      headerTitleStyle: {
-        fontSize: FONT.SIZE.LG + 12,
-        color: COLORS.TEXT,
-      },
+      headerTitle: (props: { children: string }) => (
+        <AndroidHeaderTitle {...props} />
+      ),
       headerTintColor: COLORS.TEXT,
       headerShadowVisible: false,
-      WelcomeContentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
     web: {
       headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
@@ -99,8 +102,7 @@ export const LayoutScreenHeader: NativeStackNavigationOptions = Platform.select(
       headerShadowVisible: false,
       contentStyle: { backgroundColor: COLORS.BACKGROUND },
     },
-  },
-)
+  })
 
 const createTabBarConstants = (posY: number) =>
   ({

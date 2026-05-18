@@ -1,8 +1,9 @@
 import { FontAwesome } from '@expo/vector-icons'
 import { router, Stack } from 'expo-router'
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { TouchableOpacity, View } from 'react-native'
 
 import { LayoutScreenHeader } from '@/constants/constants'
+import { headerStyles } from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
@@ -11,7 +12,7 @@ export default function Layout() {
         ...LayoutScreenHeader,
         headerLeft: () => (
           <TouchableOpacity onPress={() => router.back()}>
-            <View style={styles.backButton}>
+            <View style={headerStyles.backButton}>
               <FontAwesome name="chevron-left" size={24} color="white" />
             </View>
           </TouchableOpacity>
@@ -20,17 +21,3 @@ export default function Layout() {
     ></Stack>
   )
 }
-
-const styles = StyleSheet.create({
-  backButton: {
-    paddingBottom: 2,
-    paddingLeft: Platform.select({
-      ios: 0,
-      android: 0,
-      web: 10,
-      default: 0,
-    }),
-    paddingRight: 12,
-    paddingTop: 8,
-  },
-})
