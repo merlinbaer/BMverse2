@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
-import React from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
+import React, { useEffect } from 'react'
+import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import {
   Gesture,
   GestureDetector,
@@ -12,6 +12,7 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  withTiming,
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -21,13 +22,32 @@ import { COLORS } from 'src/constants/constants'
 
 const SortSongs = () => {
   const router = useRouter()
-  const translateY = useSharedValue(0)
+  const { top } = useSafeAreaInsets()
+  const startOffset = 600
+  const translateY = useSharedValue(Platform.OS === 'ios' ? 0 : startOffset)
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios') {
+      translateY.value = withSpring(0, {
+        damping: 25,
+        stiffness: 80,
+        mass: 0.5,
+      })
+    }
+  }, [translateY])
 
   const updateSortSongs = (sorting: string) => {
     console.log('Sorting: ' + sorting)
-    router.back()
+    handleDismiss() // Use shared dismiss logic
   }
-  const { top } = useSafeAreaInsets()
+
+  const handleDismiss = () => {
+    translateY.value = withTiming(startOffset, { duration: 250 }, finished => {
+      if (finished) {
+        runOnJS(router.back)()
+      }
+    })
+  }
 
   const gesture = Gesture.Pan()
     .onUpdate(event => {
@@ -68,10 +88,7 @@ const SortSongs = () => {
   return (
     <GestureHandlerRootView style={styles.screenWrapper}>
       <Animated.View style={[styles.backdrop, backdropAnimatedStyle]}>
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={() => router.back()}
-        />
+        <Pressable style={StyleSheet.absoluteFill} onPress={handleDismiss} />
       </Animated.View>
       <GestureDetector gesture={gesture}>
         <Animated.View
