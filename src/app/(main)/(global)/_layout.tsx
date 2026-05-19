@@ -19,6 +19,17 @@ export default function GlobalLayout() {
         }}
       />
       <Stack.Screen
+        name="VideoSort"
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          contentStyle: {
+            backgroundColor: COLORS.TRANSPARENT,
+          },
+        }}
+      />
+      <Stack.Screen
         name="Player"
         options={{
           headerShown: false,

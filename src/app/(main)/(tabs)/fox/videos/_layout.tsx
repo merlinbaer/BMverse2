@@ -1,6 +1,10 @@
 import { Stack } from 'expo-router'
 
-import { BackButton, LayoutScreenHeader } from '@/layout/HeaderHelper'
+import {
+  BackButton,
+  LayoutScreenHeader,
+  SortButton,
+} from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
@@ -9,6 +13,16 @@ export default function Layout() {
         ...LayoutScreenHeader,
         headerLeft: () => <BackButton />,
       }}
-    ></Stack>
+    >
+      <Stack.Screen
+        name="Videos"
+        options={{
+          title: 'Videos',
+          headerRight: () => (
+            <SortButton targetRoute="/(main)/(global)/VideoSort" />
+          ),
+        }}
+      />
+    </Stack>
   )
 }
