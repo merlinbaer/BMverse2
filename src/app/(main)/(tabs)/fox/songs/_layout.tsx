@@ -26,17 +26,3 @@ export default function Layout() {
     </Stack>
   )
 }
-
-/*
-      <Stack.Screen
-        name="SongSort"
-        options={{
-          headerShown: false,
-          presentation: 'transparentModal',
-          gestureEnabled: true,
-          contentStyle: {
-            backgroundColor: COLORS.TRANSPARENT,
-          },
-        }}
-      />
- */
