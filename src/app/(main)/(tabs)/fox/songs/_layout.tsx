@@ -1,24 +1,27 @@
-import { FontAwesome } from '@expo/vector-icons'
-import { router, Stack } from 'expo-router'
-import { TouchableOpacity, View } from 'react-native'
+import { Stack } from 'expo-router'
 
-import { COLORS, LayoutScreenHeader } from '@/constants/constants'
-import { headerStyles } from '@/layout/HeaderHelper'
+import { COLORS } from '@/constants/constants'
+import {
+  BackButton,
+  LayoutScreenHeader,
+  SortButton,
+} from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
     <Stack
       screenOptions={{
         ...LayoutScreenHeader,
-        headerLeft: () => (
-          <TouchableOpacity onPress={() => router.back()}>
-            <View style={headerStyles.backButton}>
-              <FontAwesome name="chevron-left" size={24} color="white" />
-            </View>
-          </TouchableOpacity>
-        ),
+        headerLeft: () => <BackButton />,
       }}
     >
+      <Stack.Screen
+        name="Songs"
+        options={{
+          title: 'Songs',
+          headerRight: () => <SortButton targetRoute="/fox/songs/SongSort" />,
+        }}
+      />
       <Stack.Screen
         name="SongSort"
         options={{

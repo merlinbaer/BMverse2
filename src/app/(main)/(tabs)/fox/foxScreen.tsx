@@ -1,6 +1,6 @@
 import { Image } from 'expo-image'
 import { Href, useFocusEffect, useRouter } from 'expo-router'
-import { useCallback, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 

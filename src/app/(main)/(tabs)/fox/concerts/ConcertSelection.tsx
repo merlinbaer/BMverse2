@@ -86,7 +86,7 @@ export default function ConcertSelectionScreen() {
       enableOnAndroid={true}
       extraScrollHeight={100}
     >
-      <Stack.Screen options={{ title: '' }} />
+      <Stack.Screen options={{ title: 'Concert Selection' }} />
       <View style={styles.container}>
         <MomoSpeaks markup={momoMessage} />
 

@@ -1,9 +1,4 @@
 import { DarkTheme } from '@react-navigation/native'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
-import { isLiquidGlassAvailable } from 'expo-glass-effect'
-import { Platform } from 'react-native'
-
-import { AndroidHeaderTitle } from '@/layout/HeaderHelper'
 
 import appJson from '../../app.json'
 
@@ -58,51 +53,7 @@ export const LAYOUT = {
   gap: 24,
 }
 
-export const MAP_HEIGHT = 160
-
-export const LayoutScreenHeader: NativeStackNavigationOptions =
-  Platform.select<NativeStackNavigationOptions>({
-    ios: {
-      headerLargeTitle: true,
-      headerTransparent: true,
-      headerBlurEffect: !isLiquidGlassAvailable() ? 'dark' : 'none',
-      headerLargeStyle: !isLiquidGlassAvailable()
-        ? { backgroundColor: COLORS.BACKGROUND }
-        : {},
-      headerBackButtonDisplayMode: 'minimal',
-      headerLargeTitleStyle: {
-        color: COLORS.TEXT,
-      },
-      headerTitleStyle: {
-        color: COLORS.TEXT,
-      },
-      headerTintColor: COLORS.TEXT,
-    },
-    android: {
-      headerStyle: { backgroundColor: COLORS.BACKGROUND },
-      headerTitle: (props: { children: string }) => (
-        <AndroidHeaderTitle {...props} />
-      ),
-      headerTintColor: COLORS.TEXT,
-      headerShadowVisible: false,
-    },
-    web: {
-      headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
-      headerTitleStyle: {
-        fontSize: FONT.SIZE.LG + 12,
-        color: COLORS.TEXT,
-      },
-      headerTintColor: COLORS.TEXT,
-      headerShadowVisible: false,
-      WelcomeContentStyle: { backgroundColor: COLORS.BACKGROUND },
-    },
-    default: {
-      headerStyle: { backgroundColor: COLORS.BACKGROUND },
-      headerTintColor: COLORS.TEXT,
-      headerShadowVisible: false,
-      contentStyle: { backgroundColor: COLORS.BACKGROUND },
-    },
-  })
+export const MAP_HEIGHT = 160 // used in ConcertsDetails and UpcomingDetails
 
 const createTabBarConstants = (posY: number) =>
   ({

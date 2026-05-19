@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router'
 
-import { LayoutScreenHeader } from '@/constants/constants'
+import { LayoutScreenHeader } from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
