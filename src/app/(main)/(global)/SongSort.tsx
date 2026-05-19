@@ -1,14 +1,19 @@
+import { useValue } from '@legendapp/state/react'
 import React from 'react'
 import { StyleSheet } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
+import { songSort$ } from '@/services/legend'
+import { SongListType } from '@/types/list'
 
 const SongSort = () => {
-  const updateSortSongs = (sorting: string, dismiss: () => void) => {
+  const currentSort = useValue(songSort$)
+
+  const updateSortSongs = (sorting: SongListType, dismiss: () => void) => {
     console.log('Sorting selected:', sorting)
-    // Perform your sorting logic here
+    songSort$.set(sorting)
     dismiss()
   }
 
@@ -18,16 +23,19 @@ const SongSort = () => {
         <>
           <AppText style={styles.title}>List by</AppText>
           <AppButton
-            title="release"
-            onPress={() => updateSortSongs('release', dismiss)}
+            title="Release"
+            disabled={currentSort === 'Release'}
+            onPress={() => updateSortSongs('Release', dismiss)}
           />
           <AppButton
-            title="appearance"
-            onPress={() => updateSortSongs('appearance', dismiss)}
+            title="Appearance"
+            disabled={currentSort === 'Appearance'}
+            onPress={() => updateSortSongs('Appearance', dismiss)}
           />
           <AppButton
-            title="title"
-            onPress={() => updateSortSongs('title', dismiss)}
+            title="Title"
+            disabled={currentSort === 'Title'}
+            onPress={() => updateSortSongs('Title', dismiss)}
           />
         </>
       )}

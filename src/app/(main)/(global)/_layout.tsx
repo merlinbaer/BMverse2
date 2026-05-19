@@ -3,6 +3,7 @@ import React from 'react'
 
 import { COLORS } from '@/constants/constants'
 
+// Modal screens that cover the entire screen, including tab bar
 export default function GlobalLayout() {
   return (
     <Stack>

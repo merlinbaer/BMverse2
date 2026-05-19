@@ -3,10 +3,11 @@ import { Stack } from 'expo-router'
 import React, { useMemo } from 'react'
 
 import { AppListScreen } from '@/components/AppListScreen'
-import { songList$ } from '@/services/legend'
+import { songList$, songSort$ } from '@/services/legend'
 
 export default function SongsScreen() {
-  const list$ = useMemo(() => songList$(), [])
+  const sortType = useValue(songSort$)
+  const list$ = useMemo(() => songList$(sortType), [sortType])
   const data = useValue(list$)
 
   return (
