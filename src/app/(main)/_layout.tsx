@@ -9,12 +9,8 @@ export default function MainLayout() {
     >
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
-        name="(global)/player"
-        options={{
-          title: 'Player',
-          headerBackButtonDisplayMode: 'minimal',
-          headerTransparent: true,
-        }}
+        name="(global)"
+        options={{ presentation: 'transparentModal' }}
       />
     </Stack>
   )

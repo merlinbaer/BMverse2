@@ -15,9 +15,9 @@ import Animated, {
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
-import { AppButton } from '@/components/AppButton'
-import { AppText } from '@/components/AppText'
-import { COLORS } from '@/constants/constants'
+import { AppButton } from 'src/components/AppButton'
+import { AppText } from 'src/components/AppText'
+import { COLORS } from 'src/constants/constants'
 
 const SortSongs = () => {
   const router = useRouter()

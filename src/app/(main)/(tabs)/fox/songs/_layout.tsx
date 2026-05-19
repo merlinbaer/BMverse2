@@ -1,6 +1,5 @@
 import { Stack } from 'expo-router'
 
-import { COLORS } from '@/constants/constants'
 import {
   BackButton,
   LayoutScreenHeader,
@@ -19,9 +18,16 @@ export default function Layout() {
         name="Songs"
         options={{
           title: 'Songs',
-          headerRight: () => <SortButton targetRoute="/fox/songs/SongSort" />,
+          headerRight: () => (
+            <SortButton targetRoute="/(main)/(global)/SongSort" />
+          ),
         }}
       />
+    </Stack>
+  )
+}
+
+/*
       <Stack.Screen
         name="SongSort"
         options={{
@@ -33,6 +39,4 @@ export default function Layout() {
           },
         }}
       />
-    </Stack>
-  )
-}
+ */
