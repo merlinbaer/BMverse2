@@ -7,11 +7,12 @@ import { Pressable, StyleSheet, View } from 'react-native'
 import { AppBox } from '@/components/AppBox'
 import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppMarkdown } from '@/components/AppMarkdown'
+import { AppPictureCarousel } from '@/components/AppPictureCarousel'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { MoaSpeaks, MomoSpeaks, SuSpeaks } from '@/components/CharacterSpeaks'
 import { COLORS, FONT } from '@/constants/constants'
-import { songItem$ } from '@/services/legend'
+import { songItem$, videosBySong$ } from '@/services/legend'
 
 type LyricsType = 'jp' | 'rom' | 'en'
 const activeTab$ = observable<LyricsType>('jp')
@@ -23,6 +24,8 @@ export default function SongDetailScreen() {
 
   const detail = useValue(songItem$(id ?? ''))
   const activeTab = useValue(activeTab$)
+  const videos = useValue(videosBySong$(detail?.song_title ?? ''))
+  console.log('videos: ' + videos)
 
   useEffect(() => {
     activeTab$.set('jp')
@@ -70,7 +73,12 @@ export default function SongDetailScreen() {
       </View>
       <AppBox>
         <AppText fontSize={FONT.SIZE.LG}>{'Info:'}</AppText>
-        <AppMarkdown markup={detail?.song_info ?? 'No info available.'} />
+        <AppMarkdown
+          markup={
+            detail?.song_info ??
+            'Work in progress. Join the [discord channel](https://discord.gg/69wxecseRw)'
+          }
+        />
       </AppBox>
       {!!detail?.song_lyrics_jp && (
         <>
@@ -144,6 +152,18 @@ export default function SongDetailScreen() {
           </AppText>
         </>
       )}
+      {videos && videos.length > 0 && (
+        <>
+          <View style={styles.characterSpeakBox}>
+            <MoaSpeaks markup={'Want to see us?'} />
+          </View>
+          <AppBox>
+            <View style={styles.carouselWrapper}>
+              <AppPictureCarousel data={videos} />
+            </View>
+          </AppBox>
+        </>
+      )}
       <View style={styles.characterSpeakBox}>
         <MomoSpeaks markup={'Some concert statistics'} />
       </View>
@@ -193,17 +213,6 @@ export default function SongDetailScreen() {
           </AppText>
         </View>
       </AppBox>
-      <View style={styles.characterSpeakBox}>
-        <MoaSpeaks markup={'Want to see us?'} />
-      </View>
-      <AppBox>
-        <AppText fontSize={FONT.SIZE.LG}>{'YouTube'}</AppText>
-        <AppText fontSize={FONT.SIZE.LG}>{'...'}</AppText>
-        <AppText fontSize={FONT.SIZE.LG}>{'Viewer'}</AppText>
-        <AppText fontSize={FONT.SIZE.XS} style={styles.songTitle_jp}>
-          {'Official MV'}
-        </AppText>
-      </AppBox>
     </AppScreen>
   )
 }
@@ -211,6 +220,12 @@ export default function SongDetailScreen() {
 const styles = StyleSheet.create({
   appTextCenter: {
     textAlign: 'center',
+  },
+  carouselWrapper: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'column',
+    paddingLeft: 8,
   },
   characterSpeakBox: {
     paddingVertical: 12,

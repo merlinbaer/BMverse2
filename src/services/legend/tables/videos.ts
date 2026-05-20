@@ -62,3 +62,27 @@ export const videoList$ = (sortType?: VideoListType) =>
         }),
       )
   })
+
+export const videosBySong$ = (songTitle: string) =>
+  computed<ListItemType[]>(() => {
+    const data = store$.get()
+    if (!data) return []
+
+    return Object.values(data)
+      .filter((item): item is VideoType & { deleted: false } => {
+        return !(!item || item.deleted) && item.video_song === songTitle
+      })
+      .sort((a, b) => (b.video_viewcount ?? 0) - (a.video_viewcount ?? 0))
+      .map(
+        (item): ListItemType => ({
+          id: item.id,
+          line1: item.channel_type,
+          line2: item.video_duration,
+          icon: item.video_artwork,
+          route: {
+            pathname: '/(main)/(tabs)/fox/videos/VideoDetail',
+            params: { id: item.id },
+          } as Href,
+        }),
+      )
+  })

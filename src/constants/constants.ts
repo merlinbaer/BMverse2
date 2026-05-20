@@ -25,6 +25,7 @@ export const COLORS = {
   MODAL_BACKGROUND: 'rgba(30, 30, 30, 0.9)',
   MODAL_BORDER: 'rgba(255, 255, 255, 0.1)',
   BACKDROP: 'rgba(0, 0, 0, 0.7)',
+  IMAGE_ARROW: 'rgba(0, 0, 0, 0.5)',
 }
 
 export const AppTheme = {
