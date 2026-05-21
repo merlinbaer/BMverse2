@@ -6,6 +6,7 @@ import { WebViewMessageEvent } from 'react-native-webview'
 import YoutubePlayer, { YoutubeIframeRef } from 'react-native-youtube-iframe'
 
 import { AppBox } from '@/components/AppBox'
+import { AppInfoRow } from '@/components/AppInfoRow'
 import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
@@ -113,38 +114,19 @@ export default function VideoDetailScreen() {
         </AppText>
       </AppBox>
       <AppBox>
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'PUBLISHED at:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {formattedDate}
-          </AppText>
-        </View>
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'VIEW count:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {Number(detail?.video_viewcount).toLocaleString()}
-          </AppText>
-        </View>
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'LIKE count:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {Number(detail?.video_likecount).toLocaleString()}
-          </AppText>
-        </View>
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'COMMENT count:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {Number(detail?.video_commentcount).toLocaleString()}
-          </AppText>
-        </View>
+        <AppInfoRow label="PUBLISHED at:" value={formattedDate} />
+        <AppInfoRow
+          label="VIEW count:"
+          value={Number(detail?.video_viewcount).toLocaleString()}
+        />
+        <AppInfoRow
+          label="LIKE count:"
+          value={Number(detail?.video_likecount).toLocaleString()}
+        />
+        <AppInfoRow
+          label="COMMENT count:"
+          value={Number(detail?.video_commentcount).toLocaleString()}
+        />
       </AppBox>
       <AppBox>
         <AppText>{detail?.video_description}</AppText>
@@ -157,18 +139,6 @@ const styles = StyleSheet.create({
   durationText: {
     textAlign: 'right',
     width: '100%',
-  },
-  infoRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  prompt: {
-    color: COLORS.TEXT_MUTED,
-  },
-  value: {
-    color: COLORS.SECONDARY,
   },
   ytContainer: {
     alignItems: 'center',

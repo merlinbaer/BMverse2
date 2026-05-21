@@ -4,9 +4,11 @@ import { Href } from 'expo-router'
 import concertBoxTour from '@/../assets/images/concert_box_tour.png'
 import concertBoxYear from '@/../assets/images/concert_box_year.png'
 import { ConcertListType, ListItemType } from '@/types/list'
-import { ConcertsType } from '@/types/tables'
+import { ConcertsType, SetlistType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
+
+import { setlists$ } from './setlists'
 
 // Define supabase observable
 const { store$, item$, sync, clearCache } = createTableStore<ConcertsType>({
@@ -174,4 +176,56 @@ export const concertsVenueList$ = (type?: ConcertListType, value?: string) =>
           } as Href,
         }),
       )
+  })
+
+export const songPerformanceStats$ = (songTitle: string) =>
+  computed(() => {
+    const concertsData = store$.get()
+    const setlistsData = setlists$.get()
+    if (!concertsData || !setlistsData) return null
+
+    const songSetlistEntries = Object.values(setlistsData).filter(
+      (item): item is SetlistType & { deleted: false } =>
+        !!item &&
+        !item.deleted &&
+        !!item.song_name &&
+        item.song_name.includes(songTitle),
+    )
+
+    if (songSetlistEntries.length === 0) return null
+
+    const matchingConcerts = songSetlistEntries
+      .map(entry => {
+        return Object.values(concertsData).find(
+          c => c && !c.deleted && c.setlist_id === entry.setlist_id,
+        )
+      })
+      .filter((c): c is ConcertsType => !!c)
+
+    if (matchingConcerts.length === 0) return null
+
+    const sortedConcerts = matchingConcerts.sort(
+      (a, b) =>
+        new Date(a.setlist_eventdate).getTime() -
+        new Date(b.setlist_eventdate).getTime(),
+    )
+
+    const firstConcert = sortedConcerts[0]
+    const lastConcert = sortedConcerts[sortedConcerts.length - 1]
+
+    const formatDate = (dateStr: string) => {
+      if (!dateStr) return 'N/A'
+      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr
+      const d = new Date(dateStr)
+      if (isNaN(d.getTime())) return 'N/A'
+      return d.toISOString().split('T')[0]
+    }
+
+    return {
+      totalLivePlays: String(matchingConcerts.length),
+      firstPerformed: formatDate(firstConcert.setlist_eventdate),
+      firstPerformedIn: firstConcert.setlist_venue_city_country_name,
+      lastPerformed: formatDate(lastConcert.setlist_eventdate),
+      lastPerformedIn: lastConcert.setlist_venue_city_country_name,
+    }
   })

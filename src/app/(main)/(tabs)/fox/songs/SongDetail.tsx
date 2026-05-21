@@ -5,6 +5,7 @@ import React, { useEffect, useMemo } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 import { AppBox } from '@/components/AppBox'
+import { AppInfoRow } from '@/components/AppInfoRow'
 import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppMarkdown } from '@/components/AppMarkdown'
 import { AppPictureCarousel } from '@/components/AppPictureCarousel'
@@ -12,7 +13,11 @@ import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { MoaSpeaks, MomoSpeaks, SuSpeaks } from '@/components/CharacterSpeaks'
 import { COLORS, FONT } from '@/constants/constants'
-import { songItem$, videosBySong$ } from '@/services/legend'
+import {
+  songItem$,
+  songPerformanceStats$,
+  videosBySong$,
+} from '@/services/legend'
 
 type LyricsType = 'jp' | 'rom' | 'en'
 const activeTab$ = observable<LyricsType>('jp')
@@ -25,6 +30,13 @@ export default function SongDetailScreen() {
   const detail = useValue(songItem$(id ?? ''))
   const activeTab = useValue(activeTab$)
   const videos = useValue(videosBySong$(detail?.song_title ?? ''))
+  const stats = useValue(songPerformanceStats$(detail?.song_title ?? '')) || {
+    totalLivePlays: '0',
+    firstPerformed: 'N/A',
+    firstPerformedIn: 'N/A',
+    lastPerformed: 'N/A',
+    lastPerformedIn: 'N/A',
+  }
 
   useEffect(() => {
     activeTab$.set('jp')
@@ -164,53 +176,17 @@ export default function SongDetailScreen() {
         </>
       )}
       <View style={styles.characterSpeakBox}>
-        <MomoSpeaks markup={'Some concert statistics'} />
+        <MomoSpeaks markup={'Stats from our concerts'} />
       </View>
       <AppBox>
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'TOTAL LIVE Plays:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {'142'}
-          </AppText>
-        </View>
-
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'FIRST PERFORMED:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {'SEP 07, 2018'}
-          </AppText>
-        </View>
-
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'FIRST PERFORMED IN:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {'UK'}
-          </AppText>
-        </View>
-
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'LAST PERFORMED:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {'MAR 14, 2024'}
-          </AppText>
-        </View>
-
-        <View style={styles.infoRow}>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.prompt}>
-            {'LAST PERFORMED IN:'}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.SM} style={styles.value}>
-            {'Japan'}
-          </AppText>
-        </View>
+        <AppInfoRow label="TOTAL LIVE Plays:" value={stats.totalLivePlays} />
+        <AppInfoRow label="FIRST PERFORMED:" value={stats.firstPerformed} />
+        <AppInfoRow
+          label="FIRST PERFORMED IN:"
+          value={stats.firstPerformedIn}
+        />
+        <AppInfoRow label="LAST PERFORMED:" value={stats.lastPerformed} />
+        <AppInfoRow label="LAST PERFORMED IN:" value={stats.lastPerformedIn} />
       </AppBox>
     </AppScreen>
   )
@@ -228,15 +204,6 @@ const styles = StyleSheet.create({
   },
   characterSpeakBox: {
     paddingVertical: 12,
-  },
-  infoRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  prompt: {
-    color: COLORS.TEXT_MUTED,
   },
   songLyrics: {
     paddingTop: 16,
@@ -263,8 +230,5 @@ const styles = StyleSheet.create({
   tabsContainer: {
     flexDirection: 'row',
     marginTop: 12,
-  },
-  value: {
-    color: COLORS.SECONDARY,
   },
 })
