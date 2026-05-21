@@ -31,9 +31,10 @@ function Item({
   return (
     <Pressable
       onPress={() => item.route && router.push(item.route)}
+      unstable_pressDelay={100}
       style={({ pressed }) => [
         styles.pressable,
-        pressed && styles.pressablePressed,
+        pressed && isPressable && styles.pressablePressed,
       ]}
     >
       {displayIconAsText ? (
@@ -72,21 +73,42 @@ export function AppFlatList({
   displayIconAsText = false,
   ...props
 }: AppFlatListProps) {
-  const renderSeparator = () => <View style={styles.divider} />
+  const renderSeparator = (key: string) => (
+    <View key={key} style={styles.divider} />
+  )
+
+  // Default to false for Detail screens if scrollEnabled is not provided
+  const scrollEnabled = props.scrollEnabled ?? false
+
+  // If scrollEnabled is false, render as a plain View to prevent touch-action blocking on Safari Web.
+  if (!scrollEnabled) {
+    return (
+      <View style={styles.flatList}>
+        {data.map((item, index) => (
+          <React.Fragment key={item.id}>
+            <Item item={item} displayIconAsText={displayIconAsText} />
+            {index < data.length - 1 && renderSeparator(`sep-${item.id}`)}
+          </React.Fragment>
+        ))}
+      </View>
+    )
+  }
+
+  const renderSeparatorComponent = () => <View style={styles.divider} />
 
   return (
     <FlatList
       style={styles.flatList}
       data={data}
       keyExtractor={(item: ListItemType) => item.id}
-      ItemSeparatorComponent={renderSeparator}
+      ItemSeparatorComponent={renderSeparatorComponent}
       renderItem={({ item }: { item: ListItemType }) => (
         <Item item={item} displayIconAsText={displayIconAsText} />
       )}
       automaticallyAdjustsScrollIndicatorInsets
       contentInsetAdjustmentBehavior="automatic"
       scrollEventThrottle={16}
-      scrollEnabled={false} // Default to false for Detail screens
+      scrollEnabled={true}
       {...props}
     />
   )

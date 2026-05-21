@@ -25,7 +25,6 @@ export default function SongDetailScreen() {
   const detail = useValue(songItem$(id ?? ''))
   const activeTab = useValue(activeTab$)
   const videos = useValue(videosBySong$(detail?.song_title ?? ''))
-  console.log('videos: ' + videos)
 
   useEffect(() => {
     activeTab$.set('jp')
