@@ -18,6 +18,7 @@
     "types": ["expo", "react-native"],
     "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./src/*"]
     }
