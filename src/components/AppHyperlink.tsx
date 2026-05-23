@@ -1,5 +1,5 @@
-import Feather from '@expo/vector-icons/Feather'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
+import Feather from '@react-native-vector-icons/feather'
+import MaterialIcons from '@react-native-vector-icons/material-icons'
 import * as WebBrowser from 'expo-web-browser'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 

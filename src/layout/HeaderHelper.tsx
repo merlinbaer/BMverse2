@@ -1,15 +1,16 @@
-import { FontAwesome } from '@expo/vector-icons'
-import MaterialIcons from '@expo/vector-icons/MaterialIcons'
-import { NativeStackNavigationOptions } from '@react-navigation/native-stack'
+import FontAwesome from '@react-native-vector-icons/fontawesome'
+import MaterialIcons from '@react-native-vector-icons/material-icons'
 import { isLiquidGlassAvailable } from 'expo-glass-effect'
-import { Href, router } from 'expo-router'
+import { Href, router, Stack } from 'expo-router'
 import React from 'react'
 import {
   Platform,
   StatusBar,
+  StyleProp,
   StyleSheet,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native'
 
 import { AppText } from '@/components/AppText'
@@ -32,49 +33,55 @@ export const AndroidHeaderTitle = ({ children }: { children: string }) => {
   )
 }
 
-export const LayoutScreenHeader: NativeStackNavigationOptions =
-  Platform.select<NativeStackNavigationOptions>({
-    ios: {
-      headerLargeTitle: true,
-      headerTransparent: true,
-      headerBlurEffect: !isLiquidGlassAvailable() ? 'dark' : 'none',
-      headerLargeStyle: !isLiquidGlassAvailable()
-        ? { backgroundColor: COLORS.BACKGROUND }
-        : {},
-      headerBackButtonDisplayMode: 'minimal',
-      headerLargeTitleStyle: {
-        color: COLORS.TEXT,
-      },
-      headerTitleStyle: {
-        color: COLORS.TEXT,
-      },
-      headerTintColor: COLORS.TEXT,
+export const LayoutScreenHeader: React.ComponentProps<
+  typeof Stack
+>['screenOptions'] = Platform.select<
+  React.ComponentProps<typeof Stack>['screenOptions']
+>({
+  ios: {
+    headerLargeTitle: true,
+    headerTransparent: true,
+    headerBlurEffect: !isLiquidGlassAvailable() ? 'dark' : 'none',
+    headerLargeStyle: !isLiquidGlassAvailable()
+      ? { backgroundColor: COLORS.BACKGROUND }
+      : {},
+    headerBackButtonDisplayMode: 'minimal',
+    headerLargeTitleStyle: {
+      color: COLORS.TEXT,
     },
-    android: {
-      headerStyle: { backgroundColor: COLORS.BACKGROUND },
-      headerTitle: (props: { children: string }) => (
-        <AndroidHeaderTitle {...props} />
-      ),
-      headerTintColor: COLORS.TEXT,
-      headerShadowVisible: false,
+    headerTitleStyle: {
+      color: COLORS.TEXT,
     },
-    web: {
-      headerStyle: { backgroundColor: COLORS.BACKGROUND, height: 80 },
-      headerTitleStyle: {
-        fontSize: FONT.SIZE.LG + 12,
-        color: COLORS.TEXT,
-      },
-      headerTintColor: COLORS.TEXT,
-      headerShadowVisible: false,
-      WelcomeContentStyle: { backgroundColor: COLORS.BACKGROUND },
+    headerTintColor: COLORS.TEXT,
+  },
+  android: {
+    headerStyle: { backgroundColor: COLORS.BACKGROUND },
+    headerTitle: (props: { children: string }) => (
+      <AndroidHeaderTitle {...props} />
+    ),
+    headerTintColor: COLORS.TEXT,
+    headerShadowVisible: false,
+  },
+  web: {
+    headerStyle: {
+      backgroundColor: COLORS.BACKGROUND,
+      height: 80,
+    } as StyleProp<ViewStyle>,
+    headerTitleStyle: {
+      fontSize: FONT.SIZE.LG + 12,
+      color: COLORS.TEXT,
     },
-    default: {
-      headerStyle: { backgroundColor: COLORS.BACKGROUND },
-      headerTintColor: COLORS.TEXT,
-      headerShadowVisible: false,
-      contentStyle: { backgroundColor: COLORS.BACKGROUND },
-    },
-  })
+    headerTintColor: COLORS.TEXT,
+    headerShadowVisible: false,
+    contentStyle: { backgroundColor: COLORS.BACKGROUND },
+  },
+  default: {
+    headerStyle: { backgroundColor: COLORS.BACKGROUND },
+    headerTintColor: COLORS.TEXT,
+    headerShadowVisible: false,
+    contentStyle: { backgroundColor: COLORS.BACKGROUND },
+  },
+})
 
 export const BackButton = () => (
   <TouchableOpacity onPress={() => router.back()}>

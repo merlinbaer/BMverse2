@@ -177,7 +177,7 @@ export default function ConcertSelectionScreen() {
 
 const styles = StyleSheet.create({
   blurBackground: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     height: '100%',
     opacity: 0.8,
     width: '100%',

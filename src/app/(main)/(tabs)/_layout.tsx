@@ -1,9 +1,9 @@
-import Octicons from '@expo/vector-icons/Octicons'
+import Octicons from '@react-native-vector-icons/octicons'
 import { BlurView } from 'expo-blur'
 import { Image } from 'expo-image'
 import { Tabs } from 'expo-router'
 import React from 'react'
-import { Platform, View } from 'react-native'
+import { ColorValue, Platform, View } from 'react-native'
 
 import { COLORS, TAB_BAR } from '@/constants/constants'
 import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
@@ -65,7 +65,7 @@ export default function TabsLayout() {
           options={{
             title: 'News',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
-            tabBarIcon: ({ color }: { color: string }) => (
+            tabBarIcon: ({ color }: { color: ColorValue }) => (
               <Octicons name="home" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
@@ -75,7 +75,7 @@ export default function TabsLayout() {
           options={{
             title: 'Player',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
-            tabBarIcon: ({ color }: { color: string }) => (
+            tabBarIcon: ({ color }: { color: ColorValue }) => (
               <Octicons name="play" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
@@ -106,7 +106,7 @@ export default function TabsLayout() {
           options={{
             title: 'Games',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
-            tabBarIcon: ({ color }: { color: string }) => (
+            tabBarIcon: ({ color }: { color: ColorValue }) => (
               <Octicons name="rocket" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}
@@ -116,7 +116,7 @@ export default function TabsLayout() {
           options={{
             title: 'Profile',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
-            tabBarIcon: ({ color }: { color: string }) => (
+            tabBarIcon: ({ color }: { color: ColorValue }) => (
               <Octicons name="person" size={TAB_BAR.ICON_SIZE} color={color} />
             ),
           }}

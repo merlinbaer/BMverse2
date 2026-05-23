@@ -1,8 +1,8 @@
 import { syncState } from '@legendapp/state'
 import { useValue } from '@legendapp/state/react'
-import { ThemeProvider } from '@react-navigation/native'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
+import { ThemeProvider } from 'expo-router/react-navigation'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 

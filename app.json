@@ -7,8 +7,11 @@
     "icon": "./assets/icon.png",
     "scheme": "bmverse2",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
-    "platforms": ["ios", "android", "web"],
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "eu.bruu.bmverse2",
@@ -22,16 +25,10 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "edgeToEdgeEnabled": true,
       "package": "eu.bruu.bmverse2"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
     },
     "plugins": [
       "expo-router",
@@ -51,10 +48,18 @@
         "expo-build-properties",
         {
           "android": {
-            "extraLines": ["AsyncStorage_db_size_in_MB=10"]
+            "extraLines": [
+              "AsyncStorage_db_size_in_MB=10"
+            ]
           }
         }
-      ]
+      ],
+      "expo-sqlite",
+      "expo-status-bar",
+      "@react-native-vector-icons/octicons",
+      "@react-native-vector-icons/feather",
+      "@react-native-vector-icons/material-icons",
+      "@react-native-vector-icons/fontawesome"
     ],
     "experiments": {
       "typedRoutes": true,

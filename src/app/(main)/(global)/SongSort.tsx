@@ -12,7 +12,6 @@ const SongSort = () => {
   const currentSort = useValue(songSort$)
 
   const updateSortSongs = (sorting: SongListType, dismiss: () => void) => {
-    console.log('Sorting selected:', sorting)
     songSort$.set(sorting)
     dismiss()
   }
