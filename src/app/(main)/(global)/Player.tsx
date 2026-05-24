@@ -1,7 +1,7 @@
 import { useValue } from '@legendapp/state/react'
 import MaterialIcons from '@react-native-vector-icons/material-icons'
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
-import Constants from 'expo-constants'
+import Constants, { ExecutionEnvironment } from 'expo-constants'
 import * as WebBrowser from 'expo-web-browser'
 import React, { useEffect } from 'react'
 import { Image, Platform, Pressable, StyleSheet, View } from 'react-native'
@@ -10,6 +10,24 @@ import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import { activePreviewSong$ } from '@/types/player'
+
+type PlayerStatus = ReturnType<typeof useAudioPlayerStatus>
+
+function AutoDismissHandler({
+  status,
+  dismiss,
+}: {
+  status: PlayerStatus
+  dismiss: () => void
+}) {
+  useEffect(() => {
+    if (status?.didJustFinish) {
+      dismiss()
+    }
+  }, [status, dismiss])
+
+  return null
+}
 
 export default function PlayerScreen() {
   const previewSong = useValue(activePreviewSong$)
@@ -20,7 +38,8 @@ export default function PlayerScreen() {
   useEffect(() => {
     if (player && previewSong?.song_preview) {
       player.play()
-      const isExpoGo = Constants.appOwnership === 'expo'
+      const isExpoGo =
+        Constants.executionEnvironment === ExecutionEnvironment.StoreClient
       if (Platform.OS === 'android' && !isExpoGo) {
         try {
           console.log(Platform.OS, isExpoGo)
@@ -34,7 +53,6 @@ export default function PlayerScreen() {
         }
       }
     }
-    // No manual pause needed on unmount as useAudioPlayer handles its own lifecycle [[2]](https://docs.expo.dev/versions/latest/sdk/audio)
   }, [player, previewSong])
 
   const duration = status?.duration || 0
@@ -77,7 +95,8 @@ export default function PlayerScreen() {
     <AppModalScreen>
       {dismiss => (
         <View style={styles.container}>
-          <AppText fontSize={FONT.SIZE.BASE} style={styles.header}>
+          <AutoDismissHandler status={status} dismiss={dismiss} />
+          <AppText fontSize={FONT.SIZE.LG} style={styles.header}>
             {'Preview Player'}
           </AppText>
 
@@ -169,7 +188,7 @@ export default function PlayerScreen() {
             >
               <MaterialIcons name="open-in-new" size={18} color={COLORS.TEXT} />
               <AppText fontSize={FONT.SIZE.XS} style={styles.externalLinkText}>
-                {'Listen/Buy on Apple Music'}
+                {'provided courtesy of iTunes'}
               </AppText>
             </Pressable>
           )}
@@ -199,7 +218,6 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    flex: 1,
     justifyContent: 'space-between',
     paddingBottom: 24,
     paddingHorizontal: 20,
