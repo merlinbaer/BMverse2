@@ -7,17 +7,14 @@
     "icon": "./assets/icon.png",
     "scheme": "bmverse2",
     "userInterfaceStyle": "dark",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "eu.bruu.bmverse2",
       "backgroundColor": "#000000",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["audio"]
       }
     },
     "android": {
@@ -48,9 +45,7 @@
         "expo-build-properties",
         {
           "android": {
-            "extraLines": [
-              "AsyncStorage_db_size_in_MB=10"
-            ]
+            "extraLines": ["AsyncStorage_db_size_in_MB=10"]
           }
         }
       ],
@@ -59,7 +54,13 @@
       "@react-native-vector-icons/octicons",
       "@react-native-vector-icons/feather",
       "@react-native-vector-icons/material-icons",
-      "@react-native-vector-icons/fontawesome"
+      "@react-native-vector-icons/fontawesome",
+      [
+        "expo-audio",
+        {
+          "enableBackgroundPlayback": true
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

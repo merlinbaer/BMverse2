@@ -1,6 +1,6 @@
 import { observable } from '@legendapp/state'
 import { useValue } from '@legendapp/state/react'
-import { Stack, useLocalSearchParams } from 'expo-router'
+import { router, Stack, useLocalSearchParams } from 'expo-router'
 import React, { useEffect, useMemo } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
@@ -18,6 +18,7 @@ import {
   songPerformanceStats$,
   videosBySong$,
 } from '@/services/legend'
+import { activePreviewSong$ } from '@/types/player'
 
 type LyricsType = 'jp' | 'rom' | 'en'
 const activeTab$ = observable<LyricsType>('jp')
@@ -79,9 +80,21 @@ export default function SongDetailScreen() {
           {detail?.song_artist}
         </AppText>
       </AppBox>
-      <View style={styles.characterSpeakBox}>
+      <Pressable
+        onPress={() => {
+          activePreviewSong$.set({
+            song_preview: detail?.song_preview ?? null,
+            song_title: detail?.song_title ?? null,
+            song_artist: detail?.song_artist ?? null,
+            song_preview_artwork: detail?.song_preview_artwork ?? null,
+            song_preview_uri: detail?.song_preview_uri ?? null,
+          })
+          router.push('/Player')
+        }}
+        style={styles.characterSpeakBox}
+      >
         <SuSpeaks markup={'Do you want to hear a preview?'} />
-      </View>
+      </Pressable>
       <AppBox>
         <AppText fontSize={FONT.SIZE.LG}>{'Info:'}</AppText>
         <AppMarkdown

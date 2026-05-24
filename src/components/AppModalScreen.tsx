@@ -29,32 +29,36 @@ export function AppModalScreen({ children }: AppModalScreenProps) {
   const translateY = useSharedValue(Platform.OS === 'ios' ? 0 : startOffset)
 
   const handleDismiss = React.useCallback(() => {
-    translateY.value = withTiming(startOffset, { duration: 250 }, finished => {
-      if (finished) {
-        runOnJS(router.back)()
-      }
-    })
+    translateY.set(
+      withTiming(startOffset, { duration: 250 }, finished => {
+        if (finished) {
+          runOnJS(router.back)()
+        }
+      }),
+    )
   }, [router, startOffset, translateY])
 
   useEffect(() => {
     if (Platform.OS !== 'ios') {
-      translateY.value = withSpring(0, {
-        damping: 25,
-        stiffness: 80,
-        mass: 0.5,
-      })
+      translateY.set(
+        withSpring(0, {
+          damping: 25,
+          stiffness: 80,
+          mass: 0.5,
+        }),
+      )
     }
   }, [translateY])
 
   const gesture = Gesture.Pan()
     .onUpdate(event => {
-      if (event.translationY > 0) translateY.value = event.translationY
+      if (event.translationY > 0) translateY.set(event.translationY)
     })
     .onEnd(event => {
       if (event.translationY > 150 || event.velocityY > 500) {
         runOnJS(handleDismiss)()
       } else {
-        translateY.value = withSpring(0, { damping: 20 })
+        translateY.set(withSpring(0, { damping: 20 }))
       }
     })
 

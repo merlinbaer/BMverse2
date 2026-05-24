@@ -33,9 +33,11 @@ export default function GlobalLayout() {
         name="Player"
         options={{
           headerShown: false,
-          title: 'Player',
-          headerBackButtonDisplayMode: 'minimal',
-          headerTransparent: true,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          contentStyle: {
+            backgroundColor: COLORS.TRANSPARENT,
+          },
         }}
       />
     </Stack>
