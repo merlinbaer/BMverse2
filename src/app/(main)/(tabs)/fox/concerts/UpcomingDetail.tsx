@@ -83,13 +83,14 @@ export default function UpComingDetailScreen() {
           {!!detail?.setlist_info && <AppText>{detail.setlist_info}</AppText>}
         </AppBox>
       )}
-      <AppBox>
-        <AppText fontSize={FONT.SIZE.LG}>{'Tickets:'}</AppText>
-      </AppBox>
     </AppScreen>
   )
 }
-
+/*
+      <AppBox>
+        <AppText fontSize={FONT.SIZE.LG}>{'Tickets:'}</AppText>
+      </AppBox>
+ */
 const styles = StyleSheet.create({
   mapContainer: {
     alignItems: 'center',
