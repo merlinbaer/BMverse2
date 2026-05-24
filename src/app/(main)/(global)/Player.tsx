@@ -59,9 +59,9 @@ export default function PlayerScreen() {
   const currentTime = status?.currentTime || 0
   const progress = duration > 0 ? currentTime / duration : 0
 
-  const formatTime = (ms: number) => {
-    if (!ms || isNaN(ms)) return '0:00'
-    const totalSeconds = Math.floor(ms / 1000)
+  const formatTime = (secondsTotal: number) => {
+    if (!secondsTotal || isNaN(secondsTotal)) return '0:00'
+    const totalSeconds = Math.floor(secondsTotal)
     const minutes = Math.floor(totalSeconds / 60)
     const seconds = totalSeconds % 60
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
@@ -150,7 +150,7 @@ export default function PlayerScreen() {
               <View style={styles.controlsRow}>
                 <Pressable onPress={skipBackward} style={styles.skipButton}>
                   <MaterialIcons
-                    name="replay-5"
+                    name="skip-previous"
                     size={32}
                     color={COLORS.TEXT}
                   />
@@ -166,7 +166,7 @@ export default function PlayerScreen() {
 
                 <Pressable onPress={skipForward} style={styles.skipButton}>
                   <MaterialIcons
-                    name="forward-5"
+                    name="skip-next"
                     size={32}
                     color={COLORS.TEXT}
                   />

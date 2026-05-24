@@ -58,6 +58,17 @@ export default function SongDetailScreen() {
     }
   }, [activeTab, detail])
 
+  const playPreview = () => {
+    activePreviewSong$.set({
+      song_preview: detail?.song_preview ?? null,
+      song_title: detail?.song_title ?? null,
+      song_artist: detail?.song_artist ?? null,
+      song_preview_artwork: detail?.song_preview_artwork ?? null,
+      song_preview_uri: detail?.song_preview_uri ?? null,
+    })
+    router.push('/Player')
+  }
+
   if (!id || !detail)
     return (
       <AppScreen>
@@ -80,21 +91,14 @@ export default function SongDetailScreen() {
           {detail?.song_artist}
         </AppText>
       </AppBox>
-      <Pressable
-        onPress={() => {
-          activePreviewSong$.set({
-            song_preview: detail?.song_preview ?? null,
-            song_title: detail?.song_title ?? null,
-            song_artist: detail?.song_artist ?? null,
-            song_preview_artwork: detail?.song_preview_artwork ?? null,
-            song_preview_uri: detail?.song_preview_uri ?? null,
-          })
-          router.push('/Player')
-        }}
-        style={styles.characterSpeakBox}
-      >
-        <SuSpeaks markup={'Do you want to hear a preview?'} />
-      </Pressable>
+      {detail?.song_preview && detail.song_preview.trim().length > 0 && (
+        <Pressable
+          onPress={() => playPreview()}
+          style={styles.characterSpeakBox}
+        >
+          <SuSpeaks markup={'Do you want to hear a preview?'} />
+        </Pressable>
+      )}
       <AppBox>
         <AppText fontSize={FONT.SIZE.LG}>{'Info:'}</AppText>
         <AppMarkdown
