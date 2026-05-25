@@ -12,8 +12,9 @@ import {
   type TextInputRef,
 } from '@expo/ui'
 import React, { useRef, useState } from 'react'
+import { Platform } from 'react-native'
 
-import { COLORS } from 'src/constants/constants'
+import { COLORS } from '@/constants/constants'
 
 const REGION = [
   { label: 'Unknown', value: 'Unknown' },
@@ -55,7 +56,7 @@ export default function SettingsScreen() {
   const [openStat, setOpenStat] = useState(true)
 
   return (
-    <Host style={{ flex: 1, paddingTop: 100 }}>
+    <Host style={{ flex: 1, paddingTop: 10 }}>
       <FieldGroup>
         <FieldGroup.Section title="Version">
           <Row>
@@ -71,7 +72,7 @@ export default function SettingsScreen() {
         </FieldGroup.Section>
         <FieldGroup.Section title="User">
           <Row>
-            <Text>User:</Text>
+            <Text>Status:</Text>
             <Spacer flexible />
             <Text>You are not logged in</Text>
           </Row>
@@ -88,6 +89,7 @@ export default function SettingsScreen() {
                 onChangeText={value => console.log(value)}
               />
             </Row>
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Row spacing={8}>
               <Text>Received Passcode:</Text>
               <TextInput
@@ -109,20 +111,33 @@ export default function SettingsScreen() {
               <Button label="Logout" onPress={() => alert('Logout pressed')} />
               <Spacer flexible />
             </Row>
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Row>
               <Text> </Text>
               <Spacer flexible />
-              <Button
-                variant="text"
-                label="Delete Account"
-                onPress={() => alert('Update Data pressed')}
-                style={{
-                  backgroundColor: COLORS.PRIMARY,
-                  borderRadius: 16,
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                }}
-              />
+              {Platform.OS === 'ios' && (
+                <Button
+                  variant="text"
+                  label="Delete Account"
+                  onPress={() => alert('Update Data pressed')}
+                  style={{
+                    backgroundColor: COLORS.PRIMARY,
+                    borderRadius: 16,
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                  }}
+                />
+              )}
+              {Platform.OS !== 'ios' && (
+                <Button
+                  label="Delete Account"
+                  onPress={() => alert('Update Data pressed')}
+                >
+                  <Text textStyle={{ color: COLORS.PRIMARY }}>
+                    Delete Account
+                  </Text>
+                </Button>
+              )}
               <Spacer flexible />
             </Row>
           </Collapsible>
@@ -148,6 +163,7 @@ export default function SettingsScreen() {
                 <Picker.Item key={f.value} label={f.label} value={f.value} />
               ))}
             </Picker>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text> </Text>
               <Spacer flexible />
@@ -186,19 +202,24 @@ export default function SettingsScreen() {
               label="Website"
               onPress={() => alert('Visit website pressed')}
             />
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Button label="Q&A" onPress={() => alert('Visit Q&A pressed')} />
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Terms"
               onPress={() => alert('Visit Terms pressed')}
             />
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Privacy"
               onPress={() => alert('Visit Privacy pressed')}
             />
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Contact"
               onPress={() => alert('Visit Contact pressed')}
             />
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Credits"
               onPress={() => alert('Visit Credits pressed')}
@@ -226,6 +247,7 @@ export default function SettingsScreen() {
               />
               <Spacer flexible />
             </Row>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Picker
               selectedValue={interval}
               onValueChange={setInterval}
@@ -235,6 +257,7 @@ export default function SettingsScreen() {
                 <Picker.Item key={f.value} label={f.label} value={f.value} />
               ))}
             </Picker>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text> </Text>
               <Spacer flexible />
@@ -253,6 +276,7 @@ export default function SettingsScreen() {
             <Text>
               {`As Moderator you can add News and\nupdate Song Information.\nYour help is appreciated\nJoin the Discord channel.`}
             </Text>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text> </Text>
               <Spacer flexible />
@@ -263,6 +287,7 @@ export default function SettingsScreen() {
               />
               <Spacer flexible />
             </Row>
+            {Platform.OS === 'web' && <Spacer size={8} />}
             <Row>
               <Text> </Text>
               <Spacer flexible />
@@ -282,6 +307,7 @@ export default function SettingsScreen() {
             <Text>
               {`All Cache Data will be deleted.\nApp will Restart and Reload.\nUse when Data seems to be corrupted.`}
             </Text>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Spacer flexible />
               <Button
@@ -303,20 +329,23 @@ export default function SettingsScreen() {
               <Spacer flexible />
               <Text>70</Text>
             </Row>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text>Videos:</Text>
               <Spacer flexible />
               <Text>100</Text>
             </Row>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text>Concerts:</Text>
               <Spacer flexible />
               <Text>200</Text>
             </Row>
+            {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text>News:</Text>
               <Spacer flexible />
-              <Text>200</Text>
+              <Text>150</Text>
             </Row>
           </Collapsible>
         </FieldGroup.Section>
