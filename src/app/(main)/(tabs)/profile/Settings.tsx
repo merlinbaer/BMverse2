@@ -56,7 +56,7 @@ export default function SettingsScreen() {
   const [openStat, setOpenStat] = useState(true)
 
   return (
-    <Host style={{ flex: 1, paddingTop: 10 }}>
+    <Host style={{ flex: 1 }}>
       <FieldGroup>
         <FieldGroup.Section title="Version">
           <Row>
