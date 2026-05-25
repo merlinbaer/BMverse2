@@ -9,7 +9,7 @@ export default function PlayerScreen() {
   return (
     <AppScreen>
       <Stack.Screen options={{ title: 'Music Player' }} />
-      <View style={styles.characterContainer}>
+      <View style={styles.container}>
         <AppBubbleText
           markup={'Only in IOS and Android available.'}
           orientation={'center'}
@@ -20,7 +20,7 @@ export default function PlayerScreen() {
 }
 
 const styles = StyleSheet.create({
-  characterContainer: {
+  container: {
     alignItems: 'center',
     marginVertical: 20,
     width: '100%',

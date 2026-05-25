@@ -1048,6 +1048,14 @@
     sf-symbols-typescript "^2.1.0"
     vaul "^1.1.2"
 
+"@expo/ui@~56.0.13":
+  version "56.0.13"
+  resolved "https://registry.yarnpkg.com/@expo/ui/-/ui-56.0.13.tgz#2839362dbc00bd81bea81afebefbaab809c8b104"
+  integrity sha512-Dx05pO3lo8lzWp0hgvJ011j/a5DD2BwHXtr08hdiRUc03KrWQJ3QzdbqPqNayrr+Usc2COC+bOkmPNX7N0k0+w==
+  dependencies:
+    sf-symbols-typescript "^2.1.0"
+    vaul "^1.1.2"
+
 "@expo/ws-tunnel@^1.0.1":
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/@expo/ws-tunnel/-/ws-tunnel-1.0.6.tgz#92b70e7264ad42ea07f28a20f2f540b91d07bdd9"
