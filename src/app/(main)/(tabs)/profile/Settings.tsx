@@ -16,7 +16,7 @@ import React, { useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { APP_VERSION, COLORS } from '@/constants/constants'
-import { latestVersion$, syncRefresh$ } from '@/services/legend'
+import { latestVersion$, localStore$, syncRefresh$ } from '@/services/legend'
 import { clearCacheAll, syncAll } from '@/services/legend/lib'
 
 const REGION = [
@@ -52,7 +52,7 @@ export default function SettingsScreen() {
   const nameRef = useRef<TextInputRef>(null)
   const [openDisclaimer, setOpenDisclaimer] = useState(false)
   const [openLinks, setOpenLinks] = useState(false)
-  const [welcome, setWelcome] = useState(false)
+  const isOnboarding = useValue(localStore$.isOnboarding)
   const [openSyncInterval, setOpenSyncInterval] = useState(false)
   const syncRefresh = useValue(syncRefresh$)
   const [openClearCache, setOpenClearCache] = useState(false)
@@ -231,8 +231,8 @@ export default function SettingsScreen() {
           </Collapsible>
           <Switch
             label="Show Welcome Page"
-            value={welcome}
-            onValueChange={setWelcome}
+            value={isOnboarding}
+            onValueChange={value => localStore$.isOnboarding.set(value)}
           />
         </FieldGroup.Section>
         <FieldGroup.Section title="Data">
