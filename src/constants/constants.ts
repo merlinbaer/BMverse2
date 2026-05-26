@@ -79,5 +79,5 @@ export const AUTH = {
 export const SYNC = {
   DELAY: 1000,
   MAX_DELAY: 4096 * 1000,
-  REFRESH_INTERVAL: 30 * 2 * 1000, // 60 * 60 * 1000 = 1 hour,
+  DEBUG_LOG: false,
 } as const

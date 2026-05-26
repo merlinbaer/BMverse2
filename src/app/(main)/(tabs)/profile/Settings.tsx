@@ -11,10 +11,13 @@ import {
   TextInput,
   type TextInputRef,
 } from '@expo/ui'
+import { useValue } from '@legendapp/state/react'
 import React, { useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
-import { COLORS } from '@/constants/constants'
+import { APP_VERSION, COLORS } from '@/constants/constants'
+import { latestVersion$, syncRefresh$ } from '@/services/legend'
+import { clearCacheAll, syncAll } from '@/services/legend/lib'
 
 const REGION = [
   { label: 'Unknown', value: 'Unknown' },
@@ -31,14 +34,15 @@ const REGION = [
 ]
 
 const INTERVAL = [
-  { label: '30 sec', value: '30000' },
-  { label: '1 min', value: '60000' },
-  { label: '2 min', value: '120000' },
-  { label: '5 min', value: '300000' },
-  { label: '10 min', value: '600000' },
+  { label: '30 sec', value: 30 },
+  { label: '1 min - Default', value: 60 },
+  { label: '2 min', value: 120 },
+  { label: '5 min', value: 300 },
+  { label: '10 min', value: 600 },
 ]
 
 export default function SettingsScreen() {
+  const latestVersion = useValue(latestVersion$)
   const [openLogin, setOpenLogin] = useState(false)
   const [openLogout, setOpenLogout] = useState(false)
   const [openRegion, setOpenRegion] = useState(false)
@@ -50,7 +54,7 @@ export default function SettingsScreen() {
   const [openLinks, setOpenLinks] = useState(false)
   const [welcome, setWelcome] = useState(false)
   const [openSyncInterval, setOpenSyncInterval] = useState(false)
-  const [interval, setInterval] = useState('30000')
+  const syncRefresh = useValue(syncRefresh$)
   const [openClearCache, setOpenClearCache] = useState(false)
   const [openManage, setOpenManage] = useState(false)
   const [openStat, setOpenStat] = useState(true)
@@ -62,12 +66,12 @@ export default function SettingsScreen() {
           <Row>
             <Text>Current App Version:</Text>
             <Spacer flexible />
-            <Text>2.0.0</Text>
+            <Text>{APP_VERSION}</Text>
           </Row>
           <Row>
             <Text>Download Version:</Text>
             <Spacer flexible />
-            <Text>2.0.1</Text>
+            <Text>{latestVersion ?? 'N/A'}</Text>
           </Row>
         </FieldGroup.Section>
         <FieldGroup.Section title="User">
@@ -225,7 +229,6 @@ export default function SettingsScreen() {
               onPress={() => alert('Visit Credits pressed')}
             />
           </Collapsible>
-
           <Switch
             label="Show Welcome Page"
             value={welcome}
@@ -238,19 +241,16 @@ export default function SettingsScreen() {
             onOpenChange={setOpenSyncInterval}
             label="Sync"
           >
-            <Row>
-              <Text> </Text>
-              <Spacer flexible />
-              <Button
-                label="Sync now"
-                onPress={() => alert('Update Data pressed')}
-              />
-              <Spacer flexible />
-            </Row>
+            <Text>
+              {`Change Check Interval:\nA short network request checks periodically for changed data. When a change is discovered, only new or updated data will be syncronized, when you are online.`}
+            </Text>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Picker
-              selectedValue={interval}
-              onValueChange={setInterval}
+              selectedValue={syncRefresh}
+              onValueChange={itemValue => {
+                syncRefresh$.set(itemValue)
+                setOpenSyncInterval(false)
+              }}
               appearance="wheel"
             >
               {INTERVAL.map(f => (
@@ -262,8 +262,11 @@ export default function SettingsScreen() {
               <Text> </Text>
               <Spacer flexible />
               <Button
-                label="Set Interval"
-                onPress={() => alert('Interval pressed')}
+                label="Sync now"
+                onPress={() => {
+                  void syncAll()
+                  setOpenSyncInterval(false)
+                }}
               />
               <Spacer flexible />
             </Row>
@@ -274,7 +277,7 @@ export default function SettingsScreen() {
             label="Manage"
           >
             <Text>
-              {`As Moderator you can add News and\nupdate Song Information.\nYour help is appreciated\nJoin the Discord channel.`}
+              {`As Moderator you can add News and\nupdate Song Information.\nYour help is appreciated. Join the Discord channel to become a moderator.`}
             </Text>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
@@ -305,14 +308,18 @@ export default function SettingsScreen() {
             label="Clear Cache"
           >
             <Text>
-              {`All Cache Data will be deleted.\nApp will Restart and Reload.\nUse when Data seems to be corrupted.`}
+              {`All Cache Data will be deleted and reloaded.\nJust use when data seems to be corrupted.`}
             </Text>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Spacer flexible />
               <Button
                 label="Clear Cache"
-                onPress={() => alert('Clear Cache pressed')}
+                onPress={() => {
+                  void clearCacheAll()
+                  void syncAll()
+                  setOpenClearCache(false)
+                }}
               />
               <Spacer flexible />
             </Row>

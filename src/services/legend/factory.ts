@@ -9,6 +9,9 @@ import {
   when,
 } from '@legendapp/state'
 
+import { SYNC } from '@/constants/constants'
+import { getTimestamp } from '@/services/dateTimeHelper'
+
 import { customSynced, generateId } from './config'
 
 // Only the four columns guaranteed on every table
@@ -89,7 +92,15 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
     await when(syncState(store$).isPersistLoaded)
     try {
       await syncState(store$).sync()
-      console.log(`LegendState: Sync for ${collection} called`)
+      if (collection === 'gl_sync') {
+        if (SYNC.DEBUG_LOG) {
+          console.log(
+            `LegendState (${getTimestamp()}): Sync for ${collection} called`,
+          )
+        }
+      } else {
+        console.log(`LegendState: Sync for ${collection} called`)
+      }
     } catch (err) {
       console.error(`LegendState: Sync for ${collection} failed:`, err)
     }

@@ -8,3 +8,5 @@ export const isAuthLoaded$ = observable(false) // New: Track hydration
 // States for list sorts
 export const songSort$ = observable<SongListType>('Release')
 export const videoSort$ = observable<VideoListType>('Views')
+//Sync state
+export const syncRefresh$ = observable<number>(60) // 1 minute

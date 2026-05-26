@@ -1,23 +1,31 @@
 import { syncState } from '@legendapp/state'
 
-import { SYNC } from '@/constants/constants'
+import { getTimestamp } from '@/services/dateTimeHelper'
 import {
+  concertClearCache,
   concerts$,
   concertSync,
   getsSyncUpdatedAt,
   localStore$,
   news$,
+  newsClearCache,
   newsSync,
+  setlistClearCache,
   setlists$,
   setlistSync,
+  songClearCache,
   songs$,
   songSync,
   sync$,
+  syncRefresh$,
   syncSync,
   upcoming$,
+  upcomingClearCache,
   upcomingSync,
+  versionClearCache,
   versions$,
   versionSync,
+  videoClearCache,
   videos$,
   videoSync,
 } from '@/services/legend'
@@ -51,6 +59,18 @@ export const syncAll = async () => {
   ])
 }
 
+export const clearCacheAll = async () => {
+  await Promise.all([
+    versionClearCache(),
+    newsClearCache(),
+    songClearCache(),
+    concertClearCache(),
+    setlistClearCache(),
+    upcomingClearCache(),
+    videoClearCache(),
+  ])
+}
+
 export const startSyncCoordinator = () => {
   // Cascade on sync marker change
   const unsubscribeSync = sync$.onChange(async () => {
@@ -72,18 +92,36 @@ export const startSyncCoordinator = () => {
       }
     }
   })
-  // Automated "Heartbeat" Sync
-  const intervalId = setInterval(async () => {
-    const state$ = syncState(sync$)
-    const isReady = state$.isLoaded.get() && !state$.error.get()
 
-    if (isReady) {
-      void syncSync() // Async call
-    }
-  }, SYNC.REFRESH_INTERVAL)
+  let intervalId: ReturnType<typeof setInterval> | null = null
+
+  const setupHeartbeat = (seconds: number) => {
+    if (intervalId) clearInterval(intervalId)
+    console.log(
+      `LegendState (${getTimestamp()}): Heartbeat started with ${seconds}s interval.`,
+    )
+    intervalId = setInterval(async () => {
+      const state$ = syncState(sync$)
+      const isReady = state$.isLoaded.get() && !state$.error.get()
+
+      if (isReady) {
+        void syncSync() // Async call
+      }
+    }, seconds * 1000)
+  }
+
+  // Initial setup
+  setupHeartbeat(syncRefresh$.peek())
+
+  // Restart heartbeat when syncRefresh$ changes
+  const unsubscribeRefresh = syncRefresh$.onChange(({ value }) => {
+    console.log(`LegendState: Sync interval changed. Restarting heartbeat...`)
+    setupHeartbeat(value)
+  })
 
   return () => {
     unsubscribeSync?.()
-    clearInterval(intervalId)
+    unsubscribeRefresh?.()
+    if (intervalId) clearInterval(intervalId)
   }
 }
