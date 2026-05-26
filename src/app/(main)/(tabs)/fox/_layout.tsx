@@ -5,12 +5,12 @@ import { LayoutScreenHeader } from '@/layout/HeaderHelper'
 export default function Layout() {
   return (
     <Stack
-      initialRouteName="foxScreen"
+      initialRouteName="Fox"
       screenOptions={{
         headerShown: false,
       }}
     >
-      <Stack.Screen name="foxScreen" options={{ ...LayoutScreenHeader }} />
+      <Stack.Screen name="Fox" options={{ ...LayoutScreenHeader }} />
     </Stack>
   )
 }

@@ -22,7 +22,7 @@ export default function WelcomePage() {
 
   const onAcceptPress = () => {
     localStore$.isOnboarding.set(false)
-    router.replace(`/(main)/(tabs)/news/newsScreen`)
+    router.replace(`/(main)/(tabs)/news/News`)
   }
   return (
     <KeyboardAwareScrollView

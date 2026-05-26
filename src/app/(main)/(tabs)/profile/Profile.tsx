@@ -50,7 +50,7 @@ const INTERVAL = [
   { label: '10 min', value: 600 },
 ]
 
-export default function SettingsScreen() {
+export default function ProfileScreen() {
   const latestVersion = useValue(latestVersion$)
   const [openLogin, setOpenLogin] = useState(false)
   const [openLogout, setOpenLogout] = useState(false)
