@@ -229,3 +229,9 @@ export const songPerformanceStats$ = (songTitle: string) =>
       lastPerformedIn: lastConcert.setlist_venue_city_country_name,
     }
   })
+
+export const concertsCount$ = computed(() => {
+  const data = store$.get()
+  if (!data) return 0
+  return Object.values(data).filter(item => item && !item.deleted).length
+})

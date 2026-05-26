@@ -12,11 +12,20 @@ import {
   type TextInputRef,
 } from '@expo/ui'
 import { useValue } from '@legendapp/state/react'
+import * as WebBrowser from 'expo-web-browser'
 import React, { useRef, useState } from 'react'
 import { Platform } from 'react-native'
 
 import { APP_VERSION, COLORS } from '@/constants/constants'
-import { latestVersion$, localStore$, syncRefresh$ } from '@/services/legend'
+import {
+  concertsCount$,
+  latestVersion$,
+  localStore$,
+  newsList$,
+  songList$,
+  syncRefresh$,
+  videoList$,
+} from '@/services/legend'
 import { clearCacheAll, syncAll } from '@/services/legend/lib'
 
 const REGION = [
@@ -58,6 +67,15 @@ export default function SettingsScreen() {
   const [openClearCache, setOpenClearCache] = useState(false)
   const [openManage, setOpenManage] = useState(false)
   const [openStat, setOpenStat] = useState(true)
+  const songsCount = useValue(songList$).length
+  const videosCount = useValue(videoList$).length
+  const concertsCount = useValue(concertsCount$)
+  const newsCount = useValue(newsList$).length
+
+  const handleOnPressVisit = async (hyperlink: string) => {
+    console.log('Hyperlink-i: ' + hyperlink)
+    await WebBrowser.openBrowserAsync(hyperlink)
+  }
 
   return (
     <Host style={{ flex: 1 }}>
@@ -204,29 +222,42 @@ export default function SettingsScreen() {
           >
             <Button
               label="Website"
-              onPress={() => alert('Visit website pressed')}
+              onPress={() => handleOnPressVisit('https://bmverse.bruu.eu/')}
             />
             {Platform.OS === 'web' && <Spacer size={8} />}
-            <Button label="Q&A" onPress={() => alert('Visit Q&A pressed')} />
+            <Button
+              label="Q&A"
+              onPress={() => handleOnPressVisit('https://bmverse.bruu.eu/qa/')}
+            />
             {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Terms"
-              onPress={() => alert('Visit Terms pressed')}
+              onPress={() =>
+                handleOnPressVisit(
+                  'https://bmverse.bruu.eu/terms_and_conditions/',
+                )
+              }
             />
             {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Privacy"
-              onPress={() => alert('Visit Privacy pressed')}
+              onPress={() =>
+                handleOnPressVisit('https://bmverse.bruu.eu/privacy_policy/')
+              }
             />
             {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Contact"
-              onPress={() => alert('Visit Contact pressed')}
+              onPress={() =>
+                handleOnPressVisit('https://bmverse.bruu.eu/contact/')
+              }
             />
             {Platform.OS === 'web' && <Spacer size={8} />}
             <Button
               label="Credits"
-              onPress={() => alert('Visit Credits pressed')}
+              onPress={() =>
+                handleOnPressVisit('https://bmverse.bruu.eu/credits/')
+              }
             />
           </Collapsible>
           <Switch
@@ -308,7 +339,7 @@ export default function SettingsScreen() {
             label="Clear Cache"
           >
             <Text>
-              {`All Cache Data will be deleted and reloaded.\nJust use when data seems to be corrupted.`}
+              {`All cached data will be deleted and reloaded.\nJust use when data seems to be corrupted.`}
             </Text>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
@@ -334,25 +365,25 @@ export default function SettingsScreen() {
             <Row>
               <Text>Songs:</Text>
               <Spacer flexible />
-              <Text>70</Text>
+              <Text>{songsCount.toString()}</Text>
             </Row>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text>Videos:</Text>
               <Spacer flexible />
-              <Text>100</Text>
+              <Text>{videosCount.toString()}</Text>
             </Row>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text>Concerts:</Text>
               <Spacer flexible />
-              <Text>200</Text>
+              <Text>{concertsCount.toString()}</Text>
             </Row>
             {Platform.OS !== 'ios' && <Spacer size={8} />}
             <Row>
               <Text>News:</Text>
               <Spacer flexible />
-              <Text>150</Text>
+              <Text>{newsCount.toString()}</Text>
             </Row>
           </Collapsible>
         </FieldGroup.Section>
