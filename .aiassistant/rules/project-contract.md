@@ -20,18 +20,26 @@ STATE MANAGEMENT: @legendapp/state v3 (beta)
 - Persistence: SQLite (native) / IndexedDB (web) — never AsyncStorage directly
 
 ARCHITECTURE:
-src/app/ → Expo Router pages (file = route)
-src/components/ → Reusable UI prefixed with "App" (AppScreen, AppText, AppButton…)
-src/services/ → All business logic (legend/, auth.ts, supabase.ts)
-src/constants/ → Constants only (COLORS, LAYOUT, FONT, SYNC, AUTH)
-src/hooks/ → Custom hooks (useAlert, useBetterSafeAreaInsets)
-src/layout/ → Global layout helpers and shared style utilities
-src/types/ → TypeScript types only
+
+- src/app/ → Expo Router pages (file = route)
+- src/components/ → Reusable UI prefixed with "App" (AppScreen, AppText, AppButton…
+    - Prefixed with "App": Project-independent/Generic UI (AppScreen, AppText, AppButton…)
+    - Prefixed with "Profile": Specific to the Profile domain (ProfileStatsSection, ProfileUserSection…)
+    - No prefix: Project-specific components that don't fit into a broader generic category
+- src/services/ → All business logic (legend/, auth.ts, supabase.ts)
+- src/constants/ → Constants only (COLORS, LAYOUT, FONT, SYNC, AUTH)
+- src/hooks/ → Custom hooks (useAlert, useBetterSafeAreaInsets)
+- src/layout/ → Global layout helpers and shared style utilities
+- src/types/ → TypeScript types only
 
 CONVENTIONS:
 
 - Observable names: always camelCase + $ suffix
 - Component files: PascalCase; hook files: camelCase starting with "use"
+- Component Naming:
+    - "App..." for generic, project-independent components.
+    - "Profile..." for profile-related sub-components.
+    - No prefix for other project-specific components.
 - Path alias: @/ maps to src/
 - Async pattern: async/await; void prefix for fire-and-forget calls
 - No React Context API for state — use legendapp/state memory observables instead
