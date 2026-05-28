@@ -2,6 +2,7 @@ import { syncState } from '@legendapp/state'
 
 import { getTimestamp } from '@/services/dateTimeHelper'
 import {
+  authUser$,
   concertClearCache,
   concerts$,
   concertSync,
@@ -10,6 +11,8 @@ import {
   news$,
   newsClearCache,
   newsSync,
+  profileClearCache,
+  profileSync,
   setlistClearCache,
   setlists$,
   setlistSync,
@@ -35,6 +38,7 @@ export const initializeStores = () => {
   try {
     sync$.peek()
     versions$.peek()
+    // profile$ is handled reactively in auth.ts via profileSync()
     news$.peek()
     songs$.peek()
     concerts$.peek()
@@ -46,9 +50,8 @@ export const initializeStores = () => {
     console.log('LegendState: Failed to initialize table stores:', error)
   }
 }
-
 export const syncAll = async () => {
-  await Promise.all([
+  const syncs: Promise<void>[] = [
     versionSync(),
     newsSync(),
     songSync(),
@@ -56,11 +59,15 @@ export const syncAll = async () => {
     setlistSync(),
     upcomingSync(),
     videoSync(),
-  ])
+  ]
+  if (authUser$.peek()) {
+    syncs.push(profileSync())
+  }
+  await Promise.all(syncs)
 }
 
 export const clearCacheAll = async () => {
-  await Promise.all([
+  const clears: Promise<void>[] = [
     versionClearCache(),
     newsClearCache(),
     songClearCache(),
@@ -68,7 +75,11 @@ export const clearCacheAll = async () => {
     setlistClearCache(),
     upcomingClearCache(),
     videoClearCache(),
-  ])
+  ]
+  if (authUser$.peek()) {
+    clears.push(profileClearCache())
+  }
+  await Promise.all(clears)
 }
 
 export const startSyncCoordinator = () => {

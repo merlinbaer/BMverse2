@@ -78,7 +78,7 @@ export default function ProfileScreen() {
         onPress={handleDeleteAccount}
         disabled={!user}
       />
-      <AppText>User: {user ?? 'not logged in'}</AppText>
+      <AppText>User: {user?.email ?? 'not logged in'}</AppText>
     </View>
   )
 }

@@ -4,6 +4,7 @@ import * as Updates from 'expo-updates'
 import { DevSettings, Platform } from 'react-native'
 
 import { AUTH } from '@/constants/constants'
+import { profileSync } from '@/services/legend'
 import { authUser$, isAuthLoaded$ } from '@/services/legend/memory/variables'
 
 import { supabase } from './supabase'
@@ -27,7 +28,10 @@ export function initAuth() {
       }
     }
     if (data.session?.user?.email) {
-      authUser$.set(data.session?.user?.email)
+      authUser$.set({
+        id: data.session.user.id,
+        email: data.session.user.email,
+      })
       console.log('Auth: User logged in.')
     } else {
       authUser$.set(null)
@@ -39,9 +43,17 @@ export function initAuth() {
   // Add listener
   supabase.auth.onAuthStateChange((event, session) => {
     //debug: console.log('supabase auth state change:', event, session)
-    authUser$.set(session?.user?.email ?? null) // important setting authUser$
+    if (session?.user?.email) {
+      authUser$.set({
+        id: session.user.id,
+        email: session.user.email,
+      })
+    } else {
+      authUser$.set(null)
+    }
     isAuthLoaded$.set(true) // Ensure it's true if a listener event happens first
     if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+      void profileSync()
       ;(async () => {
         try {
           const { error } = await supabase.rpc('update_last_seen')

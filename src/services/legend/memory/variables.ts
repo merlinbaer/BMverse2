@@ -1,9 +1,10 @@
 import { observable } from '@legendapp/state'
 
 import { SongListType, VideoListType } from '@/types/list'
+import { User } from '@/types/user'
 
 // Reactive auth states
-export const authUser$ = observable<string | null>(null)
+export const authUser$ = observable<User | null>(null)
 export const isAuthLoaded$ = observable(false) // New: Track hydration
 // States for list sorts
 export const songSort$ = observable<SongListType>('Release')

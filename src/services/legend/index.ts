@@ -1,5 +1,6 @@
 export * from './tables/sync'
 export * from './tables/versions'
+export * from './tables/profile'
 export * from './tables/news'
 export * from './tables/concerts'
 export * from './tables/setlists'

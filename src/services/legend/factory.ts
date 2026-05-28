@@ -31,6 +31,11 @@ interface TableConfig<T extends BaseRow> {
   changesSince?: 'all' | 'last-sync'
   /** Custom sort for the list$. Default: newest created_at first */
   sort?: (a: T, b: T) => number
+  /** Custom supabase filter */
+  filter?: (
+    select: any, // PostgrestFilterBuilder<any, any, any[], string, [], unknown, unknown>
+    params: any, // SyncedGetParams<any>
+  ) => any
 }
 
 // Main call to factory (with defaults when not passed)
@@ -39,6 +44,7 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
     collection,
     actions = ['read'] as const,
     changesSince = 'all',
+    filter,
     sort = (a, b) =>
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   } = config
@@ -46,6 +52,7 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
   const store$ = observable<Record<string, T>>(
     customSynced({
       collection,
+      filter,
       actions,
       realtime: false,
       persist: { name: collection, retrySync: true },
