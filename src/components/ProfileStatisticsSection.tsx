@@ -18,32 +18,35 @@ export const ProfileStatsSection = () => {
   const newsCount = useValue(newsCount$)
 
   return (
-    <FieldGroup.Section title="Statistics">
-      <Collapsible isOpen={openStat} onOpenChange={setOpenStat} label="Data">
-        <Row>
-          <Text>Songs:</Text>
-          <Spacer flexible />
-          <Text>{songsCount.toString()}</Text>
-        </Row>
-        {Platform.OS !== 'ios' && <Spacer size={8} />}
-        <Row>
-          <Text>Videos:</Text>
-          <Spacer flexible />
-          <Text>{videosCount.toString()}</Text>
-        </Row>
-        {Platform.OS !== 'ios' && <Spacer size={8} />}
-        <Row>
-          <Text>Concerts:</Text>
-          <Spacer flexible />
-          <Text>{concertsCount.toString()}</Text>
-        </Row>
-        {Platform.OS !== 'ios' && <Spacer size={8} />}
-        <Row>
-          <Text>News:</Text>
-          <Spacer flexible />
-          <Text>{newsCount.toString()}</Text>
-        </Row>
-      </Collapsible>
-    </FieldGroup.Section>
+    <>
+      {Platform.OS === 'web' && <Spacer size={16} />}
+      <FieldGroup.Section title="Statistics">
+        <Collapsible isOpen={openStat} onOpenChange={setOpenStat} label="Data">
+          <Row>
+            <Text>Songs:</Text>
+            <Spacer flexible />
+            <Text>{songsCount.toString()}</Text>
+          </Row>
+          {Platform.OS !== 'ios' && <Spacer size={8} />}
+          <Row>
+            <Text>Videos:</Text>
+            <Spacer flexible />
+            <Text>{videosCount.toString()}</Text>
+          </Row>
+          {Platform.OS !== 'ios' && <Spacer size={8} />}
+          <Row>
+            <Text>Concerts:</Text>
+            <Spacer flexible />
+            <Text>{concertsCount.toString()}</Text>
+          </Row>
+          {Platform.OS !== 'ios' && <Spacer size={8} />}
+          <Row>
+            <Text>News:</Text>
+            <Spacer flexible />
+            <Text>{newsCount.toString()}</Text>
+          </Row>
+        </Collapsible>
+      </FieldGroup.Section>
+    </>
   )
 }

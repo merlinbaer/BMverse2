@@ -1,9 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AuthResponse } from '@supabase/supabase-js'
+import Constants, { ExecutionEnvironment } from 'expo-constants'
 import * as Updates from 'expo-updates'
 import { DevSettings, Platform } from 'react-native'
 
 import { AUTH } from '@/constants/constants'
+import { clearCacheAll } from '@/services/legend/lib'
 import { authUser$, isAuthLoaded$ } from '@/services/legend/memory/variables'
 import { profileSync } from '@/services/legend/tables/profile'
 
@@ -82,12 +84,7 @@ export function initAuth() {
  */
 export const startLogin = async (email: string) => {
   if (await supabase.auth.getUser().then(u => u.data.user != null)) return
-  /*
-  await supabase.auth.signInWithOtp({
-    email,
-    options: { shouldCreateUser: true },
-  })
-  */
+
   const timeoutPromise = new Promise((_, reject) =>
     setTimeout(
       () => reject(new Error('Timeout. Please check your connection.')),
@@ -183,17 +180,38 @@ export const forceLogout = async () => {
   try {
     await AsyncStorage.removeItem(AUTH.STORAGE_KEY)
     console.log('Auth: AUTH_STORAGE_KEY cleared')
+
+    // Reset reactive state immediately
     authUser$.set(null)
+
+    // Reset all data
+    void clearCacheAll()
+
     if (Platform.OS === 'web') {
       console.log('Auth: Reloading web app...')
       window.location.reload()
+    } else if (Platform.OS === 'ios') {
+      // In SDK 56 Development, this triggers a system error with a reload overlay but guarantees a clean state.
+      console.log('Auth: Reloading iOS app via Updates.reloadAsync')
+      try {
+        await Updates.reloadAsync()
+      } catch (e) {
+        console.error('Auth: Updates.reloadAsync failed', e)
+      }
     } else {
-      if (__DEV__) {
-        console.log('Auth: Reloading expo app using DevSettings.reload()')
+      // Android
+      if (Constants.executionEnvironment === ExecutionEnvironment.StoreClient) {
+        console.log(
+          'Auth: Reloading Android expo app using DevSettings.reload()',
+        )
         DevSettings.reload()
       } else {
-        console.log('Auth: Reloading native app using Updates.reloadAsync()')
-        await Updates.reloadAsync()
+        console.log('Auth: Reloading Android app using Updates.reloadAsync()')
+        try {
+          await Updates.reloadAsync()
+        } catch (err) {
+          console.error('Auth: Updates.reloadAsync failed', err)
+        }
       }
     }
   } catch (err) {

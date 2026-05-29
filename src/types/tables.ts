@@ -11,5 +11,4 @@ export type SetlistType =
 export type UpcomingType =
   Database['public']['Tables']['bm_event_concert_upcoming']['Row']
 export type SongType = Database['public']['Tables']['bm_songs']['Row']
-
 export type VideoType = Database['public']['Tables']['bm_videos']['Row']
