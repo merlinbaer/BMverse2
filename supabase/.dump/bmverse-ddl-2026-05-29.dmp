@@ -1,0 +1,747 @@
+
+
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+
+CREATE SCHEMA IF NOT EXISTS "public";
+
+
+ALTER SCHEMA "public" OWNER TO "pg_database_owner";
+
+
+COMMENT ON SCHEMA "public" IS 'standard public schema';
+
+
+
+CREATE TYPE "public"."user_role" AS ENUM (
+    'user',
+    'admin',
+    'moderator'
+);
+
+
+ALTER TYPE "public"."user_role" OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."delete_user"() RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public', 'auth'
+    AS $$
+BEGIN
+    DELETE FROM auth.users WHERE id = auth.uid();
+END;
+$$;
+
+
+ALTER FUNCTION "public"."delete_user"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."handle_new_user"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+    INSERT INTO public.gl_profiles (id, user_email, user_role)
+    VALUES (new.id, new.email, 'user')
+    ON conflict (id) do nothing;
+
+    INSERT INTO public.gl_users (id, last_seen_at)
+    VALUES (new.id, now())
+    ON conflict (id) do nothing;
+
+    RETURN new;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."handle_new_user"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."handle_times"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+    IF (TG_OP = 'INSERT') THEN
+        NEW.created_at := now();
+        NEW.updated_at := now();
+    ELSEIF (TG_OP = 'UPDATE') THEN
+        NEW.created_at = OLD.created_at;
+        NEW.updated_at = now();
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."handle_times"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."is_admin"() RETURNS boolean
+    LANGUAGE "sql" STABLE
+    SET "search_path" TO 'public'
+    AS $$
+SELECT EXISTS (SELECT 1
+               FROM public.gl_profiles p
+               WHERE p.id = auth.uid()
+                 AND p.user_role = 'admin');
+$$;
+
+
+ALTER FUNCTION "public"."is_admin"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."is_moderator"() RETURNS boolean
+    LANGUAGE "sql" STABLE
+    SET "search_path" TO 'public'
+    AS $$
+SELECT EXISTS (SELECT 1
+               FROM public.gl_profiles p
+               WHERE p.id = auth.uid()
+                 AND p.user_role = 'moderator');
+$$;
+
+
+ALTER FUNCTION "public"."is_moderator"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."is_public_user"() RETURNS boolean
+    LANGUAGE "sql" STABLE
+    SET "search_path" TO 'public'
+    AS $$
+SELECT EXISTS (SELECT 1
+               FROM public.gl_profiles p
+               WHERE p.id = auth.uid()
+                 AND p.user_role in ('user', 'moderator', 'admin'));
+$$;
+
+
+ALTER FUNCTION "public"."is_public_user"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."sync_bm_news"() RETURNS "trigger"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+    -- 1. Overwrite the news_updater with the actual user ID or 'postgres'
+    NEW.news_updater := coalesce(auth.uid()::text, 'postgres');
+
+    -- 2. Update the singleton sync row (sync_id = 1)
+    UPDATE public.gl_sync
+    SET updater = NEW.news_updater
+    WHERE sync_id = 1;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION "public"."sync_bm_news"() OWNER TO "postgres";
+
+
+CREATE OR REPLACE FUNCTION "public"."update_last_seen"() RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
+    AS $$
+BEGIN
+    UPDATE public.gl_users
+    SET last_seen_at = now()
+    WHERE id = auth.uid();
+END;
+$$;
+
+
+ALTER FUNCTION "public"."update_last_seen"() OWNER TO "postgres";
+
+SET default_tablespace = '';
+
+SET default_table_access_method = "heap";
+
+
+CREATE TABLE IF NOT EXISTS "public"."bm_event_concert" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "setlist_id" "text" NOT NULL,
+    "setlist_versionid" "text",
+    "setlist_eventdate" "date" NOT NULL,
+    "setlist_eventyear" integer NOT NULL,
+    "setlist_lastupdated" timestamp with time zone,
+    "setlist_info" "text",
+    "setlist_url" "text",
+    "setlist_artist_mbid" "text" NOT NULL,
+    "setlist_artist_name" "text" NOT NULL,
+    "setlist_artist_sortname" "text",
+    "setlist_artist_url" "text",
+    "setlist_venue_id" "text",
+    "setlist_venue_name" "text",
+    "setlist_venue_city_id" "text",
+    "setlist_venue_city_name" "text" NOT NULL,
+    "setlist_venue_city_state" "text",
+    "setlist_venue_city_statecode" "text",
+    "setlist_venue_city_coords_lat" real,
+    "setlist_venue_city_coords_long" real,
+    "setlist_venue_city_country_code" "text" NOT NULL,
+    "setlist_venue_city_country_name" "text" NOT NULL,
+    "setlist_venue_url" "text",
+    "setlist_tour_name" "text",
+    "setlist_artwork" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."bm_event_concert" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."bm_event_concert_songs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "setlist_id" "text" NOT NULL,
+    "setlist_versionid" "text" NOT NULL,
+    "song_nr" smallint NOT NULL,
+    "song_name_original" "text" NOT NULL,
+    "song_name" "text",
+    "song_encore" boolean NOT NULL,
+    "song_info" "text",
+    "song_artwork" "text"
+);
+
+
+ALTER TABLE "public"."bm_event_concert_songs" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."bm_event_concert_upcoming" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "setlist_id" "text" NOT NULL,
+    "setlist_versionid" "text",
+    "setlist_eventdate" "date" NOT NULL,
+    "setlist_eventyear" integer NOT NULL,
+    "setlist_lastupdated" timestamp with time zone,
+    "setlist_info" "text",
+    "setlist_url" "text",
+    "setlist_artist_mbid" "text" NOT NULL,
+    "setlist_artist_name" "text" NOT NULL,
+    "setlist_artist_sortname" "text",
+    "setlist_artist_url" "text",
+    "setlist_venue_id" "text",
+    "setlist_venue_name" "text",
+    "setlist_venue_city_id" "text",
+    "setlist_venue_city_name" "text" NOT NULL,
+    "setlist_venue_city_state" "text",
+    "setlist_venue_city_statecode" "text",
+    "setlist_venue_city_coords_lat" real,
+    "setlist_venue_city_coords_long" real,
+    "setlist_venue_city_country_code" "text" NOT NULL,
+    "setlist_venue_city_country_name" "text" NOT NULL,
+    "setlist_venue_url" "text",
+    "setlist_tour_name" "text",
+    "setlist_artwork" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."bm_event_concert_upcoming" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."bm_news" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "news_update" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "news_info" "text" DEFAULT '.'::"text" NOT NULL,
+    "news_updater" "text" NOT NULL
+);
+
+
+ALTER TABLE "public"."bm_news" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."bm_songs" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "song_id" "text" NOT NULL,
+    "song_title" "text" NOT NULL,
+    "song_title_jp" "text",
+    "song_artist" "text" NOT NULL,
+    "song_first_appearance" "date" NOT NULL,
+    "song_album_type" "text" DEFAULT 'M'::"text" NOT NULL,
+    "song_album_name" "text",
+    "song_release_year" "text",
+    "song_default_cover" "text" NOT NULL,
+    "song_preview" "text",
+    "song_preview_artwork" "text",
+    "song_preview_uri" "text",
+    "song_info" "text",
+    "song_lyrics_jp" "text",
+    "song_lyrics_en" "text",
+    "song_lyrics_rom" "text"
+);
+
+
+ALTER TABLE "public"."bm_songs" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."bm_videos" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "video_id" "text" NOT NULL,
+    "channel_id" "text" NOT NULL,
+    "channel_title" "text" NOT NULL,
+    "channel_decription" "text" NOT NULL,
+    "channel_customurl" "text",
+    "channel_type" "text" NOT NULL,
+    "channel_artwork" "text" NOT NULL,
+    "video_title_original" "text" NOT NULL,
+    "video_title" "text" NOT NULL,
+    "video_publishedat" timestamp without time zone NOT NULL,
+    "video_description" "text",
+    "video_duration" "text" NOT NULL,
+    "video_viewcount" bigint NOT NULL,
+    "video_likecount" bigint NOT NULL,
+    "video_commentcount" bigint NOT NULL,
+    "video_artwork" "text" NOT NULL,
+    "video_song" "text"
+);
+
+
+ALTER TABLE "public"."bm_videos" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."gl_profiles" (
+    "id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "user_email" "text" NOT NULL,
+    "user_role" "public"."user_role" DEFAULT 'user'::"public"."user_role" NOT NULL,
+    "user_name" "text",
+    "user_country" "text"
+);
+
+
+ALTER TABLE "public"."gl_profiles" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."gl_sync" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "sync_id" smallint DEFAULT 1 NOT NULL,
+    "updater" "text" DEFAULT 'postgres'::"text" NOT NULL,
+    CONSTRAINT "gl_sync_is_singleton" CHECK (("sync_id" = 1))
+);
+
+
+ALTER TABLE "public"."gl_sync" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."gl_users" (
+    "id" "uuid" NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "last_seen_at" timestamp with time zone DEFAULT "now"() NOT NULL
+);
+
+
+ALTER TABLE "public"."gl_users" OWNER TO "postgres";
+
+
+CREATE TABLE IF NOT EXISTS "public"."gl_versions" (
+    "id" "uuid" DEFAULT "gen_random_uuid"() NOT NULL,
+    "created_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "updated_at" timestamp with time zone DEFAULT "now"() NOT NULL,
+    "deleted" boolean DEFAULT false,
+    "version_id" integer NOT NULL,
+    "version" "text" NOT NULL,
+    "version_info" "text"
+);
+
+
+ALTER TABLE "public"."gl_versions" OWNER TO "postgres";
+
+
+ALTER TABLE "public"."gl_versions" ALTER COLUMN "version_id" ADD GENERATED BY DEFAULT AS IDENTITY (
+    SEQUENCE NAME "public"."gl_versions_version_id_seq"
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+
+ALTER TABLE ONLY "public"."bm_event_concert"
+    ADD CONSTRAINT "bm_event_concert_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."bm_event_concert_songs"
+    ADD CONSTRAINT "bm_event_concert_songs_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."bm_event_concert_upcoming"
+    ADD CONSTRAINT "bm_event_concert_upcoming_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."bm_news"
+    ADD CONSTRAINT "bm_news_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."bm_songs"
+    ADD CONSTRAINT "bm_songs_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."bm_videos"
+    ADD CONSTRAINT "bm_videos_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."gl_profiles"
+    ADD CONSTRAINT "gl_profiles_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."gl_sync"
+    ADD CONSTRAINT "gl_sync_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."gl_sync"
+    ADD CONSTRAINT "gl_sync_sync_id_key" UNIQUE ("sync_id");
+
+
+
+ALTER TABLE ONLY "public"."gl_users"
+    ADD CONSTRAINT "gl_users_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."gl_versions"
+    ADD CONSTRAINT "gl_version_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."gl_versions"
+    ADD CONSTRAINT "gl_versions_version_id_key" UNIQUE ("version_id");
+
+
+
+CREATE INDEX "bm_event_concert_songs_setlist_id_index" ON "public"."bm_event_concert_songs" USING "btree" ("setlist_id");
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."bm_event_concert" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."bm_event_concert_songs" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."bm_event_concert_upcoming" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."bm_news" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."bm_songs" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."bm_videos" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."gl_profiles" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."gl_sync" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."gl_users" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "handle_times" BEFORE INSERT OR UPDATE ON "public"."gl_versions" FOR EACH ROW EXECUTE FUNCTION "public"."handle_times"();
+
+
+
+CREATE OR REPLACE TRIGGER "sync_bm_news" BEFORE INSERT OR UPDATE ON "public"."bm_news" FOR EACH ROW EXECUTE FUNCTION "public"."sync_bm_news"();
+
+
+
+ALTER TABLE ONLY "public"."gl_profiles"
+    ADD CONSTRAINT "gl_profiles_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY "public"."gl_users"
+    ADD CONSTRAINT "gl_users_id_fkey" FOREIGN KEY ("id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."bm_event_concert" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."bm_event_concert_songs" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."bm_event_concert_upcoming" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."bm_news" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."bm_songs" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."bm_videos" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."gl_sync" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_all_users_to_select" ON "public"."gl_versions" FOR SELECT USING (("auth"."role"() = ANY (ARRAY['anon'::"text", 'authenticated'::"text"])));
+
+
+
+CREATE POLICY "allow_moderator_to_edit" ON "public"."bm_news" FOR UPDATE USING ("public"."is_moderator"()) WITH CHECK ((("id" = "id") AND ("created_at" = "created_at")));
+
+
+
+CREATE POLICY "allow_moderator_to_edit" ON "public"."bm_songs" FOR UPDATE USING ("public"."is_moderator"()) WITH CHECK ((("id" = "id") AND ("created_at" = "created_at") AND ("deleted" = "deleted") AND ("song_id" = "song_id") AND ("song_title" = "song_title") AND ("song_title_jp" = "song_title_jp") AND ("song_artist" = "song_artist") AND ("song_first_appearance" = "song_first_appearance") AND ("song_album_type" = "song_album_type") AND ("song_album_name" = "song_album_name") AND ("song_release_year" = "song_release_year") AND ("song_default_cover" = "song_default_cover") AND ("song_preview" = "song_preview") AND ("song_preview_artwork" = "song_preview_artwork") AND ("song_preview_uri" = "song_preview_uri") AND ("song_lyrics_jp" = "song_lyrics_jp") AND ("song_lyrics_en" = "song_lyrics_en") AND ("song_lyrics_rom" = "song_lyrics_rom")));
+
+
+
+CREATE POLICY "allow_moderator_to_insert" ON "public"."bm_news" FOR INSERT WITH CHECK ("public"."is_moderator"());
+
+
+
+ALTER TABLE "public"."bm_event_concert" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."bm_event_concert_songs" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."bm_event_concert_upcoming" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."bm_news" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."bm_songs" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."bm_videos" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."gl_profiles" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."gl_sync" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."gl_users" ENABLE ROW LEVEL SECURITY;
+
+
+ALTER TABLE "public"."gl_versions" ENABLE ROW LEVEL SECURITY;
+
+
+CREATE POLICY "users_can_read_own_profile" ON "public"."gl_profiles" FOR SELECT USING (("id" = "auth"."uid"()));
+
+
+
+CREATE POLICY "users_can_update_own_profile" ON "public"."gl_profiles" FOR UPDATE USING (("id" = "auth"."uid"())) WITH CHECK ((("id" = "auth"."uid"()) AND ("created_at" = "created_at") AND ("deleted" = "deleted") AND ("user_email" = "user_email") AND ("user_role" = "user_role")));
+
+
+
+GRANT USAGE ON SCHEMA "public" TO "postgres";
+GRANT USAGE ON SCHEMA "public" TO "anon";
+GRANT USAGE ON SCHEMA "public" TO "authenticated";
+GRANT USAGE ON SCHEMA "public" TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."delete_user"() TO "anon";
+GRANT ALL ON FUNCTION "public"."delete_user"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."delete_user"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_new_user"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."handle_times"() TO "anon";
+GRANT ALL ON FUNCTION "public"."handle_times"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."handle_times"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."is_admin"() TO "anon";
+GRANT ALL ON FUNCTION "public"."is_admin"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."is_admin"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."is_moderator"() TO "anon";
+GRANT ALL ON FUNCTION "public"."is_moderator"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."is_moderator"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."is_public_user"() TO "anon";
+GRANT ALL ON FUNCTION "public"."is_public_user"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."is_public_user"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."sync_bm_news"() TO "anon";
+GRANT ALL ON FUNCTION "public"."sync_bm_news"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."sync_bm_news"() TO "service_role";
+
+
+
+GRANT ALL ON FUNCTION "public"."update_last_seen"() TO "anon";
+GRANT ALL ON FUNCTION "public"."update_last_seen"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."update_last_seen"() TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."bm_event_concert" TO "anon";
+GRANT ALL ON TABLE "public"."bm_event_concert" TO "authenticated";
+GRANT ALL ON TABLE "public"."bm_event_concert" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."bm_event_concert_songs" TO "anon";
+GRANT ALL ON TABLE "public"."bm_event_concert_songs" TO "authenticated";
+GRANT ALL ON TABLE "public"."bm_event_concert_songs" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."bm_event_concert_upcoming" TO "anon";
+GRANT ALL ON TABLE "public"."bm_event_concert_upcoming" TO "authenticated";
+GRANT ALL ON TABLE "public"."bm_event_concert_upcoming" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."bm_news" TO "anon";
+GRANT ALL ON TABLE "public"."bm_news" TO "authenticated";
+GRANT ALL ON TABLE "public"."bm_news" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."bm_songs" TO "anon";
+GRANT ALL ON TABLE "public"."bm_songs" TO "authenticated";
+GRANT ALL ON TABLE "public"."bm_songs" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."bm_videos" TO "anon";
+GRANT ALL ON TABLE "public"."bm_videos" TO "authenticated";
+GRANT ALL ON TABLE "public"."bm_videos" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."gl_profiles" TO "anon";
+GRANT ALL ON TABLE "public"."gl_profiles" TO "authenticated";
+GRANT ALL ON TABLE "public"."gl_profiles" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."gl_sync" TO "anon";
+GRANT ALL ON TABLE "public"."gl_sync" TO "authenticated";
+GRANT ALL ON TABLE "public"."gl_sync" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."gl_users" TO "anon";
+GRANT ALL ON TABLE "public"."gl_users" TO "authenticated";
+GRANT ALL ON TABLE "public"."gl_users" TO "service_role";
+
+
+
+GRANT ALL ON TABLE "public"."gl_versions" TO "anon";
+GRANT ALL ON TABLE "public"."gl_versions" TO "authenticated";
+GRANT ALL ON TABLE "public"."gl_versions" TO "service_role";
+
+
+
+GRANT ALL ON SEQUENCE "public"."gl_versions_version_id_seq" TO "anon";
+GRANT ALL ON SEQUENCE "public"."gl_versions_version_id_seq" TO "authenticated";
+GRANT ALL ON SEQUENCE "public"."gl_versions_version_id_seq" TO "service_role";
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON SEQUENCES TO "service_role";
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON FUNCTIONS TO "service_role";
+
+
+
+
+
+
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "postgres";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "anon";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "authenticated";
+ALTER DEFAULT PRIVILEGES FOR ROLE "postgres" IN SCHEMA "public" GRANT ALL ON TABLES TO "service_role";
+
+
+
+
+
+
+
