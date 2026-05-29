@@ -4,8 +4,8 @@ import * as Updates from 'expo-updates'
 import { DevSettings, Platform } from 'react-native'
 
 import { AUTH } from '@/constants/constants'
-import { profileSync } from '@/services/legend'
 import { authUser$, isAuthLoaded$ } from '@/services/legend/memory/variables'
+import { profileSync } from '@/services/legend/tables/profile'
 
 import { supabase } from './supabase'
 

@@ -86,3 +86,9 @@ export const videosBySong$ = (songTitle: string) =>
         }),
       )
   })
+
+export const videosCount$ = computed(() => {
+  const data = videos$.get()
+  if (!data) return 0
+  return Object.values(data).filter(item => item && !item.deleted).length
+})

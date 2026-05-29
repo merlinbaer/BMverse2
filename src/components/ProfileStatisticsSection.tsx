@@ -5,17 +5,17 @@ import { Platform } from 'react-native'
 
 import {
   concertsCount$,
-  newsList$,
-  songList$,
-  videoList$,
+  newsCount$,
+  songsCount$,
+  videosCount$,
 } from '@/services/legend'
 
 export const ProfileStatsSection = () => {
   const [openStat, setOpenStat] = useState(true)
-  const songsCount = useValue(songList$).length
-  const videosCount = useValue(videoList$).length
+  const songsCount = useValue(songsCount$)
+  const videosCount = useValue(videosCount$)
   const concertsCount = useValue(concertsCount$)
-  const newsCount = useValue(newsList$).length
+  const newsCount = useValue(newsCount$)
 
   return (
     <FieldGroup.Section title="Statistics">

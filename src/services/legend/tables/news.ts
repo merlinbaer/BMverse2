@@ -1,3 +1,5 @@
+import { computed } from '@legendapp/state'
+
 import { generateId } from '@/services/legend/config'
 import { NewsType } from '@/types/tables'
 
@@ -35,3 +37,9 @@ export const newsAdd = () => {
   })
   return id
 }
+
+export const newsCount$ = computed(() => {
+  const data = news$.get()
+  if (!data) return 0
+  return Object.values(data).filter(item => item && !item.deleted).length
+})

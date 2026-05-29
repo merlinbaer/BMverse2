@@ -94,3 +94,9 @@ export const songList$ = (sortType?: SongListType) =>
         }),
       )
   })
+
+export const songsCount$ = computed(() => {
+  const data = songs$.get() // React to changes in the store
+  if (!data) return 0
+  return Object.values(data).filter(item => item && !item.deleted).length
+})

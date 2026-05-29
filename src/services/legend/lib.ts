@@ -11,8 +11,6 @@ import {
   news$,
   newsClearCache,
   newsSync,
-  profileClearCache,
-  profileSync,
   setlistClearCache,
   setlists$,
   setlistSync,
@@ -32,6 +30,10 @@ import {
   videos$,
   videoSync,
 } from '@/services/legend'
+import {
+  profileClearCache,
+  profileSync,
+} from '@/services/legend/tables/profile'
 
 export const initializeStores = () => {
   // Wake up table stores

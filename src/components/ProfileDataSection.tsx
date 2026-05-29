@@ -27,7 +27,20 @@ export const ProfileDataSection = () => {
   const syncRefresh = useValue(syncRefresh$)
   const [openClearCache, setOpenClearCache] = useState(false)
   const [openManage, setOpenManage] = useState(false)
+  const [isResetting, setIsResetting] = useState(false)
 
+  const onResetPress = async () => {
+    setIsResetting(true)
+    try {
+      await clearCacheAll()
+      void syncAll()
+      setOpenClearCache(false)
+    } catch (e) {
+      console.error('Reset failed:', e)
+    } finally {
+      setIsResetting(false)
+    }
+  }
   return (
     <FieldGroup.Section title="Data">
       <Collapsible
@@ -108,12 +121,9 @@ export const ProfileDataSection = () => {
         <Row>
           <Spacer flexible />
           <Button
-            label="Clear Cache"
-            onPress={() => {
-              void clearCacheAll()
-              void syncAll()
-              setOpenClearCache(false)
-            }}
+            label={isResetting ? 'Clearing...' : 'Clear Cache'}
+            disabled={isResetting}
+            onPress={onResetPress}
           />
           <Spacer flexible />
         </Row>
