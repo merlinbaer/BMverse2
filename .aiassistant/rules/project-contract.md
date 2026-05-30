@@ -49,18 +49,19 @@ CONVENTIONS:
 - Screen files must be simple and easy to read:
   → Complex layout → extract into a component in src/components/
   → Business logic → extract into src/services/
-- Styling: React Native StyleSheet only — no Tailwind, no inline style objects, no third-party style libs
-- Global/shared styles go into src/constants/ (COLORS, LAYOUT, FONT) or src/layout/
-- Screen-local styles go in a StyleSheet at the bottom of the file
-
-STYLING:
-
-- React Native StyleSheet only — no Tailwind, no inline style objects, no third-party style libs.
-- **@expo/ui Integration**: When using `@expo/ui`, prefer their built-in props (variant, textStyle, spacing) but use the
-  project's `COLORS`, `LAYOUT`, and `FONT` constants for consistency.
+- Styling:
+    - React Native StyleSheet only — no Tailwind, no inline style objects, no third-party style libs
+    - **@expo/ui Integration**: When using `@expo/ui`, prefer their built-in props (variant, textStyle, spacing) but use
+      the project's `COLORS`, `LAYOUT`, and `FONT` constants for consistency.
+    - Global/shared styles go into src/constants/ (COLORS, LAYOUT, FONT) or src/layout/
+    - Screen-local styles go in a StyleSheet at the bottom of the file
 
 CRITICAL RULES — AI MUST NOT VIOLATE:
 ✗ Do NOT use React Context, Redux, Zustand, or useState for global/shared state
+✗ Do NOT use raw `Alert.alert` from React Native — ALWAYS use `useAlert` hook (`showAlert`) for cross-platform (Web)
+compatibility
+✗ Do NOT use raw React Native components for Profile domain / Profile components — ALWAYS use `@expo/ui` (Button,
+TextInput, Row, Picker, etc.)
 ✗ Do NOT add new tables without createTableStore() factory
 x Do NOT suggest older LegendState Code that defined in the STATE Management
 ✗ Do NOT use raw AsyncStorage — use persistLargeStore plugin

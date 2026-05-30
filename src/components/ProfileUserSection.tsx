@@ -11,9 +11,10 @@ import {
 } from '@expo/ui'
 import { useObservable, useValue } from '@legendapp/state/react'
 import React, { useRef, useState } from 'react'
-import { Alert, Platform } from 'react-native'
+import { Platform } from 'react-native'
 
 import { AUTH, COLORS } from '@/constants/constants'
+import { useAlert } from '@/hooks/useAlert'
 import { deleteAccount, signOut, startLogin, verifyOtp } from '@/services/auth'
 import {
   authUser$,
@@ -37,12 +38,16 @@ const REGION = [
 ]
 
 export const ProfileUserSection = () => {
+  const { showAlert } = useAlert()
   const user = useValue(authUser$)
   const profile = useValue(profileItem$(user?.id ?? ''))
   const draftName$ = useObservable(profile?.user_name ?? '')
   const [openLogin, setOpenLogin] = useState(false)
   const [openLogout, setOpenLogout] = useState(false)
   const [openRegion, setOpenRegion] = useState(false)
+  const currentRegionLabel = REGION.find(
+    r => r.value === (profile?.user_region ?? 'UNKN'),
+  )?.label
   const [emailValue, setEmailValue] = useState('')
   const emailRef = useRef<TextInputRef>(null)
   const codeRef = useRef<TextInputRef>(null)
@@ -55,14 +60,14 @@ export const ProfileUserSection = () => {
   const handleStartLogin = async () => {
     const emailToLogin = emailValue.trim()
     if (!isValidEmail(emailToLogin)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.')
+      showAlert('Invalid Email', 'Please enter a valid email address.')
       return
     }
 
     try {
       await startLogin(emailToLogin)
       setEmailValue(emailToLogin)
-      Alert.alert(
+      showAlert(
         'Email Sent',
         `A one-time password has been sent to ${emailToLogin}. Please check your inbox.`,
       )
@@ -71,7 +76,7 @@ export const ProfileUserSection = () => {
         error instanceof Error
           ? error.message
           : 'Failed to start login process.'
-      Alert.alert('Login Error', message)
+      showAlert('Login Error', message)
     }
   }
 
@@ -86,7 +91,7 @@ export const ProfileUserSection = () => {
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : 'Invalid passcode.'
-      Alert.alert('Verification Failed', message)
+      showAlert('Verification Failed', message)
     }
   }
 
@@ -163,7 +168,7 @@ export const ProfileUserSection = () => {
             <Collapsible
               isOpen={openRegion}
               onOpenChange={setOpenRegion}
-              label="Your Region"
+              label={`Your Region: ${currentRegionLabel}`}
             >
               <Picker
                 selectedValue={profile?.user_region ?? 'UNKN'}
