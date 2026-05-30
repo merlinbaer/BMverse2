@@ -34,10 +34,8 @@ export function initAuth() {
         id: data.session.user.id,
         email: data.session.user.email,
       })
-      console.log('Auth: User logged in.')
     } else {
       authUser$.set(null)
-      console.log('Auth: No user session found.')
     }
     isAuthLoaded$.set(true) // Mark as finished
   })
@@ -55,7 +53,6 @@ export function initAuth() {
     }
     isAuthLoaded$.set(true) // Ensure it's true if a listener event happens first
     if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-      void profileSync()
       ;(async () => {
         try {
           const { error } = await supabase.rpc('update_last_seen')
@@ -124,6 +121,7 @@ export const verifyOtp = async (
 
     // Verify OK
     if (!error) {
+      void profileSync()
       return data.session
     }
 
@@ -189,7 +187,7 @@ export const forceLogout = async () => {
 
     if (Platform.OS === 'web') {
       console.log('Auth: Reloading web app...')
-      window.location.reload()
+      window.location.href = '/'
     } else if (Platform.OS === 'ios') {
       // In SDK 56 Development, this triggers a system error with a reload overlay but guarantees a clean state.
       console.log('Auth: Reloading iOS app via Updates.reloadAsync')

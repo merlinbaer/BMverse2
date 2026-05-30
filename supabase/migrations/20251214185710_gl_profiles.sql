@@ -5,17 +5,31 @@ CREATE TYPE public.user_role AS enum (
     'moderator'
     );
 
+CREATE TYPE public.user_region AS enum (
+    'UNKN',
+    'JPAN',
+    'NOAM',
+    'LATM',
+    'EURO',
+    'UKIE',
+    'EASI',
+    'SEAS',
+    'OCEA',
+    'MEAF'
+
+    );
+
 CREATE TABLE
     public.gl_profiles
 (
-    id           uuid primary key references auth.users (id) on delete cascade,
-    created_at   timestamp with time zone not null default now(),
-    updated_at   timestamp with time zone not null default now(),
-    deleted      boolean                  null     default false,
-    user_email   text                     not null,
-    user_role    public.user_role         not null default 'user',
-    user_name    text                     null,
-    user_country text                     null
+    id          uuid primary key references auth.users (id) on delete cascade,
+    created_at  timestamp with time zone not null default now(),
+    updated_at  timestamp with time zone not null default now(),
+    deleted     boolean                  null     default false,
+    user_email  text                     not null,
+    user_role   public.user_role         not null default 'user',
+    user_name   text                     null,
+    user_region public.user_region       not null default 'UNKN'
 ) tablespace pg_default;
 
 GRANT SELECT ON public.gl_profiles TO anon;

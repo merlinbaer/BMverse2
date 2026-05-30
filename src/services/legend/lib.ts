@@ -2,7 +2,6 @@ import { syncState } from '@legendapp/state'
 
 import { getTimestamp } from '@/services/dateTimeHelper'
 import {
-  authUser$,
   concertClearCache,
   concerts$,
   concertSync,
@@ -11,6 +10,9 @@ import {
   news$,
   newsClearCache,
   newsSync,
+  profile$,
+  profileClearCache,
+  profileSync,
   setlistClearCache,
   setlists$,
   setlistSync,
@@ -30,17 +32,13 @@ import {
   videos$,
   videoSync,
 } from '@/services/legend'
-import {
-  profileClearCache,
-  profileSync,
-} from '@/services/legend/tables/profile'
 
 export const initializeStores = () => {
   // Wake up table stores
   try {
     sync$.peek()
     versions$.peek()
-    // profile$ is handled reactively in auth.ts via profileSync()
+    profile$.peek()
     news$.peek()
     songs$.peek()
     concerts$.peek()
@@ -55,6 +53,7 @@ export const initializeStores = () => {
 export const syncAll = async () => {
   const syncs: Promise<void>[] = [
     versionSync(),
+    profileSync(),
     newsSync(),
     songSync(),
     concertSync(),
@@ -62,15 +61,13 @@ export const syncAll = async () => {
     upcomingSync(),
     videoSync(),
   ]
-  if (authUser$.peek()) {
-    syncs.push(profileSync())
-  }
   await Promise.all(syncs)
 }
 
 export const clearCacheAll = async () => {
   const clears: Promise<void>[] = [
     versionClearCache(),
+    profileClearCache(),
     newsClearCache(),
     songClearCache(),
     concertClearCache(),
@@ -78,9 +75,6 @@ export const clearCacheAll = async () => {
     upcomingClearCache(),
     videoClearCache(),
   ]
-  if (authUser$.peek()) {
-    clears.push(profileClearCache())
-  }
   await Promise.all(clears)
 }
 

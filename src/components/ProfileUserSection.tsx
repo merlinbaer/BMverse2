@@ -18,17 +18,16 @@ import { deleteAccount, signOut, startLogin, verifyOtp } from '@/services/auth'
 import { authUser$ } from '@/services/legend'
 
 const REGION = [
-  { label: 'Unknown', value: 'Unknown' },
-  { label: 'Japan', value: 'JP' },
-  { label: 'US', value: 'US' },
-  { label: 'Europe', value: 'Europe' },
-  { label: 'North America', value: 'NAM' },
-  { label: 'Central America', value: 'CAM' },
-  { label: 'South America', value: 'SAM' },
-  { label: 'East-Asia', value: 'EAS' },
-  { label: 'West-Asia', value: 'WAS' },
-  { label: 'Australia & Oceania', value: 'AU' },
-  { label: 'Africa', value: 'AF' },
+  { label: 'Unknown', value: 'UNKN' },
+  { label: 'Japan', value: 'JPAN' },
+  { label: 'North America', value: 'NOAM' },
+  { label: 'Latin America', value: 'LATM' },
+  { label: 'Continental Europe', value: 'EURO' },
+  { label: 'UK & Ireland', value: 'UKIE' },
+  { label: 'East Asia', value: 'EASI' },
+  { label: 'Southeast Asia', value: 'SEAS' },
+  { label: 'Australia & Oceania', value: 'OCEA' },
+  { label: 'Middle East & Africa', value: 'MEAF' },
 ]
 
 export const ProfileUserSection = () => {

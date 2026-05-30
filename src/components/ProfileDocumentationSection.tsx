@@ -34,7 +34,7 @@ export const ProfileDocumentationSection = () => {
         <Collapsible
           isOpen={openLinks}
           onOpenChange={setOpenLinks}
-          label="Visit"
+          label="Look at"
         >
           <Button
             label="Website"

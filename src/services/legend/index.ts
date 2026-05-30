@@ -1,6 +1,6 @@
 export * from './tables/sync'
 export * from './tables/versions'
-// export * from './tables/profile'. // could not add to index.ts because of circular dependency
+export * from './tables/profile'
 export * from './tables/news'
 export * from './tables/concerts'
 export * from './tables/setlists'
