@@ -8,10 +8,11 @@ import {
   Text,
 } from '@expo/ui'
 import { useValue } from '@legendapp/state/react'
+import { useRouter } from 'expo-router'
 import React, { useState } from 'react'
 import { Platform } from 'react-native'
 
-import { syncRefresh$ } from '@/services/legend'
+import { authUser$, profileItem$, syncRefresh$ } from '@/services/legend'
 import { clearCacheAll, syncAll } from '@/services/legend/lib'
 
 const INTERVAL = [
@@ -23,6 +24,13 @@ const INTERVAL = [
 ]
 
 export const ProfileDataSection = () => {
+  const router = useRouter()
+  const user = useValue(authUser$)
+  const profile = useValue(profileItem$(user?.id ?? ''))
+
+  const isModerator =
+    profile?.user_role === 'moderator' || profile?.user_role === 'admin'
+
   const [openSyncInterval, setOpenSyncInterval] = useState(false)
   const syncRefresh = useValue(syncRefresh$)
   const [openClearCache, setOpenClearCache] = useState(false)
@@ -94,8 +102,8 @@ export const ProfileDataSection = () => {
             <Spacer flexible />
             <Button
               label="Add News"
-              disabled={true}
-              onPress={() => alert('Add News pressed')}
+              disabled={!isModerator}
+              onPress={() => router.push('/profile/NewsModeratorTest')}
             />
             <Spacer flexible />
           </Row>
