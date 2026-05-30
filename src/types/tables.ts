@@ -1,5 +1,8 @@
 import type { Database } from '@/types/database.types'
 
+export type UserRegion = Database['public']['Enums']['user_region']
+// export type UserRole = Database['public']['Enums']['user_role']
+
 export type SyncType = Database['public']['Tables']['gl_sync']['Row']
 export type VersionsType = Database['public']['Tables']['gl_versions']['Row']
 export type ProfileType = Database['public']['Tables']['gl_profiles']['Row']

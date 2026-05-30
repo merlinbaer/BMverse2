@@ -26,6 +26,8 @@ ARCHITECTURE:
     - Prefixed with "App": Project-independent/Generic UI (AppScreen, AppText, AppButton…)
     - Prefixed with "Profile": Specific to the Profile domain (ProfileStatsSection, ProfileUserSection…)
     - No prefix: Project-specific components that don't fit into a broader generic category
+    - **MANDATORY**: For "Profile" components, use `@expo/ui` (SDK 56+) components (Button, TextInput, Row, Column,
+      Text, Spacer, FieldGroup, Picker, Collapsible) instead of raw React Native components
 - src/services/ → All business logic (legend/, auth.ts, supabase.ts)
 - src/constants/ → Constants only (COLORS, LAYOUT, FONT, SYNC, AUTH)
 - src/hooks/ → Custom hooks (useAlert, useBetterSafeAreaInsets)
@@ -50,6 +52,12 @@ CONVENTIONS:
 - Styling: React Native StyleSheet only — no Tailwind, no inline style objects, no third-party style libs
 - Global/shared styles go into src/constants/ (COLORS, LAYOUT, FONT) or src/layout/
 - Screen-local styles go in a StyleSheet at the bottom of the file
+
+STYLING:
+
+- React Native StyleSheet only — no Tailwind, no inline style objects, no third-party style libs.
+- **@expo/ui Integration**: When using `@expo/ui`, prefer their built-in props (variant, textStyle, spacing) but use the
+  project's `COLORS`, `LAYOUT`, and `FONT` constants for consistency.
 
 CRITICAL RULES — AI MUST NOT VIOLATE:
 ✗ Do NOT use React Context, Redux, Zustand, or useState for global/shared state

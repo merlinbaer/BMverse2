@@ -9,13 +9,19 @@ import {
   TextInput,
   type TextInputRef,
 } from '@expo/ui'
-import { useValue } from '@legendapp/state/react'
+import { useObservable, useValue } from '@legendapp/state/react'
 import React, { useRef, useState } from 'react'
 import { Alert, Platform } from 'react-native'
 
 import { AUTH, COLORS } from '@/constants/constants'
 import { deleteAccount, signOut, startLogin, verifyOtp } from '@/services/auth'
-import { authUser$ } from '@/services/legend'
+import {
+  authUser$,
+  profileItem$,
+  profileRegionUpdate,
+  profileUsernameUpdate,
+} from '@/services/legend'
+import { UserRegion } from '@/types/tables'
 
 const REGION = [
   { label: 'Unknown', value: 'UNKN' },
@@ -32,10 +38,11 @@ const REGION = [
 
 export const ProfileUserSection = () => {
   const user = useValue(authUser$)
+  const profile = useValue(profileItem$(user?.id ?? ''))
+  const draftName$ = useObservable(profile?.user_name ?? '')
   const [openLogin, setOpenLogin] = useState(false)
   const [openLogout, setOpenLogout] = useState(false)
   const [openRegion, setOpenRegion] = useState(false)
-  const [region, setRegion] = useState('UN')
   const [emailValue, setEmailValue] = useState('')
   const emailRef = useRef<TextInputRef>(null)
   const codeRef = useRef<TextInputRef>(null)
@@ -80,6 +87,13 @@ export const ProfileUserSection = () => {
       const message =
         error instanceof Error ? error.message : 'Invalid passcode.'
       Alert.alert('Verification Failed', message)
+    }
+  }
+
+  const handleUpdateName = () => {
+    const newName = draftName$.get().trim()
+    if (user?.id && newName !== (profile?.user_name ?? '')) {
+      profileUsernameUpdate(user.id, newName)
     }
   }
 
@@ -140,7 +154,10 @@ export const ProfileUserSection = () => {
               <TextInput
                 ref={nameRef}
                 placeholder="Type here"
-                onChangeText={value => console.log(value)}
+                defaultValue={profile?.user_name ?? ''}
+                onChangeText={val => draftName$.set(val)}
+                onSubmitEditing={handleUpdateName}
+                onBlur={handleUpdateName}
               />
             </Row>
             <Collapsible
@@ -149,8 +166,13 @@ export const ProfileUserSection = () => {
               label="Your Region"
             >
               <Picker
-                selectedValue={region}
-                onValueChange={setRegion}
+                selectedValue={profile?.user_region ?? 'UNKN'}
+                onValueChange={(itemValue: UserRegion) => {
+                  if (user?.id) {
+                    profileRegionUpdate(user.id, itemValue)
+                    setOpenRegion(false)
+                  }
+                }}
                 appearance="wheel"
               >
                 {REGION.map(f => (
@@ -158,20 +180,11 @@ export const ProfileUserSection = () => {
                 ))}
               </Picker>
               {Platform.OS !== 'ios' && <Spacer size={8} />}
-              <Row>
-                <Text> </Text>
-                <Spacer flexible />
-                <Button
-                  label="Set Region"
-                  onPress={() => alert('Region pressed')}
-                />
-                <Spacer flexible />
-              </Row>
             </Collapsible>
             <Row>
               <Text>Role:</Text>
               <Spacer flexible />
-              <Text>User</Text>
+              <Text>{profile?.user_role ?? 'Unknown'}</Text>
             </Row>
           </>
         ) : (

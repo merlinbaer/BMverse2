@@ -442,9 +442,9 @@ export type Database = {
           deleted: boolean | null
           id: string
           updated_at: string
-          user_country: string | null
           user_email: string
           user_name: string | null
+          user_region: Database['public']['Enums']['user_region']
           user_role: Database['public']['Enums']['user_role']
         }
         Insert: {
@@ -452,9 +452,9 @@ export type Database = {
           deleted?: boolean | null
           id: string
           updated_at?: string
-          user_country?: string | null
           user_email: string
           user_name?: string | null
+          user_region?: Database['public']['Enums']['user_region']
           user_role?: Database['public']['Enums']['user_role']
         }
         Update: {
@@ -462,9 +462,9 @@ export type Database = {
           deleted?: boolean | null
           id?: string
           updated_at?: string
-          user_country?: string | null
           user_email?: string
           user_name?: string | null
+          user_region?: Database['public']['Enums']['user_region']
           user_role?: Database['public']['Enums']['user_role']
         }
         Relationships: []
@@ -562,6 +562,17 @@ export type Database = {
       update_last_seen: { Args: never; Returns: undefined }
     }
     Enums: {
+      user_region:
+        | 'UNKN'
+        | 'JPAN'
+        | 'NOAM'
+        | 'LATM'
+        | 'EURO'
+        | 'UKIE'
+        | 'EASI'
+        | 'SEAS'
+        | 'OCEA'
+        | 'MEAF'
       user_role: 'user' | 'admin' | 'moderator'
     }
     CompositeTypes: {
@@ -693,6 +704,18 @@ export const Constants = {
   },
   public: {
     Enums: {
+      user_region: [
+        'UNKN',
+        'JPAN',
+        'NOAM',
+        'LATM',
+        'EURO',
+        'UKIE',
+        'EASI',
+        'SEAS',
+        'OCEA',
+        'MEAF',
+      ],
       user_role: ['user', 'admin', 'moderator'],
     },
   },
