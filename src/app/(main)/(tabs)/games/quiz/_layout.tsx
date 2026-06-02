@@ -1,15 +1,13 @@
 import { Stack } from 'expo-router'
-import { Platform } from 'react-native'
 
-import { LayoutScreenHeader } from '@/layout/HeaderHelper'
+import { BackButton, LayoutScreenHeader } from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
     <Stack
-      initialRouteName="Games"
       screenOptions={{
         ...LayoutScreenHeader,
-        headerShown: Platform.OS === 'web',
+        headerLeft: () => <BackButton />,
       }}
     ></Stack>
   )

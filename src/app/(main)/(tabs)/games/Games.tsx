@@ -1,27 +1,34 @@
-import { Stack } from 'expo-router'
-import { StyleSheet, View } from 'react-native'
+import { router, Stack } from 'expo-router'
+import React from 'react'
+import { Pressable, StyleSheet, View } from 'react-native'
 
-import { AppBubbleText } from '@/components/AppBubbleText'
 import { AppScreen } from '@/components/AppScreen'
+import { SuSpeaks } from '@/components/CharacterSpeaks'
 
 export default function GamesScreen() {
+  const suMessage = 'I play a song. And you guess it. OK?'
   return (
     <AppScreen>
-      <Stack.Screen options={{ title: 'Games' }} />
+      <Stack.Screen options={{ title: 'Song Quiz' }} />
       <View style={styles.container}>
-        <AppBubbleText
-          markup={'Only in IOS and Android when logged in.'}
-          orientation={'center'}
-        />
+        <Pressable
+          onPress={() => router.push('/games/quiz/GuessIt')}
+          style={styles.characterSpeakBox}
+        >
+          <SuSpeaks markup={suMessage} imageSize={120} />
+        </Pressable>
       </View>
     </AppScreen>
   )
 }
 
 const styles = StyleSheet.create({
+  characterSpeakBox: {
+    paddingVertical: 12,
+  },
   container: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginVertical: 80,
     width: '100%',
   },
 })
