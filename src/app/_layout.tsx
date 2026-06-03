@@ -1,6 +1,5 @@
 import { syncState } from '@legendapp/state'
 import { useValue } from '@legendapp/state/react'
-import { setAudioModeAsync } from 'expo-audio'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 import { ThemeProvider } from 'expo-router/react-navigation'
@@ -9,6 +8,7 @@ import { useEffect } from 'react'
 
 import { AppTheme } from '@/constants/constants'
 import { bmFonts } from '@/layout/fonts'
+import { initAudioMode } from '@/services/audio'
 import { initAuth } from '@/services/auth'
 import { isAuthLoaded$, localStore$ } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
@@ -36,12 +36,7 @@ export default function RootLayout() {
     initAuth()
     initializeStores() // Starting warming up table stores
     startSyncCoordinator()
-
-    // Configure global audio mode [[2]](https://docs.expo.dev/versions/latest/sdk/audio)
-    void setAudioModeAsync({
-      playsInSilentMode: true,
-      shouldPlayInBackground: true,
-    })
+    initAudioMode()
   }, [])
 
   // 5. Can run several times

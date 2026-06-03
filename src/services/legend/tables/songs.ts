@@ -100,3 +100,24 @@ export const songsCount$ = computed(() => {
   if (!data) return 0
   return Object.values(data).filter(item => item && !item.deleted).length
 })
+
+export const getRandomSongPreview = (): {
+  song_preview: string | null
+  song_preview_uri: string
+} | null => {
+  const data = songs$.peek()
+  if (!data) return null
+
+  const validSongs = Object.values(data).filter(
+    item => item && !item.deleted && !!item.song_preview_uri,
+  )
+
+  if (validSongs.length === 0) return null
+
+  const randomSong = validSongs[Math.floor(Math.random() * validSongs.length)]
+
+  return {
+    song_preview: randomSong.song_preview,
+    song_preview_uri: randomSong.song_preview_uri!,
+  }
+}

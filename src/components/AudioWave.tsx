@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
-import { View } from 'react-native'
+import { DimensionValue, View } from 'react-native'
 import Animated, {
+  interpolate,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -9,6 +10,11 @@ import Animated, {
 } from 'react-native-reanimated'
 
 import { COLORS } from '@/constants/constants'
+
+interface AudioWaveVisualizerProps {
+  width?: DimensionValue
+  height?: DimensionValue
+}
 
 const BARS = [
   { values: [30, 100, 45, 120, 30], duration: 3200 },
@@ -31,33 +37,37 @@ const BARS = [
 function VisualizerBar({
   values,
   duration,
+  containerHeight,
 }: {
   values: number[]
   duration: number
+  containerHeight: number
 }) {
-  const height = useSharedValue(values[0])
+  const progress = useSharedValue(values[0])
 
   useEffect(() => {
     const segment = duration / (values.length - 1)
 
-    height.value = withRepeat(
+    progress.value = withRepeat(
       withSequence(
         ...values.slice(1).map(v => withTiming(v, { duration: segment })),
       ),
       -1,
       false,
     )
-  }, [])
+  }, [duration, progress, values])
 
   const animatedStyle = useAnimatedStyle(() => ({
-    height: height.value,
+    // Scale the 0-160 range of BARS to the actual container height
+    height: interpolate(progress.value, [0, 160], [0, containerHeight]),
   }))
 
   return (
     <Animated.View
       style={[
         {
-          width: 12,
+          flex: 1, // Let bars scale width based on container
+          maxWidth: 12,
           borderRadius: 2,
           backgroundColor: COLORS.PRIMARY,
         },
@@ -67,22 +77,27 @@ function VisualizerBar({
   )
 }
 
-export default function AudioWaveVisualizer() {
+export default function AudioWaveVisualizer({
+  width = 320,
+  height = 200,
+}: AudioWaveVisualizerProps) {
+  const numericHeight = typeof height === 'number' ? height : 200
   return (
     <View
       style={{
-        width: 320,
-        height: 200,
-        justifyContent: 'center',
-        alignItems: 'center',
+        width,
+        height,
+        justifyContent: 'flex-end',
+        alignItems: 'flex-start', // Changed from center to left aligned
       }}
     >
       <View
         style={{
-          height: 160,
+          width: '100%',
+          height: '100%',
           flexDirection: 'row',
           alignItems: 'flex-end',
-          gap: 8,
+          gap: 4,
         }}
       >
         {BARS.map((bar, index) => (
@@ -90,6 +105,7 @@ export default function AudioWaveVisualizer() {
             key={index}
             values={bar.values}
             duration={bar.duration}
+            containerHeight={numericHeight}
           />
         ))}
       </View>

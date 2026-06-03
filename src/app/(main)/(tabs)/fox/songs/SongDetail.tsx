@@ -14,11 +14,11 @@ import { MoaSpeaks, MomoSpeaks, SuSpeaks } from '@/components/CharacterSpeaks'
 import { SongLyrics } from '@/components/SongLyrics'
 import { COLORS, FONT } from '@/constants/constants'
 import {
+  activePreviewSong$,
   songItem$,
   songPerformanceStats$,
   videosBySong$,
 } from '@/services/legend'
-import { activePreviewSong$ } from '@/types/player'
 
 export default function SongDetailScreen() {
   const { id } = useLocalSearchParams<{
