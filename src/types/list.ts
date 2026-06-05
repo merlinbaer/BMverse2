@@ -15,4 +15,6 @@ export type ListItemType = {
   line2: string
   icon: string | number // for uri and assets
   route: Href | null
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  value?: any
 }

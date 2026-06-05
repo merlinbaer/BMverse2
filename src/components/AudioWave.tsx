@@ -67,7 +67,7 @@ function VisualizerBar({
       style={[
         {
           flex: 1, // Let bars scale width based on container
-          maxWidth: 12,
+          maxWidth: 30,
           borderRadius: 2,
           backgroundColor: COLORS.PRIMARY,
         },

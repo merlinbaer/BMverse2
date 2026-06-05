@@ -13,24 +13,47 @@ import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import { ListItemType } from '@/types/list'
 
+export type FlatListAction =
+  | { type: 'push-route' }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  | { type: 'set-observable-back'; observable: { set: (val: any) => void } }
+  | { type: 'none' }
+
 interface AppFlatListProps extends Partial<FlatListProps<ListItemType>> {
   data: ListItemType[]
   displayIconAsText?: boolean
+  pressAction?: FlatListAction
 }
 
 function Item({
   item,
   displayIconAsText,
+  pressAction,
 }: {
   item: ListItemType
   displayIconAsText?: boolean
+  pressAction?: FlatListAction
 }) {
   const router = useRouter()
-  const isPressable = !!item.route
+
+  const isPressable =
+    pressAction?.type === 'set-observable-back' ||
+    (pressAction?.type === 'push-route' && !!item.route) ||
+    (!pressAction && !!item.route)
+
+  const handlePress = () => {
+    if (pressAction?.type === 'set-observable-back') {
+      const dataToSet = item.value !== undefined ? item.value : item.line2
+      pressAction.observable.set(dataToSet)
+      router.back()
+    } else if (item.route) {
+      router.push(item.route)
+    }
+  }
 
   return (
     <Pressable
-      onPress={() => item.route && router.push(item.route)}
+      onPress={isPressable ? handlePress : undefined}
       unstable_pressDelay={100}
       style={({ pressed }) => [
         styles.pressable,
@@ -71,6 +94,7 @@ function Item({
 export function AppFlatList({
   data,
   displayIconAsText = false,
+  pressAction,
   ...props
 }: AppFlatListProps) {
   const renderSeparator = (key: string) => (
@@ -86,7 +110,11 @@ export function AppFlatList({
       <View style={styles.flatList}>
         {data.map((item, index) => (
           <React.Fragment key={item.id}>
-            <Item item={item} displayIconAsText={displayIconAsText} />
+            <Item
+              item={item}
+              displayIconAsText={displayIconAsText}
+              pressAction={pressAction}
+            />
             {index < data.length - 1 && renderSeparator(`sep-${item.id}`)}
           </React.Fragment>
         ))}
@@ -103,7 +131,11 @@ export function AppFlatList({
       keyExtractor={(item: ListItemType) => item.id}
       ItemSeparatorComponent={renderSeparatorComponent}
       renderItem={({ item }: { item: ListItemType }) => (
-        <Item item={item} displayIconAsText={displayIconAsText} />
+        <Item
+          item={item}
+          displayIconAsText={displayIconAsText}
+          pressAction={pressAction}
+        />
       )}
       automaticallyAdjustsScrollIndicatorInsets
       contentInsetAdjustmentBehavior="automatic"

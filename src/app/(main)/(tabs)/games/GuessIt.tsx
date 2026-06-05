@@ -1,48 +1,46 @@
-import { router } from 'expo-router'
+import { useObservable } from '@legendapp/state/react'
 import React, { useEffect } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 
-import { AppButton } from '@/components/AppButton'
+import { AppFlatList } from '@/components/AppFlatList'
 import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppScreen } from '@/components/AppScreen'
+import { AppText } from '@/components/AppText'
 import AudioWaveVisualizer from '@/components/AudioWave'
 import { MomoSpeaks } from '@/components/CharacterSpeaks'
 import { COLORS, FONT } from '@/constants/constants'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
 import {
   activePreviewSong$,
-  getRandomSongPreview,
+  getRandomSongPreviews,
   songQuiz$,
 } from '@/services/legend'
+import { ListItemType } from '@/types/list'
+import { PreviewSong } from '@/types/player'
 
 export default function GuessItScreen() {
   const { isPlaying, previewSong } = usePreviewPlayer()
+  const isp = true
 
-  // Initialize a random song on mount
+  // We use the property access game$.winner or game$.options later.
+  const game$ = useObservable<{
+    winner: PreviewSong
+    options: ListItemType[]
+  } | null>(() => getRandomSongPreviews())
+
+  // 2. Synchronize the global audio state with the generated winner
   useEffect(() => {
-    const song = getRandomSongPreview()
-    if (song) {
+    const winner = game$.winner.peek() // Use peek() for one-time initialization
+    if (winner) {
       activePreviewSong$.set({
-        song_preview: song.song_preview,
-        song_preview_uri: song.song_preview_uri,
-        song_title: 'Unknown Song', // Hide title during game
-        song_artist: 'Unknown Artist', // Hide artist during game
-        song_preview_artwork: null, // Hide artwork during game
+        ...winner,
+        song_title: '???',
+        song_artist: '???',
+        song_preview_artwork: null,
       })
     }
-    // Clear on unmount so audio stops when leaving
     return () => activePreviewSong$.set(null)
-  }, [])
-
-  const handleLoose = () => {
-    songQuiz$.set('LOOSE')
-    router.back()
-  }
-
-  const handleWin = () => {
-    songQuiz$.set('WIN')
-    router.back()
-  }
+  }, [game$.winner])
 
   const momoMessage = isPlaying
     ? 'Listen carefully... do you know this one?'
@@ -50,30 +48,52 @@ export default function GuessItScreen() {
 
   return (
     <AppScreen>
-      <View style={styles.container}>
-        <MomoSpeaks markup={momoMessage} imageSize={80} />
-        {isPlaying && (
-          <>
-            <View style={styles.visualizerContainer}>
-              <AudioWaveVisualizer width={240} height={140} />
+      {isp && (
+        <>
+          <View style={styles.container}>
+            <MomoSpeaks markup={momoMessage} imageSize={80} />
+            <View style={styles.visualizerRow}>
+              {/* Left Column: Visualizer + Link */}
+              <View style={styles.visualizerColumn}>
+                <AudioWaveVisualizer width={250} height={100} />
+                <View style={styles.hyperlinkWrapper}>
+                  <AppHyperlink
+                    description={'provided courtesy of iTunes'}
+                    hyperlink={
+                      previewSong?.song_preview_uri ??
+                      'https://www.apple.com/itunes/'
+                    }
+                    type={'extern'}
+                    size={FONT.SIZE.XS}
+                    color={COLORS.SECONDARY}
+                  />
+                </View>
+              </View>
+
+              {/* Right Column: Mystery Text */}
+              <AppText fontSize={FONT.SIZE.LG} style={styles.mysteryText}>
+                {'XXX'}
+              </AppText>
             </View>
-            <AppHyperlink
-              description={'provided courtesy of iTunes'}
-              hyperlink={
-                previewSong?.song_preview_uri ?? 'https://www.apple.com/itunes/'
-              }
-              type={'extern'}
-              size={FONT.SIZE.XS}
-              color={COLORS.SECONDARY}
-            />
-          </>
-        )}
-        <AppButton
-          title={'Leave & Loose'}
-          onPress={() => handleLoose()}
-        ></AppButton>
-        <AppButton title={'You Won'} onPress={() => handleWin()}></AppButton>
-      </View>
+          </View>
+          <View style={styles.listHeaderContainer}>
+            <AppText
+              fontSize={FONT.SIZE.LG}
+              style={{ color: COLORS.PRIMARY, fontWeight: '800' }}
+            >
+              {'Select a Song:'}
+            </AppText>
+          </View>
+          <AppFlatList
+            data={game$.options.get() ?? []} // Correct property access
+            displayIconAsText={true}
+            pressAction={{
+              type: 'set-observable-back',
+              observable: songQuiz$,
+            }}
+          />
+        </>
+      )}
     </AppScreen>
   )
 }
@@ -81,12 +101,36 @@ export default function GuessItScreen() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginTop: Platform.select({
+      ios: -50,
+      android: 50,
+      default: 40,
+    }),
     width: '100%',
   },
-  visualizerContainer: {
-    marginBottom: 4,
+  hyperlinkWrapper: {
+    alignItems: 'center',
+    marginTop: 8,
+    width: 200, // Match visualizer width to ensure true center
+  },
+  listHeaderContainer: {
     marginTop: 16,
+  },
+  mysteryText: {
+    color: COLORS.PRIMARY,
+    fontWeight: 'bold',
+    paddingBottom: 16,
+  },
+  visualizerColumn: {
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+  visualizerRow: {
+    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 24,
     paddingHorizontal: 12,
+    width: '100%',
   },
 })

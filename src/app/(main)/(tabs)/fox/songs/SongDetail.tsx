@@ -43,7 +43,7 @@ export default function SongDetailScreen() {
       song_preview_artwork: detail?.song_preview_artwork ?? null,
       song_preview_uri: detail?.song_preview_uri ?? null,
     })
-    router.push('/Player')
+    router.push('/PreviewPlayer')
   }
 
   if (!id || !detail)

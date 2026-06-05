@@ -9,6 +9,7 @@ import coverMETALRESISTANCE from '@/../assets/images/Resistance_Splatter_200.png
 import coverSINGLE from '@/../assets/images/Single_200.png'
 import coverNotFound from '@/../assets/images/unknown_track.png'
 import { ListItemType, SongListType } from '@/types/list'
+import { PreviewSong } from '@/types/player'
 import { SongType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
@@ -101,23 +102,50 @@ export const songsCount$ = computed(() => {
   return Object.values(data).filter(item => item && !item.deleted).length
 })
 
-export const getRandomSongPreview = (): {
-  song_preview: string | null
-  song_preview_uri: string
+export const getRandomSongPreviews = (): {
+  winner: PreviewSong
+  options: ListItemType[]
 } | null => {
   const data = songs$.peek()
   if (!data) return null
 
   const validSongs = Object.values(data).filter(
-    item => item && !item.deleted && !!item.song_preview_uri,
+    (item): item is SongType => !!item && !item.deleted && !!item.song_preview,
   )
 
-  if (validSongs.length === 0) return null
+  if (validSongs.length < 5) return null
 
-  const randomSong = validSongs[Math.floor(Math.random() * validSongs.length)]
+  // 1. Pick Winner
+  const winnerIndex = Math.floor(Math.random() * validSongs.length)
+  const winnerItem = validSongs[winnerIndex]
 
-  return {
-    song_preview: randomSong.song_preview,
-    song_preview_uri: randomSong.song_preview_uri!,
+  const winner: PreviewSong = {
+    song_preview: winnerItem.song_preview,
+    song_title: winnerItem.song_title,
+    song_artist: winnerItem.song_artist,
+    song_preview_artwork: winnerItem.song_preview_artwork,
+    song_preview_uri: winnerItem.song_preview_uri,
   }
+
+  // 2. Pick 4 unique distractors
+  const pool = validSongs.filter(s => s.id !== winnerItem.id)
+  const shuffledPool = [...pool].sort(() => 0.5 - Math.random())
+  const distractors = shuffledPool.slice(0, 4)
+
+  // 3. Combine and Shuffle
+  const optionsRaw = [winnerItem, ...distractors].sort(
+    () => 0.5 - Math.random(),
+  )
+
+  // 4. Map to ListItemType
+  const options: ListItemType[] = optionsRaw.map((item, index) => ({
+    id: item.id,
+    line1: item.song_title,
+    line2: item.song_artist,
+    value: item.id === winnerItem.id ? 'WIN' : 'LOOSE',
+    icon: (index + 1).toString(),
+    route: null,
+  }))
+
+  return { winner, options }
 }

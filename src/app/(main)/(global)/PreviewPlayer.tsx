@@ -9,7 +9,7 @@ import { COLORS, FONT } from '@/constants/constants'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
 import { formatAudioTime } from '@/services/dateTimeHelper'
 
-export default function PlayerScreen() {
+export default function PreviewPlayerScreen() {
   return (
     <AppModalScreen>
       {dismiss => <PlayerContent dismiss={dismiss} />}

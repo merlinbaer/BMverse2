@@ -30,7 +30,7 @@ export default function GlobalLayout() {
         }}
       />
       <Stack.Screen
-        name="Player"
+        name="PreviewPlayer"
         options={{
           headerShown: false,
           presentation: 'transparentModal',
