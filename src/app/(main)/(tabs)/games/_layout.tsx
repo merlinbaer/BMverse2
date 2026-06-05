@@ -1,5 +1,4 @@
 import { Stack } from 'expo-router'
-import { Platform } from 'react-native'
 
 import { LayoutScreenHeader } from '@/layout/HeaderHelper'
 
@@ -9,7 +8,7 @@ export default function Layout() {
       initialRouteName="Games"
       screenOptions={{
         ...LayoutScreenHeader,
-        headerShown: Platform.OS === 'web',
+        headerShown: false,
       }}
     ></Stack>
   )

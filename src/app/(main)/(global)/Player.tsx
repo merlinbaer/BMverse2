@@ -79,12 +79,11 @@ function PlayerContent({ dismiss }: { dismiss: () => void }) {
           </View>
 
           <View style={styles.controlsRow}>
-            <Pressable onPress={() => skipBackward()} style={styles.skipButton}>
-              <MaterialIcons
-                name="skip-previous"
-                size={32}
-                color={COLORS.TEXT}
-              />
+            <Pressable
+              onPress={() => skipBackward(5)}
+              style={styles.skipButton}
+            >
+              <MaterialIcons name="replay-5" size={32} color={COLORS.TEXT} />
             </Pressable>
 
             <Pressable onPress={handlePlayPause} style={styles.playButton}>
@@ -95,8 +94,8 @@ function PlayerContent({ dismiss }: { dismiss: () => void }) {
               />
             </Pressable>
 
-            <Pressable onPress={() => skipForward()} style={styles.skipButton}>
-              <MaterialIcons name="skip-next" size={32} color={COLORS.TEXT} />
+            <Pressable onPress={() => skipForward(5)} style={styles.skipButton}>
+              <MaterialIcons name="forward-5" size={32} color={COLORS.TEXT} />
             </Pressable>
           </View>
         </View>

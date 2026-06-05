@@ -49,15 +49,15 @@ export const usePreviewPlayer = (onFinished?: () => void) => {
     }
   }
 
-  const skipBackward = (ms = 5000) => {
-    const newPos = Math.max(0, (status?.currentTime ?? 0) - ms)
+  const skipBackward = (sec = 5) => {
+    const newPos = Math.max(0, (status?.currentTime ?? 0) - sec)
     void player.seekTo(newPos)
   }
 
-  const skipForward = (ms = 5000) => {
+  const skipForward = (sec = 5) => {
     const newPos = Math.min(
       status?.duration ?? 0,
-      (status?.currentTime ?? 0) + ms,
+      (status?.currentTime ?? 0) + sec,
     )
     void player.seekTo(newPos)
   }
