@@ -1,7 +1,9 @@
 import { useObservable } from '@legendapp/state/react'
+import { router } from 'expo-router'
 import React, { useEffect } from 'react'
 import { Platform, StyleSheet, View } from 'react-native'
 
+import { AppButton } from '@/components/AppButton'
 import { AppFlatList } from '@/components/AppFlatList'
 import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppScreen } from '@/components/AppScreen'
@@ -22,7 +24,11 @@ import { PreviewSong } from '@/types/player'
 const bottomWave = 120
 
 export default function GuessItScreen() {
-  const { isPlaying, previewSong, currentTime, duration } = usePreviewPlayer()
+  const { isPlaying, previewSong, currentTime, duration } = usePreviewPlayer(
+    () => {
+      router.back()
+    },
+  )
 
   // game$ consists game$.winner and game$.options
   const game$ = useObservable<{
@@ -46,7 +52,7 @@ export default function GuessItScreen() {
 
   const momoMessage = isPlaying
     ? 'Listen carefully... do you know this one?'
-    : 'Please select the right song.'
+    : 'One moment...'
 
   return (
     <AppScreen>
@@ -94,6 +100,9 @@ export default function GuessItScreen() {
           observable: songQuiz$,
         }}
       />
+      <View style={styles.giveUpContainer}>
+        <AppButton title="Give Up" onPress={() => router.back()} />
+      </View>
     </AppScreen>
   )
 }
@@ -106,6 +115,11 @@ const styles = StyleSheet.create({
       android: 50,
       default: 40,
     }),
+    width: '100%',
+  },
+  giveUpContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
     width: '100%',
   },
   hyperlinkWrapper: {

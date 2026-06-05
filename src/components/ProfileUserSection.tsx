@@ -157,6 +157,7 @@ export const ProfileUserSection = () => {
             <Row spacing={8}>
               <Text>Nickname:</Text>
               <TextInput
+                key={profile?.user_name ?? 'empty'}
                 ref={nameRef}
                 placeholder="Type here"
                 defaultValue={profile?.user_name ?? ''}

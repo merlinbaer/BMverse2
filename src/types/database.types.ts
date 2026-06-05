@@ -446,6 +446,7 @@ export type Database = {
           user_name: string | null
           user_region: Database['public']['Enums']['user_region']
           user_role: Database['public']['Enums']['user_role']
+          user_store: string
         }
         Insert: {
           created_at?: string
@@ -456,6 +457,7 @@ export type Database = {
           user_name?: string | null
           user_region?: Database['public']['Enums']['user_region']
           user_role?: Database['public']['Enums']['user_role']
+          user_store?: string
         }
         Update: {
           created_at?: string
@@ -466,6 +468,7 @@ export type Database = {
           user_name?: string | null
           user_region?: Database['public']['Enums']['user_region']
           user_role?: Database['public']['Enums']['user_role']
+          user_store?: string
         }
         Relationships: []
       }

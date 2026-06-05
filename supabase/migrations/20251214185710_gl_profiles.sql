@@ -29,7 +29,8 @@ CREATE TABLE
     user_email  text                     not null,
     user_role   public.user_role         not null default 'user',
     user_name   text                     null,
-    user_region public.user_region       not null default 'UNKN'
+    user_region public.user_region       not null default 'UNKN',
+    user_store  text                     not null default ' '
 ) tablespace pg_default;
 
 GRANT SELECT ON public.gl_profiles TO anon;

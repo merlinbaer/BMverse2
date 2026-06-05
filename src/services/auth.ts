@@ -194,7 +194,11 @@ export const forceLogout = async () => {
       try {
         await Updates.reloadAsync()
       } catch (e) {
-        console.error('Auth: Updates.reloadAsync failed', e)
+        if (e) {
+          console.log('Auth: Updates.reloadAsync failed')
+        } else {
+          console.log('Auth: Updates.reloadAsync failed. No error message.')
+        }
       }
     } else {
       // Android
