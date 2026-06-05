@@ -8,6 +8,7 @@ import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import AudioWaveVisualizer from '@/components/AudioWave'
 import { MomoSpeaks } from '@/components/CharacterSpeaks'
+import { SongTimerCircle } from '@/components/SongTimerCircle'
 import { COLORS, FONT } from '@/constants/constants'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
 import {
@@ -18,11 +19,12 @@ import {
 import { ListItemType } from '@/types/list'
 import { PreviewSong } from '@/types/player'
 
-export default function GuessItScreen() {
-  const { isPlaying, previewSong } = usePreviewPlayer()
-  const isp = true
+const bottomWave = 120
 
-  // We use the property access game$.winner or game$.options later.
+export default function GuessItScreen() {
+  const { isPlaying, previewSong, currentTime, duration } = usePreviewPlayer()
+
+  // game$ consists game$.winner and game$.options
   const game$ = useObservable<{
     winner: PreviewSong
     options: ListItemType[]
@@ -30,7 +32,7 @@ export default function GuessItScreen() {
 
   // 2. Synchronize the global audio state with the generated winner
   useEffect(() => {
-    const winner = game$.winner.peek() // Use peek() for one-time initialization
+    const winner = game$.winner.peek()
     if (winner) {
       activePreviewSong$.set({
         ...winner,
@@ -48,52 +50,50 @@ export default function GuessItScreen() {
 
   return (
     <AppScreen>
-      {isp && (
-        <>
-          <View style={styles.container}>
-            <MomoSpeaks markup={momoMessage} imageSize={80} />
-            <View style={styles.visualizerRow}>
-              {/* Left Column: Visualizer + Link */}
-              <View style={styles.visualizerColumn}>
-                <AudioWaveVisualizer width={250} height={100} />
-                <View style={styles.hyperlinkWrapper}>
-                  <AppHyperlink
-                    description={'provided courtesy of iTunes'}
-                    hyperlink={
-                      previewSong?.song_preview_uri ??
-                      'https://www.apple.com/itunes/'
-                    }
-                    type={'extern'}
-                    size={FONT.SIZE.XS}
-                    color={COLORS.SECONDARY}
-                  />
-                </View>
-              </View>
-
-              {/* Right Column: Mystery Text */}
-              <AppText fontSize={FONT.SIZE.LG} style={styles.mysteryText}>
-                {'XXX'}
-              </AppText>
+      <View style={styles.container}>
+        <MomoSpeaks markup={momoMessage} imageSize={80} />
+        <View style={styles.visualizerRow}>
+          {/* Left Column: Visualizer + Link */}
+          <View style={styles.visualizerColumn}>
+            <AudioWaveVisualizer width={240} height={bottomWave} />
+            <View style={styles.hyperlinkWrapper}>
+              <AppHyperlink
+                description={'provided courtesy of iTunes'}
+                hyperlink={
+                  previewSong?.song_preview_uri ??
+                  'https://www.apple.com/itunes/'
+                }
+                type={'extern'}
+                size={FONT.SIZE.XS}
+                color={COLORS.SECONDARY}
+              />
             </View>
           </View>
-          <View style={styles.listHeaderContainer}>
-            <AppText
-              fontSize={FONT.SIZE.LG}
-              style={{ color: COLORS.PRIMARY, fontWeight: '800' }}
-            >
-              {'Select a Song:'}
-            </AppText>
+          <View style={styles.timerContainer}>
+            <SongTimerCircle
+              size={60}
+              currentTime={currentTime}
+              duration={duration || 30}
+            />
           </View>
-          <AppFlatList
-            data={game$.options.get() ?? []} // Correct property access
-            displayIconAsText={true}
-            pressAction={{
-              type: 'set-observable-back',
-              observable: songQuiz$,
-            }}
-          />
-        </>
-      )}
+        </View>
+      </View>
+      <View style={styles.listHeaderContainer}>
+        <AppText
+          fontSize={FONT.SIZE.LG}
+          style={{ color: COLORS.PRIMARY, fontWeight: '800' }}
+        >
+          {'Select a Song:'}
+        </AppText>
+      </View>
+      <AppFlatList
+        data={game$.options.get() ?? []}
+        displayIconAsText={true}
+        pressAction={{
+          type: 'set-observable-back',
+          observable: songQuiz$,
+        }}
+      />
     </AppScreen>
   )
 }
@@ -111,26 +111,26 @@ const styles = StyleSheet.create({
   hyperlinkWrapper: {
     alignItems: 'center',
     marginTop: 8,
-    width: 200, // Match visualizer width to ensure true center
+    width: '100%',
   },
   listHeaderContainer: {
-    marginTop: 16,
+    marginTop: 20,
   },
-  mysteryText: {
-    color: COLORS.PRIMARY,
-    fontWeight: 'bold',
-    paddingBottom: 16,
+  timerContainer: {
+    height: bottomWave,
+    justifyContent: 'flex-end',
   },
   visualizerColumn: {
     alignItems: 'center',
     flexDirection: 'column',
+    flex: 1,
   },
   visualizerRow: {
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     marginTop: 24,
-    paddingHorizontal: 12,
+    paddingLeft: 0,
+    paddingRight: 12,
     width: '100%',
   },
 })
