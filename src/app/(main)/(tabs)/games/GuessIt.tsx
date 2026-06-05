@@ -52,7 +52,7 @@ export default function GuessItScreen() {
 
   const momoMessage = isPlaying
     ? 'Listen carefully... do you know this one?'
-    : 'One moment...'
+    : 'Ah...'
 
   return (
     <AppScreen>

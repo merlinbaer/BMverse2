@@ -1,11 +1,12 @@
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet, View } from 'react-native'
 
-import { AppBubbleText } from '@/components/AppBubbleText'
-import { AppButton } from '@/components/AppButton'
+import { MoaSpeaks } from '@/components/CharacterSpeaks'
 import { activePreviewSong$, songQuiz$ } from '@/services/legend'
 
 export const SongQuizLoose = () => {
+  const moaSpeaks = "Oh no. That's wrong.\nTry again"
+
   const handleReset = () => {
     activePreviewSong$.set(null) // Ensure player is wiped
     songQuiz$.set('NEW')
@@ -13,13 +14,17 @@ export const SongQuizLoose = () => {
 
   return (
     <View style={styles.container}>
-      <AppBubbleText markup={'You loose'} orientation={'center'} />
-      <AppButton title={'New Game'} onPress={() => handleReset()}></AppButton>
+      <Pressable onPress={() => handleReset()} style={styles.characterSpeakBox}>
+        <MoaSpeaks markup={moaSpeaks} imageSize={120} />
+      </Pressable>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  characterSpeakBox: {
+    paddingVertical: 12,
+  },
   container: {
     alignItems: 'center',
     gap: 20,
