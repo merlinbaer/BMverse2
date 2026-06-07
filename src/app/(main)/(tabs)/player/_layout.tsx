@@ -1,11 +1,23 @@
 import { Stack } from 'expo-router'
+import React from 'react'
 
-import { LayoutScreenHeader } from '@/layout/HeaderHelper'
+import { BackButton, LayoutScreenHeader } from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
-    <Stack initialRouteName="Player">
-      <Stack.Screen name="Player" options={{ ...LayoutScreenHeader }} />
+    <Stack
+      screenOptions={{
+        ...LayoutScreenHeader,
+        headerLeft: () => <BackButton />,
+      }}
+    >
+      <Stack.Screen
+        name="Player"
+        options={{
+          ...LayoutScreenHeader,
+          headerLeft: undefined,
+        }}
+      />
     </Stack>
   )
 }

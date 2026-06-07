@@ -1,11 +1,10 @@
 import { Href, Stack } from 'expo-router'
 import React from 'react'
-import { Platform, StyleSheet, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { StyleSheet, View } from 'react-native'
 
 import { AppButtonGrid, GridButtonConfig } from '@/components/AppButtonGrid'
+import { AppScreen } from '@/components/AppScreen'
 import { MomoSpeaks } from '@/components/CharacterSpeaks'
-import { COLORS, LAYOUT } from '@/constants/constants'
 
 export default function ConcertSelectionScreen() {
   const momoMessage = 'Show concerts by'
@@ -42,39 +41,20 @@ export default function ConcertSelectionScreen() {
   ]
 
   return (
-    <KeyboardAwareScrollView
-      style={styles.keyboardAwareScrollView}
-      contentContainerStyle={styles.keyboardAwareContentContainer}
-      keyboardShouldPersistTaps="handled"
-      enableOnAndroid={true}
-      extraScrollHeight={100}
-    >
+    <AppScreen>
       <Stack.Screen options={{ title: 'Concert Selection' }} />
       <View style={styles.container}>
         <MomoSpeaks markup={momoMessage} />
-
         <AppButtonGrid buttonConfigs={buttonConfigs} />
       </View>
-    </KeyboardAwareScrollView>
+    </AppScreen>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
     alignItems: 'flex-start',
+    marginTop: 16,
     width: '100%',
-  },
-  keyboardAwareContentContainer: {
-    paddingBottom: 80,
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingTop: Platform.select({
-      ios: 170,
-      android: 20,
-      default: 10,
-    }),
-  },
-  keyboardAwareScrollView: {
-    backgroundColor: COLORS.BACKGROUND,
-    flex: 1,
   },
 })
