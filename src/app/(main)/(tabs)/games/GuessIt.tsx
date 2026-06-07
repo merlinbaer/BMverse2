@@ -8,8 +8,8 @@ import { AppFlatList } from '@/components/AppFlatList'
 import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
-import AudioWaveVisualizer from '@/components/AudioWave'
 import { MomoSpeaks } from '@/components/CharacterSpeaks'
+import SongAudioWave from '@/components/SongAudioWave'
 import { SongTimerCircle } from '@/components/SongTimerCircle'
 import { COLORS, FONT } from '@/constants/constants'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
@@ -61,7 +61,7 @@ export default function GuessItScreen() {
         <View style={styles.visualizerRow}>
           {/* Left Column: Visualizer + Link */}
           <View style={styles.visualizerColumn}>
-            <AudioWaveVisualizer width={240} height={bottomWave} />
+            <SongAudioWave width={240} height={bottomWave} />
             <View style={styles.hyperlinkWrapper}>
               <AppHyperlink
                 description={'provided courtesy of iTunes'}

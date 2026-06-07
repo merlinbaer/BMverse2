@@ -34,7 +34,7 @@ const BARS = [
   { values: [60, 140, 100, 130, 60], duration: 2900 },
 ]
 
-function VisualizerBar({
+function AudioWave({
   values,
   duration,
   containerHeight,
@@ -77,7 +77,7 @@ function VisualizerBar({
   )
 }
 
-export default function AudioWaveVisualizer({
+export default function SongAudioWave({
   width = 320,
   height = 200,
 }: AudioWaveVisualizerProps) {
@@ -101,7 +101,7 @@ export default function AudioWaveVisualizer({
         }}
       >
         {BARS.map((bar, index) => (
-          <VisualizerBar
+          <AudioWave
             key={index}
             values={bar.values}
             duration={bar.duration}
