@@ -10,6 +10,7 @@ import { AppTheme } from '@/constants/constants'
 import { bmFonts } from '@/layout/fonts'
 import { initAudioMode } from '@/services/audio'
 import { initAuth } from '@/services/auth'
+import { initPlayerStats } from '@/services/games'
 import { isAuthLoaded$, localStore$ } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
 
@@ -37,6 +38,7 @@ export default function RootLayout() {
     initializeStores() // Starting warming up table stores
     startSyncCoordinator()
     initAudioMode()
+    initPlayerStats()
   }, [])
 
   // 5. Can run several times

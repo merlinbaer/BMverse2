@@ -23,26 +23,32 @@ interface AppFlatListProps extends Partial<FlatListProps<ListItemType>> {
   data: ListItemType[]
   displayIconAsText?: boolean
   pressAction?: FlatListAction
+  onPressItem?: (item: ListItemType) => void
 }
 
 function Item({
   item,
   displayIconAsText,
   pressAction,
+  onPressItem,
 }: {
   item: ListItemType
   displayIconAsText?: boolean
   pressAction?: FlatListAction
+  onPressItem?: (item: ListItemType) => void
 }) {
   const router = useRouter()
 
   const isPressable =
+    !!onPressItem ||
     pressAction?.type === 'set-observable-back' ||
     (pressAction?.type === 'push-route' && !!item.route) ||
     (!pressAction && !!item.route)
 
   const handlePress = () => {
-    if (pressAction?.type === 'set-observable-back') {
+    if (onPressItem) {
+      onPressItem(item)
+    } else if (pressAction?.type === 'set-observable-back') {
       const dataToSet = item.value !== undefined ? item.value : item.line2
       pressAction.observable.set(dataToSet)
       router.back()
@@ -95,6 +101,7 @@ export function AppFlatList({
   data,
   displayIconAsText = false,
   pressAction,
+  onPressItem,
   ...props
 }: AppFlatListProps) {
   const renderSeparator = (key: string) => (
@@ -114,6 +121,7 @@ export function AppFlatList({
               item={item}
               displayIconAsText={displayIconAsText}
               pressAction={pressAction}
+              onPressItem={onPressItem}
             />
             {index < data.length - 1 && renderSeparator(`sep-${item.id}`)}
           </React.Fragment>
@@ -135,6 +143,7 @@ export function AppFlatList({
           item={item}
           displayIconAsText={displayIconAsText}
           pressAction={pressAction}
+          onPressItem={onPressItem}
         />
       )}
       automaticallyAdjustsScrollIndicatorInsets

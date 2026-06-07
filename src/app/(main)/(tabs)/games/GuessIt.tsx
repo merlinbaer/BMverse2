@@ -13,6 +13,7 @@ import SongAudioWave from '@/components/SongAudioWave'
 import { SongTimerCircle } from '@/components/SongTimerCircle'
 import { COLORS, FONT } from '@/constants/constants'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
+import { processLooseGame, processWinGame } from '@/services/games'
 import {
   activePreviewSong$,
   getRandomSongPreviews,
@@ -26,17 +27,27 @@ const bottomWave = 120
 export default function GuessItScreen() {
   const { isPlaying, previewSong, currentTime, duration } = usePreviewPlayer(
     () => {
+      songQuiz$.set('TIMEOUT')
+      processLooseGame('TIMEOUT')
       router.back()
     },
   )
+  // Handle accidental exits (back button, swipe, etc.)
+  useEffect(() => {
+    return () => {
+      if (songQuiz$.peek() === 'GIVEUP') {
+        processLooseGame('GIVEUP')
+      }
+    }
+  }, [])
 
-  // game$ consists game$.winner and game$.options
+  // game$ consists of game$.winner and game$.options
   const game$ = useObservable<{
     winner: PreviewSong
     options: ListItemType[]
   } | null>(() => getRandomSongPreviews())
 
-  // 2. Synchronize the global audio state with the generated winner
+  // Synchronize the global audio state with the generated winner
   useEffect(() => {
     const winner = game$.winner.peek()
     if (winner) {
@@ -96,8 +107,17 @@ export default function GuessItScreen() {
         data={game$.options.get() ?? []}
         displayIconAsText={true}
         pressAction={{
-          type: 'set-observable-back',
-          observable: songQuiz$,
+          type: 'none',
+        }}
+        onPressItem={item => {
+          const outcome = item.value === 'WIN' ? 'WIN' : 'LOOSE'
+          songQuiz$.set(outcome)
+          if (outcome === 'WIN') {
+            processWinGame()
+          } else {
+            processLooseGame('LOOSE')
+          }
+          router.back()
         }}
       />
       <View style={styles.giveUpContainer}>

@@ -1,11 +1,16 @@
+import { useValue } from '@legendapp/state/react'
 import React from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
+import { AppBox } from '@/components/AppBox'
+import { AppButton } from '@/components/AppButton'
+import { AppInfoRow } from '@/components/AppInfoRow'
 import { MoaSpeaks } from '@/components/CharacterSpeaks'
-import { activePreviewSong$, songQuiz$ } from '@/services/legend'
+import { activePreviewSong$, playerStats$, songQuiz$ } from '@/services/legend'
 
 export const SongQuizWin = () => {
-  const moaSpeaks = "Yes. That' right.\nI'm happy."
+  const stats = useValue(playerStats$)
+  const moaSpeaks = "Yes. That's right.\nI'm happy."
 
   const handleReset = () => {
     activePreviewSong$.set(null) // Ensure player is wiped
@@ -14,21 +19,40 @@ export const SongQuizWin = () => {
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={() => handleReset()} style={styles.characterSpeakBox}>
+      <Pressable onPress={() => handleReset()} style={styles.pressableArea}>
         <MoaSpeaks markup={moaSpeaks} imageSize={120} />
+        <AppBox>
+          <AppInfoRow
+            label="ROUNDS PLAYED:"
+            value={stats?.roundsPlayed.toString() ?? '?'}
+          />
+          <AppInfoRow
+            label="CORRECT ANSWERS:"
+            value={stats?.correctAnswers.toString() ?? '?'}
+          />
+          <AppInfoRow
+            label="CURRENT STREAK:"
+            value={stats?.currentStreak.toString() ?? '?'}
+          />
+          <AppInfoRow
+            label="BEST STREAK:"
+            value={stats?.bestStreak.toString() ?? '?'}
+          />
+        </AppBox>
+        <AppButton title="PLAY AGAIN" onPress={() => handleReset()} />
       </Pressable>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  characterSpeakBox: {
-    paddingVertical: 12,
-  },
   container: {
     alignItems: 'center',
-    gap: 20,
     marginVertical: 20,
     width: '100%',
+  },
+  pressableArea: {
+    gap: 24,
+    paddingVertical: 12,
   },
 })

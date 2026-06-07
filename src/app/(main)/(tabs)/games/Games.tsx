@@ -15,12 +15,16 @@ export default function GamesScreen() {
     'You want to play a Game?\nI choose a song. And you guess it. OK?'
 
   const handleQuizStart = () => {
-    songQuiz$.set('LOOSE')
+    songQuiz$.set('GIVEUP')
     router.push('/games/GuessIt')
   }
 
   const renderContent = () => {
     switch (songQuizState) {
+      case 'GIVEUP':
+        return <SongQuizLoose />
+      case 'TIMEOUT':
+        return <SongQuizLoose />
       case 'LOOSE':
         return <SongQuizLoose />
       case 'WIN':

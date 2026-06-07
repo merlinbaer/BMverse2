@@ -1,6 +1,6 @@
 import { observable } from '@legendapp/state'
 
-import { SongQuizType } from '@/types/games'
+import { PlayerStats, SongQuizType } from '@/types/games'
 import { SongListType, VideoListType } from '@/types/list'
 import { PreviewSong } from '@/types/player'
 import { User } from '@/types/user'
@@ -17,3 +17,4 @@ export const syncRefresh$ = observable<number>(60) // 1-minute
 export const activePreviewSong$ = observable<PreviewSong | null>(null)
 // game state
 export const songQuiz$ = observable<SongQuizType>('NEW')
+export const playerStats$ = observable<PlayerStats | null>(null)
