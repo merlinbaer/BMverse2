@@ -3,6 +3,7 @@ import { router, Stack } from 'expo-router'
 import React from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
+import { AppButton } from '@/components/AppButton'
 import { AppScreen } from '@/components/AppScreen'
 import { SuSpeaks } from '@/components/CharacterSpeaks'
 import { SongQuizLoose } from '@/components/SongQuizLoose'
@@ -34,9 +35,10 @@ export default function GamesScreen() {
           <View style={styles.container}>
             <Pressable
               onPress={() => handleQuizStart()}
-              style={styles.characterSpeakBox}
+              style={styles.pressableArea}
             >
               <SuSpeaks markup={suSpeaks} imageSize={120} />
+              <AppButton title="Play" onPress={() => handleQuizStart()} />
             </Pressable>
           </View>
         )
@@ -52,12 +54,13 @@ export default function GamesScreen() {
 }
 
 const styles = StyleSheet.create({
-  characterSpeakBox: {
-    paddingVertical: 12,
-  },
   container: {
     alignItems: 'center',
     marginVertical: 80,
     width: '100%',
+  },
+  pressableArea: {
+    gap: 24,
+    paddingVertical: 12,
   },
 })
