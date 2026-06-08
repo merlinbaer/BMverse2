@@ -5,6 +5,13 @@ import { SongListType, VideoListType } from '@/types/list'
 import { PreviewSong } from '@/types/player'
 import { User } from '@/types/user'
 
+export interface LocalMusicFile {
+  id: string
+  name: string
+  uri: string
+  originalName: string
+}
+
 // Reactive auth states
 export const authUser$ = observable<User | null>(null)
 export const isAuthLoaded$ = observable(false) // New: Track hydration
@@ -15,6 +22,7 @@ export const videoSort$ = observable<VideoListType>('Views')
 export const syncRefresh$ = observable<number>(60) // 1-minute
 // audio player state
 export const activePreviewSong$ = observable<PreviewSong | null>(null)
+export const localMusicFiles$ = observable<LocalMusicFile[]>([])
 // game state
 export const songQuiz$ = observable<SongQuizType>('NEW')
 export const playerStats$ = observable<PlayerStats | null>(null)

@@ -10,6 +10,7 @@ import { AppTheme } from '@/constants/constants'
 import { bmFonts } from '@/layout/fonts'
 import { initAudioMode } from '@/services/audio'
 import { initAuth } from '@/services/auth'
+import { refreshLocalMusicList } from '@/services/files'
 import { initPlayerStats } from '@/services/games'
 import { isAuthLoaded$, localStore$ } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
@@ -36,6 +37,7 @@ export default function RootLayout() {
   useEffect(() => {
     initAuth()
     initializeStores() // Starting warming up table stores
+    void refreshLocalMusicList()
     startSyncCoordinator()
     initAudioMode()
     initPlayerStats()
