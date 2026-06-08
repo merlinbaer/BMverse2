@@ -103,6 +103,7 @@ create table
     deleted boolean null default false,
     setlist_id text not null,
     setlist_eventdate date not null,
+    setlist_tickets text null,
     constraint ld_upcoming_concerts_pkey primary key (id)
   ) tablespace pg_default;
 
@@ -145,6 +146,7 @@ CREATE TABLE
     setlist_venue_url text not null,
     setlist_tour_name text null,
     setlist_artwork text not null,
+    setlist_tickets text null,
     constraint ld_setlist_upcoming_pkey primary key (id)
   ) tablespace pg_default;
 
