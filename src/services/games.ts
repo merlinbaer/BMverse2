@@ -1,4 +1,5 @@
-import { playerStats$ } from '@/services/legend'
+import { authUser$, playerStats$ } from '@/services/legend'
+import { profileUserStoreUpdate } from '@/services/legend/tables/profile'
 
 export const initPlayerStats = () => {
   playerStats$.set({
@@ -33,6 +34,7 @@ export const getMoaMessage = (songQuizState: string) => {
 
 export const processLooseGame = (songQuizState: string) => {
   const current = playerStats$.peek()
+  const user = authUser$.peek()
 
   playerStats$.assign({
     roundsPlayed: (current?.roundsPlayed ?? 0) + 1,
@@ -44,10 +46,12 @@ export const processLooseGame = (songQuizState: string) => {
       (current?.reactions ?? 0) + (songQuizState !== 'TIMEOUT' ? 1 : 0),
     currentStreak: 0, // Reset streak on loose
   })
+  if (user?.id) profileUserStoreUpdate(user.id)
 }
 
 export const processWinGame = () => {
   const current = playerStats$.peek()
+  const user = authUser$.peek()
   const newStreak = (current?.currentStreak ?? 0) + 1
 
   playerStats$.assign({
@@ -57,4 +61,5 @@ export const processWinGame = () => {
     currentStreak: newStreak,
     bestStreak: Math.max(current?.bestStreak ?? 0, newStreak),
   })
+  if (user?.id) profileUserStoreUpdate(user.id)
 }
