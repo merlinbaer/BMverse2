@@ -1,13 +1,16 @@
 import { useObserve } from '@legendapp/state/react'
 import { Stack } from 'expo-router'
 
-import { authUser$, profileUserStoreLoad } from '@/services/legend'
+import { authUser$, profile$, profileUserStoreLoad } from '@/services/legend'
 
 export default function MainLayout() {
-  useObserve(authUser$, e => {
-    const user = e.value
-    if (user?.id) {
-      profileUserStoreLoad(user.id)
+  useObserve(() => {
+    const userId = authUser$.get()?.id
+    if (userId) {
+      const storeData = profile$[userId].user_store.get()
+      if (storeData) {
+        profileUserStoreLoad(userId)
+      }
     }
   })
 
