@@ -1,5 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker'
 import { Directory, File, Paths } from 'expo-file-system'
+import { Platform } from 'react-native'
 
 import { localMusicFiles$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
@@ -9,6 +10,10 @@ import { generateId } from '@/services/legend/config'
  * Uses the new Expo SDK 56 FileSystem API.
  */
 export const pickAndSaveMusicFiles = async () => {
+  if (Platform.OS === 'web') {
+    console.warn('File picking is not supported on web in this implementation.')
+    return
+  }
   try {
     const result = await DocumentPicker.getDocumentAsync({
       type: 'audio/*',
@@ -54,6 +59,7 @@ export const pickAndSaveMusicFiles = async () => {
  * Loads existing music files from the document directory into the observable.
  */
 export const refreshLocalMusicList = async () => {
+  if (Platform.OS === 'web') return
   try {
     const docDir = new Directory(Paths.document)
 
