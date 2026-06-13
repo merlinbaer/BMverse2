@@ -1,7 +1,9 @@
 import { useValue } from '@legendapp/state/react'
+import { Image } from 'expo-image'
 import React from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
+import wrong from '@/../assets/images/wrong.png'
 import { AppBox } from '@/components/AppBox'
 import { AppButton } from '@/components/AppButton'
 import { AppInfoRow } from '@/components/AppInfoRow'
@@ -26,6 +28,7 @@ export const SongQuizLoose = () => {
   return (
     <View style={styles.container}>
       <Pressable onPress={() => handleReset()} style={styles.pressableArea}>
+        <Image source={wrong} style={styles.statusImage} contentFit="contain" />
         <MoaSpeaks markup={moaSpeaks} imageSize={120} />
         <AppBox>
           <AppInfoRow
@@ -62,7 +65,13 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   pressableArea: {
+    alignItems: 'center',
     gap: 24,
     paddingVertical: 12,
+  },
+  statusImage: {
+    aspectRatio: 3,
+    height: 120,
+    width: '100%',
   },
 })
