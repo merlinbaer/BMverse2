@@ -20,23 +20,34 @@ export const generateId = () =>
 // Simple wrapper to make IndexedDB look like AsyncStorage
 const indexedDBStorage: Partial<AsyncStorageStatic> = {
   getItem: async (key: string) => {
+    if (typeof window === 'undefined') return null
     const value = await get<string>(key)
     return value ?? null
   },
-  setItem: (key: string, value: string) => set(key, value),
-  removeItem: (key: string) => del(key),
-  getAllKeys: () => keys() as Promise<string[]>,
+  setItem: async (key: string, value: string) => {
+    if (typeof window !== 'undefined') await set(key, value)
+  },
+  removeItem: async (key: string) => {
+    if (typeof window !== 'undefined') await del(key)
+  },
+  getAllKeys: async () =>
+    (typeof window !== 'undefined' ? keys() : []) as Promise<string[]>,
   multiGet: async (keys: readonly string[]) => {
+    if (typeof window === 'undefined') return keys.map(k => [k, null])
     const values = await getMany([...keys])
     return keys.map((key, index) => [key, values[index] ?? null]) as [
       string,
       string | null,
     ][]
   },
-  multiSet: (entries: readonly (readonly [string, string])[]) =>
-    setMany([...entries] as [IDBValidKey, string][]),
-  multiRemove: (keys: readonly string[]) =>
-    Promise.all(keys.map(key => del(key))) as unknown as Promise<void>,
+  multiSet: async (entries: readonly (readonly [string, string])[]) => {
+    if (typeof window !== 'undefined')
+      await setMany([...entries] as [IDBValidKey, string][])
+  },
+  multiRemove: async (keys: readonly string[]) => {
+    if (typeof window !== 'undefined')
+      await Promise.all(keys.map(key => del(key)))
+  },
 }
 
 export const persistLargeStore =

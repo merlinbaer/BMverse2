@@ -14,4 +14,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: !isSSR,
     detectSessionInUrl: !isSSR,
   },
+  realtime: isSSR
+    ? {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        transport: class {} as any,
+      }
+    : undefined,
 })
