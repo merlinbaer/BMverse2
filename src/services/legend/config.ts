@@ -3,7 +3,7 @@ import { observablePersistSqlite } from '@legendapp/state/persist-plugins/expo-s
 import { configureSynced } from '@legendapp/state/sync'
 import { syncedSupabase } from '@legendapp/state/sync-plugins/supabase'
 import { AsyncStorageStatic } from '@react-native-async-storage/async-storage'
-import Storage from 'expo-sqlite/kv-store'
+// import Storage from 'expo-sqlite/kv-store'
 import { del, get, getMany, keys, set, setMany } from 'idb-keyval'
 import { Platform } from 'react-native'
 
@@ -44,7 +44,8 @@ export const persistLargeStore =
     ? observablePersistAsyncStorage({
         AsyncStorage: indexedDBStorage as AsyncStorageStatic,
       })
-    : observablePersistSqlite(Storage)
+    : // eslint-disable-next-line @typescript-eslint/no-require-imports
+      observablePersistSqlite(require('expo-sqlite/kv-store').default)
 
 export const customSynced = configureSynced(syncedSupabase, {
   persist: {

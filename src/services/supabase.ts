@@ -1,19 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
 
-import { AUTH } from '@/constants/constants'
-import { Database } from '@/types/database.types'
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_KEY!
 
-export const supabase = createClient<Database>(
-  process.env.EXPO_PUBLIC_SUPABASE_URL!,
-  process.env.EXPO_PUBLIC_SUPABASE_KEY!,
-  {
-    auth: {
-      storageKey: AUTH.STORAGE_KEY,
-      storage: AsyncStorage,
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: false,
-    },
+// Only enable auth persistence if we are in a client environment (not Node/Build time)
+const isSSR = typeof window === 'undefined'
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: isSSR ? undefined : AsyncStorage,
+    autoRefreshToken: !isSSR,
+    persistSession: !isSSR,
+    detectSessionInUrl: !isSSR,
   },
-)
+})
