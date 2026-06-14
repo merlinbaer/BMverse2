@@ -2,6 +2,7 @@ import { syncState } from '@legendapp/state'
 import { useValue } from '@legendapp/state/react'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
+import Head from 'expo-router/head'
 import { ThemeProvider } from 'expo-router/react-navigation'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
@@ -14,6 +15,7 @@ import { refreshLocalMusicList } from '@/services/files'
 import { initPlayerStats } from '@/services/games'
 import { isAuthLoaded$, localStore$ } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
+import { registerServiceWorker } from '@/services/pwa'
 
 SplashScreen.setOptions({
   duration: 500,
@@ -41,6 +43,7 @@ export default function RootLayout() {
     startSyncCoordinator()
     initAudioMode()
     initPlayerStats()
+    void registerServiceWorker()
   }, [])
 
   // 5. Can run several times
@@ -57,6 +60,15 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={AppTheme}>
+      <Head>
+        {/* eslint-disable-next-line react-native/no-raw-text */}
+        <title>BMverse2</title>
+        <meta
+          name="description"
+          content="Welcome to BMVerse a fanmade BABYMETAL App"
+        />
+        <link rel="manifest" href="/manifest.json" />
+      </Head>
       <Stack
         screenOptions={{
           headerShown: false,

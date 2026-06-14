@@ -15,6 +15,7 @@ export default function TabsLayout() {
       <Tabs
         initialRouteName="news"
         screenOptions={{
+          sceneStyle: { backgroundColor: COLORS.BACKGROUND },
           headerShown: false,
           tabBarShowLabel: false,
           tabBarStyle: {

@@ -27,7 +27,15 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "name": "BMverse2",
+      "shortName": "BMverse2",
+      "description": "BABYMETAL Fan App",
+      "backgroundColor": "#000000",
+      "themeColor": "#000000",
+      "barStyle": "black-translucent",
+      "display": "standalone",
+      "orientation": "portrait"
     },
     "plugins": [
       "expo-router",
