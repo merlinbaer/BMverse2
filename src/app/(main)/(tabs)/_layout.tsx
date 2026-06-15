@@ -7,6 +7,7 @@ import { ColorValue, Platform, View } from 'react-native'
 
 import { COLORS, TAB_BAR } from '@/constants/constants'
 import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
+import { isPWA } from '@/services/pwa'
 
 export default function TabsLayout() {
   const insets = useBetterSafeAreaInsets()
@@ -20,7 +21,7 @@ export default function TabsLayout() {
           tabBarShowLabel: false,
           tabBarStyle: {
             position: 'absolute',
-            height: TAB_BAR.HEIGHT + insets.bottom, // Height varies by device
+            height: isPWA() ? TAB_BAR.HEIGHT : TAB_BAR.HEIGHT + insets.bottom, // Height varies by device
             borderTopLeftRadius: insets.corner, // Corners vary by device
             borderTopRightRadius: insets.corner, // Corners vary by device
             borderTopWidth: 0, // must be 0

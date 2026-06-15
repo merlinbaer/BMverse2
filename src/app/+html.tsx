@@ -25,19 +25,22 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <style
           dangerouslySetInnerHTML={{
             __html: `
-          /* Force pure black background on the absolute bottom layer */
-          :root, html, body {
-            background-color: #000000 !important;
-          }
+              /* 1. Force black background on everything */
+              :root, html, body {
+                background-color: #000000 !important;
+                margin: 0;
+                padding: 0;
+                height: 100% !important;
+                width: 100% !important;
+              }
           
-          /* Prevent the PWA from 'bouncing' and showing white underneath */
-          body {
-            overflow: hidden;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-          }
-        `,
+              /* 2. Fix content visibility - remove overflow:hidden */
+              #root {
+                display: flex;
+                flex-direction: column;
+                min-height: 100% !important;
+              }
+            `,
           }}
         />
       </head>

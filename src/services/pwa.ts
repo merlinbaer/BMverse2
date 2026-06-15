@@ -22,3 +22,26 @@ export async function registerServiceWorker() {
 
   void wb.register()
 }
+
+interface NavigatorStandalone extends Navigator {
+  standalone?: boolean
+}
+
+/**
+ * Detects if the app is running as a Progressive Web App (PWA)
+ */
+export function isPWA(): boolean {
+  // 1. If we aren't on the web or are in a server-side environment, it's not a PWA
+  if (Platform.OS !== 'web' || typeof window === 'undefined') {
+    return false
+  }
+
+  // 2. Check the standard 'display-mode' media query (Android/Chrome)
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+
+  // 3. Check the Apple-specific property (iOS Safari)
+  const isAppleStandalone =
+    (navigator as NavigatorStandalone).standalone === true
+
+  return isStandalone || isAppleStandalone
+}

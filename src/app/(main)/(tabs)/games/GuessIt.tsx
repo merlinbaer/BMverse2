@@ -2,6 +2,7 @@ import { useObservable } from '@legendapp/state/react'
 import { router } from 'expo-router'
 import React, { useEffect } from 'react'
 import { Platform, StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { AppButton } from '@/components/AppButton'
 import { AppFlatList } from '@/components/AppFlatList'
@@ -19,12 +20,22 @@ import {
   getRandomSongPreviews,
   songQuiz$,
 } from '@/services/legend'
+import { isPWA } from '@/services/pwa'
 import { ListItemType } from '@/types/list'
 import { PreviewSong } from '@/types/player'
 
 const bottomWave = 120
 
 export default function GuessItScreen() {
+  const { top } = useSafeAreaInsets()
+  const dynamicMarginTop = isPWA()
+    ? 40 + top
+    : Platform.select({
+        ios: -50,
+        android: 50,
+        default: 40,
+      })
+
   const { isPlaying, previewSong, currentTime, duration } = usePreviewPlayer(
     () => {
       songQuiz$.set('TIMEOUT')
@@ -67,7 +78,7 @@ export default function GuessItScreen() {
 
   return (
     <AppScreen>
-      <View style={styles.container}>
+      <View style={[styles.container, { marginVertical: dynamicMarginTop }]}>
         <MomoSpeaks markup={momoMessage} imageSize={80} />
         <View style={styles.visualizerRow}>
           {/* Left Column: Visualizer + Link */}

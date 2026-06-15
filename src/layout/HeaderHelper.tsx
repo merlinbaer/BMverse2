@@ -15,6 +15,7 @@ import {
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
+import { isPWA } from '@/services/pwa'
 
 const androidHeaderTopPadding = 8
 
@@ -65,7 +66,7 @@ export const LayoutScreenHeader: React.ComponentProps<
   web: {
     headerStyle: {
       backgroundColor: COLORS.BACKGROUND,
-      height: 80,
+      height: isPWA() ? 100 : 80,
     } as StyleProp<ViewStyle>,
     headerTitleStyle: {
       fontSize: FONT.SIZE.LG + 12,

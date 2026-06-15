@@ -1,6 +1,7 @@
 import { useValue } from '@legendapp/state/react'
 import React from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import AppBanner from '@/components/AppBanner'
 import { AppBox } from '@/components/AppBox'
@@ -9,10 +10,14 @@ import { AppInfoRow } from '@/components/AppInfoRow'
 import { MoaSpeaks } from '@/components/CharacterSpeaks'
 import { getMoaMessage } from '@/services/games'
 import { activePreviewSong$, playerStats$, songQuiz$ } from '@/services/legend'
+import { isPWA } from '@/services/pwa'
 
 export const SongQuizLoose = () => {
   const stats = useValue(playerStats$)
   const songQuizState = useValue(songQuiz$)
+
+  const { top } = useSafeAreaInsets()
+  const dynamicMarginVertical = isPWA() ? 20 + top : 20
 
   const moaSpeaks = React.useMemo(
     () => getMoaMessage(songQuizState),
@@ -25,7 +30,7 @@ export const SongQuizLoose = () => {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { marginVertical: dynamicMarginVertical }]}>
       <Pressable onPress={() => handleReset()} style={styles.pressableArea}>
         <AppBanner title="WRONG!" />
         <MoaSpeaks markup={moaSpeaks} imageSize={120} />
@@ -60,7 +65,6 @@ export const SongQuizLoose = () => {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 20,
     width: '100%',
   },
   pressableArea: {
