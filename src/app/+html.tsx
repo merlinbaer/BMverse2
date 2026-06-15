@@ -28,6 +28,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
               /* 1. Force black background on everything */
               :root, html, body {
                 background-color: #000000 !important;
+                color-scheme: dark !important;
                 margin: 0;
                 padding: 0;
                 height: 100% !important;
