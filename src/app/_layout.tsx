@@ -9,6 +9,7 @@ import { useEffect } from 'react'
 
 import { AppTheme } from '@/constants/constants'
 import { bmFonts } from '@/layout/fonts'
+import { initAssets } from '@/services/assets'
 import { initAudioMode } from '@/services/audio'
 import { initAuth } from '@/services/auth'
 import { refreshLocalMusicList } from '@/services/files'
@@ -39,6 +40,7 @@ export default function RootLayout() {
   useEffect(() => {
     initAuth()
     initializeStores() // Starting warming up table stores
+    void initAssets()
     void refreshLocalMusicList()
     startSyncCoordinator()
     initAudioMode()

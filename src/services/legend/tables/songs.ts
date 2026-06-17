@@ -1,13 +1,7 @@
 import { computed } from '@legendapp/state'
 import { Href } from 'expo-router'
 
-import coverBABYMETAL from '@/../assets/images/BM_Splatter_200.png'
-import coverMETALFORTH from '@/../assets/images/Forth_Splatter_200.png'
-import coverMETALGALAXY from '@/../assets/images/Galaxy_Splatter_200.png'
-import coverTHEONE from '@/../assets/images/One_Splatter_200.png'
-import coverMETALRESISTANCE from '@/../assets/images/Resistance_Splatter_200.png'
-import coverSINGLE from '@/../assets/images/Single_200.png'
-import coverNotFound from '@/../assets/images/unknown_track.png'
+import { IMAGES } from '@/constants/images'
 import { ListItemType, SongListType } from '@/types/list'
 import { PreviewSong } from '@/types/player'
 import { SongType } from '@/types/tables'
@@ -31,19 +25,19 @@ export const songClearCache = clearCache
 const getSongCover = (coverName: string | null) => {
   switch (coverName) {
     case 'BABYMETAL':
-      return coverBABYMETAL
+      return IMAGES.cover200.babymetal
     case 'METAL RESISTANCE':
-      return coverMETALRESISTANCE
+      return IMAGES.cover200.metalResistance
     case 'METAL GALAXY':
-      return coverMETALGALAXY
+      return IMAGES.cover200.metalGalaxy
     case 'THE OTHER ONE':
-      return coverTHEONE
+      return IMAGES.cover200.theOne
     case 'METAL FORTH':
-      return coverMETALFORTH
+      return IMAGES.cover200.metalForth
     case 'SINGLE':
-      return coverSINGLE
+      return IMAGES.cover200.single
     default:
-      return coverNotFound
+      return IMAGES.cover200.notFound
   }
 }
 
