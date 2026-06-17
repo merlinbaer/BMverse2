@@ -74,11 +74,11 @@ export default function GuessItScreen() {
 
   const momoMessage = isPlaying
     ? 'Listen carefully... do you know this one?'
-    : 'Ah...'
+    : "One moment, I'm preparing the song for you..."
 
   return (
     <AppScreen>
-      <View style={[styles.container, { marginVertical: dynamicMarginTop }]}>
+      <View style={[styles.container, { marginTop: dynamicMarginTop }]}>
         <MomoSpeaks markup={momoMessage} imageSize={80} />
         <View style={styles.visualizerRow}>
           {/* Left Column: Visualizer + Link */}
@@ -141,11 +141,6 @@ export default function GuessItScreen() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginTop: Platform.select({
-      ios: -50,
-      android: 50,
-      default: 40,
-    }),
     width: '100%',
   },
   giveUpContainer: {

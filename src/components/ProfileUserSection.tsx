@@ -59,6 +59,7 @@ export const ProfileUserSection = () => {
 
   const handleStartLogin = async () => {
     const emailToLogin = emailValue.trim()
+    if (!emailToLogin) return // Guard for empty inputs by blur interaction in web.
     if (!isValidEmail(emailToLogin)) {
       showAlert('Invalid Email', 'Please enter a valid email address.')
       return
@@ -208,6 +209,7 @@ export const ProfileUserSection = () => {
                 onChangeText={setEmailValue}
                 keyboardType="email-address"
                 onSubmitEditing={handleStartLogin}
+                onBlur={Platform.OS === 'web' ? handleStartLogin : undefined}
               />
             </Row>
             {Platform.OS === 'web' && <Spacer size={8} />}
