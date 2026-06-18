@@ -5,6 +5,7 @@ import { Platform, StyleSheet, View } from 'react-native'
 import { AppBubbleText } from '@/components/AppBubbleText'
 import { AppButtonGrid, GridButtonConfig } from '@/components/AppButtonGrid'
 import { AppScreen } from '@/components/AppScreen'
+import { IMAGES } from '@/constants/images'
 
 export default function PlayerScreen() {
   const isWeb = Platform.OS === 'web'
@@ -12,28 +13,28 @@ export default function PlayerScreen() {
   const buttonConfigs: GridButtonConfig[] = [
     {
       id: 'load',
-      image: require('@/../assets/images/player_box_load.png'),
+      image: IMAGES.icons.playerLoad,
       screen: '/player/PlayerLoad' as Href,
       position: 'top-left',
       label: 'Add Music',
     },
     {
       id: 'metadata',
-      image: require('@/../assets/images/player_box_metadata.png'),
+      image: IMAGES.icons.playerMeta,
       screen: '/player/PlayerMetadata' as Href,
       position: 'top-right',
       label: 'Metadata',
     },
     {
       id: 'playlist',
-      image: require('@/../assets/images/player_box_playlist.png'),
+      image: IMAGES.icons.playerList,
       screen: '/player/PlayerPlaylist' as Href,
       position: 'bottom-left',
       label: 'Playlists',
     },
     {
       id: 'play',
-      image: require('@/../assets/images/player_box_play.png'),
+      image: IMAGES.icons.playerPlay,
       screen: '/player/PlayerPlay' as Href,
       position: 'bottom-right',
       label: 'Play',

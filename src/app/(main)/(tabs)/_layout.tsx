@@ -6,6 +6,7 @@ import React from 'react'
 import { ColorValue, Platform, View } from 'react-native'
 
 import { COLORS, TAB_BAR } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
 import { isPWA } from '@/services/pwa'
 
@@ -88,11 +89,7 @@ export default function TabsLayout() {
             title: 'Main',
             tabBarIcon: ({ focused }: { focused: boolean }) => (
               <Image
-                source={
-                  focused
-                    ? require('@/../assets/tabicons/main.png')
-                    : require('@/../assets/tabicons/mainGrey.png')
-                }
+                source={focused ? IMAGES.icons.main : IMAGES.icons.mainGrey}
                 style={{
                   width: TAB_BAR.ICON_IMAGE_SIZE,
                   height: TAB_BAR.ICON_IMAGE_SIZE,

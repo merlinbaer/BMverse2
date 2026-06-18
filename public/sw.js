@@ -52,8 +52,13 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // 3. External Image Caching (Cache-First) - For Supabase images
-  if (request.destination === 'image') {
+  // 3. Image & Font Caching (Cache-First)
+  // We extend the check to include fonts so vector icons work offline
+  if (
+    request.destination === 'image' ||
+    request.destination === 'font' ||
+    url.pathname.endsWith('.ttf')
+  ) {
     event.respondWith(
       caches.match(request).then(response => {
         if (response) return response

@@ -11,6 +11,8 @@ export async function initAssets() {
     ...Object.values(IMAGES.characters),
     ...Object.values(IMAGES.cover200),
     ...Object.values(IMAGES.icons),
+    ...Object.values(IMAGES.fonts),
+    ...Object.values(IMAGES.other),
   ]
 
   try {

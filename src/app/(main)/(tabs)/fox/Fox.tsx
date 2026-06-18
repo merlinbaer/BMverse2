@@ -6,6 +6,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { AppBubbleText } from '@/components/AppBubbleText'
 import { COLORS, LAYOUT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 
 export default function FoxScreen() {
   const router = useRouter()
@@ -58,7 +59,7 @@ export default function FoxScreen() {
               style={styles.suImageTouchTarget}
             >
               <Image
-                source={require('@/../assets/images/Su-.png')}
+                source={IMAGES.characters.su}
                 style={styles.suImage}
                 contentFit="contain"
               />
@@ -88,7 +89,7 @@ export default function FoxScreen() {
                 }
               >
                 <Image
-                  source={require('@/../assets/images/Momo.png')}
+                  source={IMAGES.characters.momo}
                   style={styles.sideImage}
                   contentFit="contain"
                 />
@@ -115,7 +116,7 @@ export default function FoxScreen() {
                 }
               >
                 <Image
-                  source={require('@/../assets/images/Moa.png')}
+                  source={IMAGES.characters.moa}
                   style={styles.sideImage}
                   contentFit="contain"
                 />

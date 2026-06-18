@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native'
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 
 export type GridButtonConfig = {
   id: string
@@ -58,7 +59,7 @@ export function AppButtonGrid({ buttonConfigs }: AppButtonGridProps) {
     >
       <View style={styles.button}>
         <Image
-          source={require('@/../assets/images/icon_background_blur.png')}
+          source={IMAGES.other.background}
           style={styles.blurBackground}
           contentFit="cover"
         />

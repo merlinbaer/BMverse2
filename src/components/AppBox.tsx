@@ -3,6 +3,7 @@ import React, { ReactNode } from 'react'
 import { StyleSheet, View, ViewStyle } from 'react-native'
 
 import { COLORS } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 
 interface AppBoxProps {
   children: ReactNode
@@ -13,7 +14,7 @@ export function AppBox({ children, style }: AppBoxProps) {
   return (
     <View style={[styles.container, style]}>
       <Image
-        source={require('@/../assets/images/icon_background_blur.png')}
+        source={IMAGES.other.background}
         style={styles.blurBackground}
         contentFit="cover"
       />

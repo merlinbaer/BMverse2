@@ -3,6 +3,7 @@ import React from 'react'
 import { ImageSourcePropType, StyleSheet, View, ViewStyle } from 'react-native'
 
 import { AppBubbleText } from '@/components/AppBubbleText'
+import { IMAGES } from '@/constants/images'
 
 interface CharacterSpeaksProps {
   markup: string
@@ -55,7 +56,7 @@ export const MomoSpeaks = (props: CharacterSpeaksProps) => (
   <CharacterSpeaks
     orientation="left"
     {...props}
-    imageSource={require('@/../assets/images/Momo.png')}
+    imageSource={IMAGES.characters.momo}
   />
 )
 
@@ -63,7 +64,7 @@ export const MoaSpeaks = (props: CharacterSpeaksProps) => (
   <CharacterSpeaks
     orientation="right"
     {...props}
-    imageSource={require('@/../assets/images/Moa.png')}
+    imageSource={IMAGES.characters.moa}
   />
 )
 
@@ -71,7 +72,7 @@ export const SuSpeaks = (props: CharacterSpeaksProps) => (
   <CharacterSpeaks
     orientation="center"
     {...props}
-    imageSource={require('@/../assets/images/Su-.png')}
+    imageSource={IMAGES.characters.su}
   />
 )
 

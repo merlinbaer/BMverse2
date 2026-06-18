@@ -11,6 +11,7 @@ import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 import { concertItem$, setlistsList$ } from '@/services/legend'
 
 export default function ConcertDetailScreen() {
@@ -71,7 +72,7 @@ export default function ConcertDetailScreen() {
           ]}
         >
           <Image
-            source={require('@/../assets/images/sample_map.png')}
+            source={IMAGES.other.map}
             contentFit="fill"
             style={styles.mapImage}
           />
