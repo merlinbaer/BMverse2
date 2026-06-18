@@ -1,20 +1,17 @@
 import { router } from 'expo-router'
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { AppButton } from '@/components/AppButton'
 import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
-import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
 import { localStore$ } from '@/services/legend/local/primitives'
 import { isPWA } from '@/services/pwa'
 
 export default function WelcomePage() {
   const { height } = useWindowDimensions()
-  const { bottom } = useSafeAreaInsets()
-  const { bottom: betterBottom } = useBetterSafeAreaInsets()
+
   // Calculate available height: screen height - top padding - other elements - gaps
   const textAreaHeight =
     height -
@@ -52,7 +49,6 @@ export default function WelcomePage() {
           Apple Music. Youtube Videos and thumbnail images are under the license
           terms of YouTube.
         </AppText>
-        <AppText>{`Bottom: ${bottom} | Better Bottom: ${betterBottom} `}</AppText>
         <AppHyperlink
           description={'Read Terms'}
           hyperlink={'https://bmverse.bruu.eu/privacy_and_terms'}
