@@ -35,13 +35,6 @@ export default function Root({ children }: { children: React.ReactNode }) {
                 width: 100% !important;
               }
           
-              /* 2. Fix content visibility - remove overflow:hidden */
-              #root {
-                display: flex;
-                flex-direction: column;
-                min-height: 100% !important;
-              }
-              
               /* 2. Full-Screen PWA Splash Screen */
               #pwa-splash {
                 position: fixed;
@@ -60,11 +53,10 @@ export default function Root({ children }: { children: React.ReactNode }) {
               #pwa-splash img {
                 width: 100%;
                 height: 100%;
-                /* 'cover' makes it full screen, 'contain' keeps the aspect ratio */
                 object-fit: cover; 
               }
 
-              /* Hide the splash when the app is ready */
+              /* 3. Hide the splash when the app is ready */
               .app-loaded #pwa-splash {
                 opacity: 0;
                 pointer-events: none;
