@@ -1,26 +1,49 @@
 import { Platform } from 'react-native'
 
+/**
+ * A promise that resolves when the Service Worker is fully active
+ * and controlling the page.
+ */
+let swReadyResolve: (value: boolean) => void
+export const isOfflineReady$ = new Promise<boolean>(resolve => {
+  swReadyResolve = resolve
+})
+
 export async function registerServiceWorker() {
   if (
     Platform.OS !== 'web' ||
     typeof window === 'undefined' ||
     !('serviceWorker' in navigator)
   ) {
+    swReadyResolve(true) // Resolve immediately on non-web
     return
   }
 
-  // Dynamic import to keep the bundle small and native-friendly
   const { Workbox } = await import('workbox-window')
-
   const wb = new Workbox('/sw.js')
 
-  wb.addEventListener('installed', event => {
-    if (event.isUpdate) {
-      console.log('BMverse: New version available! Please refresh.')
-    }
+  // If there's already a controller, we are ready to intercept immediately
+  if (navigator.serviceWorker.controller) {
+    swReadyResolve(true)
+  }
+
+  // Handle first-time activation
+  wb.addEventListener('activated', () => {
+    console.log('BMverse: Offline engine activated.')
+    swReadyResolve(true)
   })
 
-  void wb.register()
+  // Register the service worker
+  try {
+    const registration = await wb.register()
+    if (registration) {
+      console.log('BMverse: PWA Offline Support registered.')
+    }
+  } catch (error) {
+    console.error('BMverse: SW Registration failed:', error)
+    // Resolve anyway to prevent the app from hanging if registration fails
+    swReadyResolve(true)
+  }
 }
 
 interface NavigatorStandalone extends Navigator {
@@ -31,15 +54,11 @@ interface NavigatorStandalone extends Navigator {
  * Detects if the app is running as a Progressive Web App (PWA)
  */
 export function isPWA(): boolean {
-  // 1. If we aren't on the web or are in a server-side environment, it's not a PWA
   if (Platform.OS !== 'web' || typeof window === 'undefined') {
     return false
   }
 
-  // 2. Check the standard 'display-mode' media query (Android/Chrome)
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-
-  // 3. Check the Apple-specific property (iOS Safari)
   const isAppleStandalone =
     (navigator as NavigatorStandalone).standalone === true
 

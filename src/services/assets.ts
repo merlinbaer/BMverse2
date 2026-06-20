@@ -2,12 +2,19 @@ import { Asset } from 'expo-asset'
 import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
+import { isOfflineReady$ } from '@/services/pwa'
 
 /**
  * Preloads all essential assets into the local device cache.
  * In PWA mode, this ensures the Service Worker captures and stores them offline.
  */
 export async function initAssets() {
+  // Wait for the Service Worker to take control before starting downloads
+  // This ensures the first-run caching actually works.
+  if (Platform.OS === 'web') {
+    await isOfflineReady$
+  }
+
   // 1. Preload Images & Raw Files
   const imagesToLoad = [
     ...Object.values(IMAGES.characters),
