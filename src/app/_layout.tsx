@@ -53,6 +53,9 @@ export default function RootLayout() {
     // Hide the splash screen ONLY when fonts AND local data are ready
     if ((loaded || error) && isHydrated && isAuthLoaded) {
       void SplashScreen.hideAsync()
+      if (typeof document !== 'undefined') {
+        document.body.classList.add('app-loaded')
+      }
     }
   }, [loaded, error, isHydrated, isAuthLoaded])
 

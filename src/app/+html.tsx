@@ -40,11 +40,65 @@ export default function Root({ children }: { children: React.ReactNode }) {
                 flex-direction: column;
                 min-height: 100% !important;
               }
+              
+              /* 2. PWA Splash Screen Styles */
+              #pwa-splash {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                transition: opacity 0.5s ease-out;
+              }
+
+              #pwa-splash img {
+                width: 200px; /* Matches your splash icon scale */
+                height: 200px;
+                object-fit: contain;
+                margin-bottom: 20px;
+              }
+
+              /* Spinner below the icon */
+              .loader {
+                width: 30px;
+                height: 30px;
+                border: 2px solid #db1b1a;
+                border-bottom-color: transparent;
+                border-radius: 50%;
+                animation: rotation 1s linear infinite;
+              }
+
+              @keyframes rotation {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+
+              /* Fade out when app is ready */
+              .app-loaded #pwa-splash {
+                opacity: 0;
+                pointer-events: none;
+                visibility: hidden;
+              }
             `,
           }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        {/* PWA Static Splash */}
+        <div id="pwa-splash">
+          {/* Using the file from public folder for immediate access */}
+          <img src="/splash-icon.png" alt="BMverse2" />
+          <div className="loader"></div>
+        </div>
+
+        {children}
+      </body>
     </html>
   )
 }
