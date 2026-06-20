@@ -42,16 +42,15 @@ export default function Root({ children }: { children: React.ReactNode }) {
                 min-height: 100% !important;
               }
               
-              /* 2. PWA Splash Screen Styles */
+              /* 2. Full-Screen PWA Splash Screen */
               #pwa-splash {
                 position: fixed;
                 top: 0;
                 left: 0;
-                width: 100%;
-                height: 100%;
+                width: 100vw;
+                height: 100vh;
                 background-color: #000;
                 display: flex;
-                flex-direction: column;
                 justify-content: center;
                 align-items: center;
                 z-index: 9999;
@@ -59,28 +58,13 @@ export default function Root({ children }: { children: React.ReactNode }) {
               }
 
               #pwa-splash img {
-                width: 200px; /* Matches your splash icon scale */
-                height: 200px;
-                object-fit: contain;
-                margin-bottom: 20px;
+                width: 100%;
+                height: 100%;
+                /* 'cover' makes it full screen, 'contain' keeps the aspect ratio */
+                object-fit: cover; 
               }
 
-              /* Spinner below the icon */
-              .loader {
-                width: 30px;
-                height: 30px;
-                border: 2px solid #db1b1a;
-                border-bottom-color: transparent;
-                border-radius: 50%;
-                animation: rotation 1s linear infinite;
-              }
-
-              @keyframes rotation {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-              }
-
-              /* Fade out when app is ready */
+              /* Hide the splash when the app is ready */
               .app-loaded #pwa-splash {
                 opacity: 0;
                 pointer-events: none;
