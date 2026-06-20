@@ -17,6 +17,7 @@ export default function PublicLayout() {
         name="privacy"
         options={{ ...LayoutScreenHeader, headerTitle: 'Privacy' }}
       />
+      <Stack.Screen name="install" options={{ headerShown: false }} />
     </Stack>
   )
 }

@@ -1,11 +1,12 @@
 import { syncState } from '@legendapp/state'
 import { useValue } from '@legendapp/state/react'
 import { useFonts } from 'expo-font'
-import { Stack } from 'expo-router'
+import { Stack, useRouter, useSegments } from 'expo-router'
 import Head from 'expo-router/head'
 import { ThemeProvider } from 'expo-router/react-navigation'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
+import { Platform } from 'react-native'
 
 import { AppTheme } from '@/constants/constants'
 import { bmFonts } from '@/layout/fonts'
@@ -14,9 +15,13 @@ import { initAudioMode } from '@/services/audio'
 import { initAuth } from '@/services/auth'
 import { refreshLocalMusicList } from '@/services/files'
 import { initPlayerStats } from '@/services/games'
-import { isAuthLoaded$, localStore$ } from '@/services/legend'
+import {
+  isAuthLoaded$,
+  isInstallDismissed$,
+  localStore$,
+} from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
-import { registerServiceWorker } from '@/services/pwa'
+import { isPWA, registerServiceWorker } from '@/services/pwa'
 
 SplashScreen.setOptions({
   duration: 500,
@@ -25,6 +30,10 @@ SplashScreen.setOptions({
 void SplashScreen.preventAutoHideAsync()
 
 export default function RootLayout() {
+  const router = useRouter()
+  const segments = useSegments() as string[]
+  const isDismissed = useValue(isInstallDismissed$)
+
   // 1. Monitor hydration status for the local store
   const localSyncStatus = useValue(syncState(localStore$))
   const isHydrated = localSyncStatus.isPersistLoaded
@@ -36,7 +45,18 @@ export default function RootLayout() {
   const isOnboarding = useValue(localStore$.isOnboarding)
   const [loaded, error] = useFonts(bmFonts)
 
-  // 4. One time tasks, this runs once
+  // 4. Show Install Screen when Web and no PWA
+  useEffect(() => {
+    if (Platform.OS !== 'web') return
+    if (!isHydrated || !isAuthLoaded) return
+    const inInstallScreen = segments.includes('install')
+    // Redirect IF on web AND not PWA AND not already on the installation screen AND not dismissed
+    if (!isPWA() && !inInstallScreen && !isDismissed) {
+      router.replace('/(onboarding)/install')
+    }
+  }, [segments, isHydrated, isAuthLoaded, router, isDismissed])
+
+  // 5. One time tasks, this runs once
   useEffect(() => {
     initAuth()
     initializeStores() // Starting warming up table stores
@@ -48,7 +68,7 @@ export default function RootLayout() {
     void registerServiceWorker()
   }, [])
 
-  // 5. Can run several times
+  // 6. Can run several times
   useEffect(() => {
     // Hide the splash screen ONLY when fonts AND local data are ready
     if ((loaded || error) && isHydrated && isAuthLoaded) {
@@ -62,6 +82,7 @@ export default function RootLayout() {
   if ((!loaded && !error) || !isHydrated || !isAuthLoaded) {
     return null
   }
+  const showInstallGate = Platform.OS === 'web' && !isPWA() && !isDismissed
 
   return (
     <ThemeProvider value={AppTheme}>
@@ -81,12 +102,12 @@ export default function RootLayout() {
         }}
       >
         {/* First called Screens: only show if is called first */}
-        <Stack.Protected guard={isOnboarding}>
+        <Stack.Protected guard={showInstallGate || isOnboarding}>
           <Stack.Screen name="(onboarding)" />
         </Stack.Protected>
 
         {/* Main Screens: show after App is initialized */}
-        <Stack.Protected guard={!isOnboarding}>
+        <Stack.Protected guard={!showInstallGate && !isOnboarding}>
           <Stack.Screen name="(main)" />
         </Stack.Protected>
       </Stack>

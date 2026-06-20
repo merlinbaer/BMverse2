@@ -12,6 +12,8 @@ export interface LocalMusicFile {
   originalName: string
 }
 
+// App state
+export const isInstallDismissed$ = observable(false)
 // Reactive auth states
 export const authUser$ = observable<User | null>(null)
 export const isAuthLoaded$ = observable(false) // New: Track hydration
