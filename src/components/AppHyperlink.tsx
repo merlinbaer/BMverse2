@@ -1,9 +1,8 @@
-import Feather from '@react-native-vector-icons/feather'
-import MaterialIcons from '@react-native-vector-icons/material-icons'
 import * as WebBrowser from 'expo-web-browser'
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 
 import { COLORS, FONT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 
 type TextHyperlinkProps = {
   description: string
@@ -51,13 +50,17 @@ export const AppHyperlink = ({
           onPress={() => handleOnPress(hyperlink)}
         >
           {type === 'intern' ? (
-            <MaterialIcons
+            <IMAGES.vector.MaterialIcons
               name={'open-in-browser'}
               size={size + 3}
               color={color}
             />
           ) : (
-            <Feather name={'external-link'} size={size} color={color} />
+            <IMAGES.vector.Feather
+              name={'external-link'}
+              size={size}
+              color={color}
+            />
           )}
         </TouchableOpacity>
       ) : (

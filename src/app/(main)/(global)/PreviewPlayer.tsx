@@ -1,4 +1,3 @@
-import MaterialIcons from '@react-native-vector-icons/material-icons'
 import React from 'react'
 import { Image, Pressable, StyleSheet, View } from 'react-native'
 
@@ -6,6 +5,7 @@ import { AppHyperlink } from '@/components/AppHyperlink'
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
 import { formatAudioTime } from '@/services/dateTimeHelper'
 
@@ -43,7 +43,11 @@ function PlayerContent({ dismiss }: { dismiss: () => void }) {
           />
         ) : (
           <View style={styles.artworkPlaceholder}>
-            <MaterialIcons name="music-note" size={80} color={COLORS.PRIMARY} />
+            <IMAGES.vector.MaterialIcons
+              name="music-note"
+              size={80}
+              color={COLORS.PRIMARY}
+            />
           </View>
         )}
       </View>
@@ -83,11 +87,15 @@ function PlayerContent({ dismiss }: { dismiss: () => void }) {
               onPress={() => skipBackward(5)}
               style={styles.skipButton}
             >
-              <MaterialIcons name="replay-5" size={32} color={COLORS.TEXT} />
+              <IMAGES.vector.MaterialIcons
+                name="replay-5"
+                size={32}
+                color={COLORS.TEXT}
+              />
             </Pressable>
 
             <Pressable onPress={handlePlayPause} style={styles.playButton}>
-              <MaterialIcons
+              <IMAGES.vector.MaterialIcons
                 name={isPlaying ? 'pause' : 'play-arrow'}
                 size={40}
                 color={COLORS.TEXT}
@@ -95,7 +103,11 @@ function PlayerContent({ dismiss }: { dismiss: () => void }) {
             </Pressable>
 
             <Pressable onPress={() => skipForward(5)} style={styles.skipButton}>
-              <MaterialIcons name="forward-5" size={32} color={COLORS.TEXT} />
+              <IMAGES.vector.MaterialIcons
+                name="forward-5"
+                size={32}
+                color={COLORS.TEXT}
+              />
             </Pressable>
           </View>
         </View>

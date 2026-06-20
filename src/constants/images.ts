@@ -1,3 +1,7 @@
+import Feather from '@react-native-vector-icons/feather'
+import MaterialIcons from '@react-native-vector-icons/material-icons'
+import Octicons from '@react-native-vector-icons/octicons'
+
 export const IMAGES = {
   characters: {
     su: require('@/../assets/images/Su-.png'),
@@ -25,14 +29,18 @@ export const IMAGES = {
     playerList: require('@/../assets/images/player_box_playlist.png'),
     playerPlay: require('@/../assets/images/player_box_play.png'),
   },
+  other: {
+    map: require('@/../assets/images/sample_map.png'),
+    background: require('@/../assets/images/icon_background_blur.png'),
+  },
+  vector: {
+    Octicons,
+    MaterialIcons,
+    Feather,
+  },
   fonts: {
     octicons: require('@react-native-vector-icons/octicons/fonts/Octicons.ttf'),
     material: require('@react-native-vector-icons/material-icons/fonts/MaterialIcons.ttf'),
     feather: require('@react-native-vector-icons/feather/fonts/Feather.ttf'),
-    fontawesome: require('@react-native-vector-icons/fontawesome/fonts/FontAwesome.ttf'),
-  },
-  other: {
-    map: require('@/../assets/images/sample_map.png'),
-    background: require('@/../assets/images/icon_background_blur.png'),
   },
 }

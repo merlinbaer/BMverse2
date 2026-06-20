@@ -1,5 +1,3 @@
-import FontAwesome from '@react-native-vector-icons/fontawesome'
-import MaterialIcons from '@react-native-vector-icons/material-icons'
 import { isLiquidGlassAvailable } from 'expo-glass-effect'
 import { Href, router, Stack } from 'expo-router'
 import React from 'react'
@@ -15,6 +13,7 @@ import {
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 import { isPWA } from '@/services/pwa'
 
 const androidHeaderTopPadding = 8
@@ -87,7 +86,11 @@ export const LayoutScreenHeader: React.ComponentProps<
 export const BackButton = () => (
   <TouchableOpacity onPress={() => router.back()}>
     <View style={headerStyles.backButton}>
-      <FontAwesome name="chevron-left" size={24} color="white" />
+      <IMAGES.vector.MaterialIcons
+        name="chevron-left"
+        size={24}
+        color="white"
+      />
     </View>
   </TouchableOpacity>
 )
@@ -95,7 +98,7 @@ export const BackButton = () => (
 export const SortButton = ({ targetRoute }: { targetRoute: Href }) => (
   <TouchableOpacity onPress={() => router.push(targetRoute)}>
     <View style={headerStyles.sortButton}>
-      <MaterialIcons name="sort" size={24} color="white" />
+      <IMAGES.vector.MaterialIcons name="sort" size={24} color="white" />
     </View>
   </TouchableOpacity>
 )

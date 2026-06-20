@@ -1,4 +1,3 @@
-import Octicons from '@react-native-vector-icons/octicons'
 import { BlurView } from 'expo-blur'
 import { Image } from 'expo-image'
 import { Tabs } from 'expo-router'
@@ -69,7 +68,11 @@ export default function TabsLayout() {
             title: 'News',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
             tabBarIcon: ({ color }: { color: ColorValue }) => (
-              <Octicons name="home" size={TAB_BAR.ICON_SIZE} color={color} />
+              <IMAGES.vector.Octicons
+                name="home"
+                size={TAB_BAR.ICON_SIZE}
+                color={color}
+              />
             ),
           }}
         />
@@ -79,7 +82,11 @@ export default function TabsLayout() {
             title: 'Player',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
             tabBarIcon: ({ color }: { color: ColorValue }) => (
-              <Octicons name="play" size={TAB_BAR.ICON_SIZE} color={color} />
+              <IMAGES.vector.Octicons
+                name="play"
+                size={TAB_BAR.ICON_SIZE}
+                color={color}
+              />
             ),
           }}
         />
@@ -106,7 +113,11 @@ export default function TabsLayout() {
             title: 'Games',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
             tabBarIcon: ({ color }: { color: ColorValue }) => (
-              <Octicons name="rocket" size={TAB_BAR.ICON_SIZE} color={color} />
+              <IMAGES.vector.Octicons
+                name="rocket"
+                size={TAB_BAR.ICON_SIZE}
+                color={color}
+              />
             ),
           }}
         />
@@ -116,7 +127,11 @@ export default function TabsLayout() {
             title: 'Profile',
             tabBarIconStyle: { marginTop: TAB_BAR.ICON_MARGIN_TOP },
             tabBarIcon: ({ color }: { color: ColorValue }) => (
-              <Octicons name="person" size={TAB_BAR.ICON_SIZE} color={color} />
+              <IMAGES.vector.Octicons
+                name="person"
+                size={TAB_BAR.ICON_SIZE}
+                color={color}
+              />
             ),
           }}
         />

@@ -1414,13 +1414,6 @@
   dependencies:
     "@react-native-vector-icons/common" "^13.0.1"
 
-"@react-native-vector-icons/fontawesome@^13.1.1":
-  version "13.1.2"
-  resolved "https://registry.yarnpkg.com/@react-native-vector-icons/fontawesome/-/fontawesome-13.1.2.tgz#f26b5a521c5533be6dfde55512549e2dc23ec51d"
-  integrity sha512-Pae4/aDhvSd5FNVy6QOfcQ8uhj+fpbIc2WFDaO9jLEkqM0p5tMZt39Mcfw1XosOXQ0eSqJdlYoI2x8vqbdyzXg==
-  dependencies:
-    "@react-native-vector-icons/common" "^13.0.1"
-
 "@react-native-vector-icons/material-icons@^13.1.1":
   version "13.1.2"
   resolved "https://registry.yarnpkg.com/@react-native-vector-icons/material-icons/-/material-icons-13.1.2.tgz#bea9dfd9c5ab27d3f8e5e75fefdfc8f531587f71"

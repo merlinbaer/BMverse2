@@ -1,10 +1,10 @@
-import MaterialIcons from '@react-native-vector-icons/material-icons'
 import React from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 import { useTrackPlayer } from '@/hooks/useTrackPlayer'
 import { formatAudioTime } from '@/services/dateTimeHelper'
 
@@ -35,7 +35,11 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
       </AppText>
 
       <View style={styles.artworkPlaceholder}>
-        <MaterialIcons name="library-music" size={80} color={COLORS.PRIMARY} />
+        <IMAGES.vector.MaterialIcons
+          name="library-music"
+          size={80}
+          color={COLORS.PRIMARY}
+        />
       </View>
 
       <View style={styles.infoContainer}>
@@ -69,11 +73,15 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
 
       <View style={styles.controlsRow}>
         <Pressable onPress={previous} style={styles.skipButton}>
-          <MaterialIcons name="skip-previous" size={40} color={COLORS.TEXT} />
+          <IMAGES.vector.MaterialIcons
+            name="skip-previous"
+            size={40}
+            color={COLORS.TEXT}
+          />
         </Pressable>
 
         <Pressable onPress={handlePlayPause} style={styles.playButton}>
-          <MaterialIcons
+          <IMAGES.vector.MaterialIcons
             name={isPlaying ? 'pause' : 'play-arrow'}
             size={40}
             color={COLORS.TEXT}
@@ -81,7 +89,11 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
         </Pressable>
 
         <Pressable onPress={next} style={styles.skipButton}>
-          <MaterialIcons name="skip-next" size={40} color={COLORS.TEXT} />
+          <IMAGES.vector.MaterialIcons
+            name="skip-next"
+            size={40}
+            color={COLORS.TEXT}
+          />
         </Pressable>
       </View>
     </View>

@@ -64,7 +64,6 @@
       "@react-native-vector-icons/octicons",
       "@react-native-vector-icons/feather",
       "@react-native-vector-icons/material-icons",
-      "@react-native-vector-icons/fontawesome",
       "expo-document-picker",
       "expo-file-system",
       [

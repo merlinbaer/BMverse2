@@ -2,23 +2,47 @@
 /* global clients */
 
 // Core cache for the HTML shell, Asset cache for JS/Images
-const CORE_CACHE = 'bmverse-core-v1'
-const ASSET_CACHE = 'bmverse-assets-v1'
+const CORE_CACHE = 'bmverse-core-v2' // Incremented version
+const ASSET_CACHE = 'bmverse-assets-v2'
 
-const PRECACHE_URLS = ['/', '/index.html', '/manifest.json', '/favicon.png']
+const PRECACHE_URLS = [
+  '/',
+  '/manifest.json',
+  '/favicon.png',
+  '/splash-icon.png',
+]
 
 self.addEventListener('install', event => {
   event.waitUntil(
     caches
       .open(CORE_CACHE)
-      .then(cache => cache.addAll(PRECACHE_URLS))
+      .then(cache => {
+        // We use a map to catch individual errors so one 404 doesn't kill the worker
+        return Promise.allSettled(
+          PRECACHE_URLS.map(url =>
+            cache
+              .add(url)
+              .catch(err => console.warn(`PWA: Failed to cache ${url}`, err)),
+          ),
+        )
+      })
       .then(() => self.skipWaiting()),
   )
 })
 
 self.addEventListener('activate', event => {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  event.waitUntil(clients.claim())
+  event.waitUntil(
+    caches
+      .keys()
+      .then(keys =>
+        Promise.all(
+          keys
+            .filter(key => key !== CORE_CACHE && key !== ASSET_CACHE)
+            .map(key => caches.delete(key)),
+        ),
+      )
+      .then(() => clients.claim()),
+  )
 })
 
 self.addEventListener('fetch', event => {
@@ -31,25 +55,35 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // 2. Internal Asset strategy (Stale-While-Revalidate)
-  // This ensures the JavaScript application bundle is saved for offline use
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      caches.open(ASSET_CACHE).then(cache => {
-        return cache.match(request).then(cachedResponse => {
-          const fetchedResponse = fetch(request)
-            .then(networkResponse => {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-              cache.put(request, networkResponse.clone())
-              return networkResponse
-            })
-            .catch(() => null)
+  // 2. Asset strategy (Images, Fonts, and internal JS bundles)
+  // This is the CRITICAL part for initAssets()
+  const isInternalAsset = url.origin === self.location.origin
+  const isImageOrFont =
+    request.destination === 'image' ||
+    request.destination === 'font' ||
+    url.pathname.includes('.ttf')
 
-          return cachedResponse || fetchedResponse
-        })
+  if (isImageOrFont || (isInternalAsset && url.pathname.includes('.js'))) {
+    event.respondWith(
+      caches.match(request).then(cachedResponse => {
+        if (cachedResponse) return cachedResponse
+
+        return fetch(request)
+          .then(networkResponse => {
+            // Only cache valid responses
+            if (!networkResponse || networkResponse.status !== 200)
+              return networkResponse
+
+            const responseToCache = networkResponse.clone()
+            caches.open(ASSET_CACHE).then(cache => {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+              cache.put(request, responseToCache)
+            })
+            return networkResponse
+          })
+          .catch(() => caches.match(request))
       }),
     )
-    return
   }
 
   // 3. Image & Font Caching (Cache-First)
