@@ -24,7 +24,9 @@ export const usePreviewPlayer = (onFinished?: () => void) => {
         Constants.executionEnvironment === ExecutionEnvironment.StoreClient
 
       const shouldSetLockScreen =
-        Platform.OS === 'ios' || (Platform.OS === 'android' && !isExpoGo)
+        Platform.OS === 'web' ||
+        Platform.OS === 'ios' ||
+        (Platform.OS === 'android' && !isExpoGo)
 
       if (shouldSetLockScreen) {
         try {

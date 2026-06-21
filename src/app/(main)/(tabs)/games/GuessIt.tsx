@@ -13,6 +13,7 @@ import { MomoSpeaks } from '@/components/CharacterSpeaks'
 import SongAudioWave from '@/components/SongAudioWave'
 import { SongTimerCircle } from '@/components/SongTimerCircle'
 import { COLORS, FONT } from '@/constants/constants'
+import { IMAGES } from '@/constants/images'
 import { usePreviewPlayer } from '@/hooks/usePreviewPlayer'
 import { processLooseGame, processWinGame } from '@/services/games'
 import {
@@ -64,9 +65,9 @@ export default function GuessItScreen() {
     if (winner) {
       activePreviewSong$.set({
         ...winner,
-        song_title: '???',
-        song_artist: '???',
-        song_preview_artwork: null,
+        song_title: 'GUESS IT',
+        song_artist: 'BABYMETAL SONG QUIZ',
+        song_preview_artwork: IMAGES.cover200.notFound,
       })
     }
     return () => activePreviewSong$.set(null)
@@ -83,7 +84,14 @@ export default function GuessItScreen() {
         <View style={styles.visualizerRow}>
           {/* Left Column: Visualizer + Link */}
           <View style={styles.visualizerColumn}>
-            <SongAudioWave width={240} height={bottomWave} />
+            <View
+              style={{
+                height: bottomWave,
+                opacity: isPlaying && previewSong ? 1 : 0,
+              }}
+            >
+              <SongAudioWave width={240} height={bottomWave} />
+            </View>
             <View style={styles.hyperlinkWrapper}>
               <AppHyperlink
                 description={'provided courtesy of iTunes'}
