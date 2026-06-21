@@ -49,6 +49,7 @@ export const ProfileUserSection = () => {
     r => r.value === (profile?.user_region ?? 'UNKN'),
   )?.label
   const [emailValue, setEmailValue] = useState('')
+  const [isLoggingIn, setIsLoggingIn] = useState(false)
   const emailRef = useRef<TextInputRef>(null)
   const codeRef = useRef<TextInputRef>(null)
   const nameRef = useRef<TextInputRef>(null)
@@ -59,13 +60,16 @@ export const ProfileUserSection = () => {
 
   const handleStartLogin = async () => {
     const emailToLogin = emailValue.trim()
-    if (!emailToLogin) return // Guard for empty inputs by blur interaction in web.
+    if (!emailToLogin || isLoggingIn) return
     if (!isValidEmail(emailToLogin)) {
       showAlert('Invalid Email', 'Please enter a valid email address.')
       return
     }
 
+    setIsLoggingIn(true)
     try {
+      emailRef.current?.clear()
+      setEmailValue('')
       await startLogin(emailToLogin)
       setEmailValue(emailToLogin)
       showAlert(
@@ -78,20 +82,24 @@ export const ProfileUserSection = () => {
           ? error.message
           : 'Failed to start login process.'
       showAlert('Login Error', message)
+      setIsLoggingIn(false)
     }
   }
 
   const handleVerifyOtp = async (code: string) => {
     if (code.length !== AUTH.OTP_LENGTH || !/^\d+$/.test(code)) return
-
     try {
       const emailToUse = emailValue.trim()
       await verifyOtp(emailToUse, code)
       // Note: authUser$ is updated by the onAuthStateChange listener in services/auth.ts
       setOpenLogin(false)
+      setIsLoggingIn(false)
+      setOpenLogout(false)
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : 'Invalid passcode.'
+      setIsLoggingIn(false)
+      codeRef.current?.clear()
       showAlert('Verification Failed', message)
     }
   }
@@ -101,6 +109,23 @@ export const ProfileUserSection = () => {
     if (user?.id && newName !== (profile?.user_name ?? '')) {
       profileUsernameUpdate(user.id, newName)
     }
+  }
+
+  const handleDeleteAccount = async () => {
+    showAlert(
+      'Delete Account',
+      'Are you sure you want to permanently delete your account with all user data? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteAccount()
+          },
+        },
+      ],
+    )
   }
 
   return (
@@ -133,7 +158,7 @@ export const ProfileUserSection = () => {
                   <Button
                     variant="text"
                     label="Delete Account"
-                    onPress={() => void deleteAccount()}
+                    onPress={() => void handleDeleteAccount()}
                     style={{
                       backgroundColor: COLORS.PRIMARY,
                       borderRadius: 16,
@@ -145,7 +170,7 @@ export const ProfileUserSection = () => {
                 {Platform.OS !== 'ios' && (
                   <Button
                     label="Delete Account"
-                    onPress={() => void deleteAccount()}
+                    onPress={() => void handleDeleteAccount()}
                   >
                     <Text textStyle={{ color: COLORS.PRIMARY }}>
                       Delete Account
@@ -204,7 +229,7 @@ export const ProfileUserSection = () => {
               <Text>Enter Email:</Text>
               <TextInput
                 ref={emailRef}
-                placeholder="Type here"
+                placeholder={isLoggingIn ? 'Verifying...' : 'Type here'}
                 defaultValue={emailValue}
                 onChangeText={setEmailValue}
                 keyboardType="email-address"
