@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
-// Core cache for the HTML shell, Asset cache for JS/Images
-const CORE_CACHE = 'bmverse-core-v2' // Incremented version
+// Core cache for the HTML shell, Asset cache for JS/Images/Fonts
+const CORE_CACHE = 'bmverse-core-v2'
 const ASSET_CACHE = 'bmverse-assets-v2'
 
 const PRECACHE_URLS = [
@@ -41,7 +41,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   const { request } = event
-  const url = new URL(request.url)
+  const requestUrl = new URL(request.url) // Renamed to avoid confusion
 
   // 1. Navigation strategy (HTML Shell)
   if (request.mode === 'navigate') {
@@ -49,22 +49,27 @@ self.addEventListener('fetch', event => {
     return
   }
 
-  // 2. Combined Asset Strategy (JS, Images, Fonts)
-  // This merges the previous Step 2 and Step 3 to prevent multiple 'respondWith' calls
-  const isInternal = url.origin === self.location.origin
+  // 2. Resource strategy (JS, Images, Fonts)
+  // Consolidating all logic here to prevent "respondWith already called" error
+  const isInternal = requestUrl.origin === self.location.origin
   const isImage = request.destination === 'image'
-  const isFont = request.destination === 'font' || url.pathname.endsWith('.ttf')
-  const isJS = isInternal && url.pathname.endsWith('.js')
+  const isFont =
+    request.destination === 'font' || requestUrl.pathname.endsWith('.ttf')
+  const isJS = isInternal && requestUrl.pathname.endsWith('.js')
 
   if (isImage || isFont || isJS) {
     event.respondWith(
       caches.match(request).then(cachedResponse => {
+        // Return cached version if exists
         if (cachedResponse) return cachedResponse
 
+        // Otherwise fetch and cache
         return fetch(request)
           .then(networkResponse => {
-            if (!networkResponse || networkResponse.status !== 200)
-              return networkResponse
+            // Allow status 0 for opaque YouTube/Google images
+            const isValid =
+              networkResponse.status === 200 || networkResponse.status === 0
+            if (!isValid) return networkResponse
 
             const responseToCache = networkResponse.clone()
             caches.open(ASSET_CACHE).then(cache => {

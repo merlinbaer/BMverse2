@@ -1,8 +1,28 @@
 import { Asset } from 'expo-asset'
 import { Platform } from 'react-native'
 
+import channelDataRaw from '@/constants/channel.json'
+import flagsDataRaw from '@/constants/flags.json'
 import { IMAGES } from '@/constants/images'
 import { isOfflineReady$ } from '@/services/pwa'
+
+export interface FlagItem {
+  setlist_artwork: string
+}
+
+export interface ChannelItem {
+  channel_artwork: string
+}
+
+const flagsData = flagsDataRaw as unknown as FlagItem[]
+const channelData = channelDataRaw as unknown as ChannelItem[]
+
+export const getFlagsList = (): string[] => {
+  return flagsData.map((item: FlagItem) => item.setlist_artwork)
+}
+export const getChannelList = (): string[] => {
+  return channelData.map((item: ChannelItem) => item.channel_artwork)
+}
 
 /**
  * Preloads all essential assets into the local device cache.
@@ -15,19 +35,36 @@ export async function initAssets() {
     await isOfflineReady$
   }
 
-  // 1. Preload Images & Raw Files
-  const imagesToLoad = [
+  const safeAssets = [
     ...Object.values(IMAGES.characters),
     ...Object.values(IMAGES.cover200),
     ...Object.values(IMAGES.icons),
     ...Object.values(IMAGES.other),
+    ...getFlagsList(),
   ]
 
   try {
-    // Standard Expo preloading for images
-    await Asset.loadAsync(imagesToLoad)
+    // 1. Load local images and safe third party image
+    await Asset.loadAsync(safeAssets)
 
-    // 2. Force Font Preloading (Web PWA specific)
+    // 2. Load YouTube Channel Images (Throttled & Browser-Native)
+    if (Platform.OS === 'web' && typeof window !== 'undefined') {
+      const channelUrls = getChannelList()
+
+      for (const url of channelUrls) {
+        // Use 1-second delay specifically for YouTube to avoid 429
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        // Using a standard Image object is less likely to trigger 429 than fetch()
+        const img = new window.Image()
+        img.crossOrigin = 'anonymous'
+        img.src = url
+      }
+    } else {
+      await Asset.loadAsync(getChannelList())
+    }
+
+    // 3. Force Font Preloading (Web PWA specific)
     // We use the 'fonts' section because it contains the actual .ttf files
     if (Platform.OS === 'web' && typeof document !== 'undefined') {
       const fontEntries = Object.entries(IMAGES.fonts)
