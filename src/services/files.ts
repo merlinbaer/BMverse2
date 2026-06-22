@@ -2,12 +2,143 @@ import { Buffer } from 'buffer'
 
 import * as DocumentPicker from 'expo-document-picker'
 import { Directory, File, Paths } from 'expo-file-system'
-import * as mm from 'music-metadata'
 import { Platform } from 'react-native'
 
 import { musicFiles$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import { MusicFile } from '@/types/player'
+
+/**
+ * A lightweight, pure-JavaScript ID3v2 (MP3) metadata tag parser.
+ * Supports both ID3v2.2 (3-byte frames) and ID3v2.3/2.4 (4-byte frames).
+ */
+const parseMp3BufferMetadata = (buffer: Buffer) => {
+  const metadata = {
+    title: null as string | null,
+    artist: null as string | null,
+    album: null as string | null,
+    lyrics: null as string | null,
+    track: null as number | null,
+    disc: null as number | null,
+    year: null as number | null,
+    tagVersion: null as string | null, // Added property
+  }
+
+  try {
+    const header = buffer.toString('ascii', 0, 3)
+    if (header !== 'ID3') return metadata
+
+    const version = buffer.readUInt8(3)
+    metadata.tagVersion = `ID3v2.${version}.0` // Set identified tag version
+
+    const sizeBytes = [
+      buffer.readUInt8(6),
+      buffer.readUInt8(7),
+      buffer.readUInt8(8),
+      buffer.readUInt8(9),
+    ]
+    const tagSize =
+      (sizeBytes[0] << 21) |
+      (sizeBytes[1] << 14) |
+      (sizeBytes[2] << 7) |
+      sizeBytes[3]
+
+    let offset = 10
+    const end = 10 + tagSize
+
+    const isV2_2 = version === 2
+    const headerSize = isV2_2 ? 6 : 10
+    const frameIdLen = isV2_2 ? 3 : 4
+
+    while (offset < end && offset < buffer.length - headerSize) {
+      const frameID = buffer.toString('ascii', offset, offset + frameIdLen)
+
+      if (frameID.replace(/\0/g, '') === '' || !/^[A-Z0-9]+$/.test(frameID)) {
+        break
+      }
+
+      let frameSize = 0
+      if (isV2_2) {
+        frameSize =
+          (buffer.readUInt8(offset + 3) << 16) |
+          (buffer.readUInt8(offset + 4) << 8) |
+          buffer.readUInt8(offset + 5)
+      } else {
+        frameSize = buffer.readUInt32BE(offset + 4)
+      }
+
+      if (frameSize <= 0 || offset + headerSize + frameSize > buffer.length) {
+        break
+      }
+
+      const frameDataOffset = offset + headerSize
+
+      const isTitle = isV2_2 ? frameID === 'TT2' : frameID === 'TIT2'
+      const isArtist = isV2_2 ? frameID === 'TP1' : frameID === 'TPE1'
+      const isAlbum = isV2_2 ? frameID === 'TAL' : frameID === 'TALB'
+      const isLyrics = isV2_2 ? frameID === 'ULT' : frameID === 'USLT'
+      const isYear = isV2_2 ? frameID === 'TYE' : frameID === 'TYER'
+      const isTrack = isV2_2 ? frameID === 'TRK' : frameID === 'TRCK'
+      const isDisc = isV2_2 ? frameID === 'TPA' : frameID === 'TPOS'
+
+      if (
+        isTitle ||
+        isArtist ||
+        isAlbum ||
+        isLyrics ||
+        isYear ||
+        isTrack ||
+        isDisc
+      ) {
+        const encoding = buffer.readUInt8(frameDataOffset)
+
+        let text = ''
+        if (encoding === 1 || encoding === 2) {
+          text = buffer
+            .toString(
+              'utf16le',
+              frameDataOffset + 3,
+              frameDataOffset + frameSize,
+            )
+            .replace(/^\uFEFF/, '')
+        } else {
+          text = buffer.toString(
+            'utf8',
+            frameDataOffset + 1,
+            frameDataOffset + frameSize,
+          )
+        }
+
+        text = text.replace(/\0/g, '').trim()
+
+        if (isTitle) metadata.title = text
+        if (isArtist) metadata.artist = text
+        if (isAlbum) metadata.album = text
+        if (isLyrics) {
+          metadata.lyrics = text.substring(4)
+        }
+        if (isYear) {
+          const parsedYear = parseInt(text, 10)
+          if (!isNaN(parsedYear)) metadata.year = parsedYear
+        }
+        if (isTrack) {
+          const match = text.match(/^(\d+)/)
+          if (match) metadata.track = parseInt(match[1], 10)
+        }
+        if (isDisc) {
+          const match = text.match(/^(\d+)/)
+          if (match) metadata.disc = parseInt(match[1], 10)
+        }
+      }
+
+      offset += headerSize + frameSize
+    }
+  } catch (e) {
+    console.log('MP3 manual ID3v2 parse error:', e)
+  }
+
+  return metadata
+}
 
 /**
  * A lightweight pure-JavaScript MP4/M4A Atom parser.
@@ -23,14 +154,11 @@ const parseM4aBufferMetadata = (buffer: Buffer) => {
     track: null as number | null,
     disc: null as number | null,
     year: null as number | null,
+    tagVersion: 'iTunes Atom' as string | null, // M4A uses iTunes Atoms structure
   }
 
   try {
     let offset = 0
-    console.log(
-      `[Parser Debug] Starting parse. Buffer size: ${buffer.length} bytes.`,
-    )
-
     while (offset < buffer.length - 8) {
       const size = buffer.readUInt32BE(offset)
 
@@ -89,7 +217,7 @@ const parseM4aBufferMetadata = (buffer: Buffer) => {
               if (isAlbum) metadata.album = dataString
               if (isLyrics) metadata.lyrics = dataString
               if (isYear) {
-                // Parse first 4 digits of release date string (e.g. "2014-02-26" -> 2014)
+                // Parse the first 4 digits of the release date string (e.g. "2014-02-26" -> 2014)
                 const matchedYear = dataString.match(/^\d{4}/)
                 if (matchedYear) metadata.year = parseInt(matchedYear[0], 10)
               }
@@ -116,9 +244,6 @@ const parseM4aBufferMetadata = (buffer: Buffer) => {
               const indexVal = buffer.readUInt16BE(subOffset + 18)
               if (type === 'trkn') metadata.track = indexVal
               if (type === 'disk') metadata.disc = indexVal
-              console.log(
-                `[Parser Debug] Parsed binary tag '${type}': index is ${indexVal}`,
-              )
             }
             break
           }
@@ -132,12 +257,9 @@ const parseM4aBufferMetadata = (buffer: Buffer) => {
     console.log('M4A manual binary parse error:', e)
   }
 
-  console.log(
-    '[Parser Debug] Parsing complete. Extracted:',
-    JSON.stringify(metadata),
-  )
   return metadata
 }
+
 /**
  * Extracts metadata from a local file URI.
  */
@@ -149,11 +271,14 @@ const getFileMetadata = async (uri: string) => {
 
     const decodedUri = decodeURIComponent(uri).toLowerCase()
     const isM4a = decodedUri.endsWith('.m4a') || decodedUri.endsWith('.mp4')
+    const isMp3 = decodedUri.endsWith('.mp3')
 
     if (isM4a) {
       // Use our custom pure-JS binary parser for iTunes M4A files
       const m4aTags = parseM4aBufferMetadata(buffer)
       return {
+        fileFormat: 'm4a' as const,
+        tagVersion: m4aTags.tagVersion,
         common: {
           title: m4aTags.title,
           artist: m4aTags.artist,
@@ -166,10 +291,28 @@ const getFileMetadata = async (uri: string) => {
       }
     }
 
-    // Use music-metadata for MP3 and other formats
-    return await mm.parseBuffer(buffer)
+    if (isMp3) {
+      // Use our custom pure-JS binary parser for MP3 ID3v2 files
+      const mp3Tags = parseMp3BufferMetadata(buffer)
+      return {
+        fileFormat: 'mp3' as const,
+        tagVersion: mp3Tags.tagVersion,
+        common: {
+          title: mp3Tags.title,
+          artist: mp3Tags.artist,
+          album: mp3Tags.album,
+          track: { no: mp3Tags.track },
+          disk: { no: mp3Tags.disc },
+          year: mp3Tags.year,
+          lyrics: mp3Tags.lyrics ? [{ text: mp3Tags.lyrics }] : null,
+        },
+      }
+    }
+
+    // Default fallback (returns null values safely)
+    return null
   } catch (e) {
-    console.log(`music-metadata: Failed parsing metadata for ${uri}:`, e)
+    console.log(`Failed parsing manual metadata for ${uri}:`, e)
     return null
   }
 }
@@ -185,7 +328,7 @@ export const pickAndSaveMusicFiles = async () => {
   }
   try {
     const result = await DocumentPicker.getDocumentAsync({
-      type: 'audio/*',
+      type: ['audio/mpeg', 'audio/x-m4a', 'audio/mp4'],
       copyToCacheDirectory: true,
       multiple: true,
     })
@@ -219,6 +362,8 @@ export const pickAndSaveMusicFiles = async () => {
         coverUri: null,
         origFilename: asset.name,
         importedAt,
+        fileFormat: metadata?.fileFormat ?? null,
+        tagVersion: metadata?.tagVersion ?? null,
         origTitle: common?.title ?? null,
         origArtist: common?.artist ?? null,
         origAlbum: common?.album ?? null,
@@ -227,7 +372,7 @@ export const pickAndSaveMusicFiles = async () => {
         origYear: common?.year ?? null,
         origLyrics: common?.lyrics?.[0].text ?? null,
         title: common?.title ?? asset.name,
-        artist: importedAt + ' ' + (common?.title ?? asset.name),
+        artist: common?.artist ?? null,
         album: common?.album ?? null,
         lyrics: common?.lyrics?.[0].text ?? null,
         appCoverUri: null,
@@ -263,6 +408,7 @@ export const refreshLocalMusicList = async () => {
           const filename = parts.slice(2).join('_')
           const existing = currentStore.find(f => f.id === id)
           const metadata = await getFileMetadata(file.uri)
+          // console.log('metadata:', metadata)
           const common = metadata?.common
 
           return {
@@ -271,6 +417,8 @@ export const refreshLocalMusicList = async () => {
             coverUri: existing?.coverUri ?? null,
             origFilename: filename,
             importedAt,
+            fileFormat: metadata?.fileFormat ?? null,
+            tagVersion: metadata?.tagVersion ?? null,
             origTitle: common?.title ?? null,
             origArtist: common?.artist ?? null,
             origAlbum: common?.album ?? null,
@@ -279,13 +427,14 @@ export const refreshLocalMusicList = async () => {
             origYear: common?.year ?? null,
             origLyrics: common?.lyrics?.[0].text ?? null,
             title: existing?.title ?? common?.title ?? filename,
-            artist: importedAt + ' ' + (common?.title ?? filename),
+            artist: existing?.artist ?? common?.artist ?? null,
             album: existing?.album ?? common?.album ?? null,
             lyrics: existing?.lyrics ?? common?.lyrics?.[0].text ?? null,
             appCoverUri: existing?.appCoverUri ?? null,
           } as MusicFile
         }),
     )
+    console.log('musicFiles:', musicFiles)
     musicFiles$.set(musicFiles)
   } catch (error) {
     console.error('refreshLocalMusicList error:', error)
@@ -310,7 +459,7 @@ export const deleteAllMusicFiles = async () => {
       void file.delete()
     }
 
-    musicFiles$.delete()
+    musicFiles$.set([])
   } catch (error) {
     console.error('deleteAllMusicFiles error:', error)
     throw error

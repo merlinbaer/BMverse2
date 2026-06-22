@@ -71,7 +71,6 @@
     "expo-web-browser": "~56.0.5",
     "idb-keyval": "^6.2.2",
     "lz-string": "^1.5.0",
-    "music-metadata": "^11.13.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.85.3",

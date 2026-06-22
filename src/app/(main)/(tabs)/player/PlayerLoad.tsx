@@ -8,13 +8,16 @@ import { AppBubbleText } from 'src/components/AppBubbleText'
 import { AppScreen } from 'src/components/AppScreen'
 
 const loadText =
-  '**Select music files for adding to BMverse**\n' +
+  '**Select your music files to add to BMverse**\n' +
   '- You can add multiple files at once\n' +
   '- You can add from your cloud drive\n' +
-  '- A playlist is created, for several files\n' +
+  '- MP3 and M4A files supported\n' +
+  '- A playlist is created, for multiple files\n' +
   '- No playlist is created, for a single file  \n\n' +
-  '**ADVISE: Tag your files before adding!**'
-const deleteText = 'Here you can delete all added files'
+  '**Supported tags**\n' +
+  '- MP3: ID3v2.2, ID3v2.3, or ID3v2.4\n' +
+  '- M4A: MP4 metadata (iTunes)'
+const deleteText = 'Here you can delete all imported music files.'
 
 export default function PlayerLoadScreen() {
   const handleLoadMusic = async () => {

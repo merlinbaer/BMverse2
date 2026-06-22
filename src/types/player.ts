@@ -6,13 +6,6 @@ export interface PreviewSong {
   song_preview_uri: string | null
 }
 
-export interface LocalMusicFile {
-  id: string
-  name: string
-  uri: string
-  originalName: string
-}
-
 export interface MusicFile {
   id: string
   importedAt: string
@@ -20,6 +13,9 @@ export interface MusicFile {
   audioUri: string
   coverUri: string | null
 
+  // Debug/Diagnostics tags
+  fileFormat: 'mp3' | 'm4a' | null
+  tagVersion: string | null
   // Original meta tags
   origTitle: string | null
   origArtist: string | null
