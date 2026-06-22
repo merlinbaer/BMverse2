@@ -13,7 +13,6 @@ import { bmFonts } from '@/layout/fonts'
 import { initAssets } from '@/services/assets'
 import { initAudioMode } from '@/services/audio'
 import { initAuth } from '@/services/auth'
-import { refreshLocalMusicList } from '@/services/files'
 import { initPlayerStats } from '@/services/games'
 import {
   isAuthLoaded$,
@@ -21,6 +20,7 @@ import {
   localStore$,
 } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
+import { refreshLocalMusicList } from '@/services/player/files'
 import { isPWA, registerServiceWorker } from '@/services/pwa'
 
 SplashScreen.setOptions({

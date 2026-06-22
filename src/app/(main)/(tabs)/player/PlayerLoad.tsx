@@ -3,7 +3,10 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
-import { deleteAllMusicFiles, pickAndSaveMusicFiles } from '@/services/files'
+import {
+  deleteAllMusicFiles,
+  pickAndSaveMusicFiles,
+} from '@/services/player/files'
 import { AppBubbleText } from 'src/components/AppBubbleText'
 import { AppScreen } from 'src/components/AppScreen'
 
