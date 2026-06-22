@@ -2,7 +2,7 @@ import * as DocumentPicker from 'expo-document-picker'
 import { Directory, File, Paths } from 'expo-file-system'
 import { Platform } from 'react-native'
 
-import { localMusicFiles$ } from '@/services/legend'
+import { musicFiles$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import { MusicFile } from '@/types/player'
 
@@ -45,7 +45,7 @@ export const pickAndSaveMusicFiles = async () => {
       void sourceFile.copy(destinationFile)
 
       // Add to LegendState memory observable
-      localMusicFiles$.push({
+      musicFiles$.push({
         id: uuid,
         audioUri: destinationFile.uri,
         coverUri: null,
@@ -113,7 +113,7 @@ export const refreshLocalMusicList = async () => {
         } as MusicFile
       })
 
-    localMusicFiles$.set(musicFiles)
+    musicFiles$.set(musicFiles)
   } catch (error) {
     console.error('refreshLocalMusicList error:', error)
   }
@@ -137,7 +137,7 @@ export const deleteAllMusicFiles = async () => {
       void file.delete()
     }
 
-    localMusicFiles$.set([])
+    musicFiles$.delete()
   } catch (error) {
     console.error('deleteAllMusicFiles error:', error)
     throw error
