@@ -3,15 +3,18 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
-import { pickAndSaveMusicFiles } from '@/services/files'
+import { deleteAllMusicFiles, pickAndSaveMusicFiles } from '@/services/files'
 import { AppBubbleText } from 'src/components/AppBubbleText'
 import { AppScreen } from 'src/components/AppScreen'
 
 const loadText =
-  'Select music files for adding them to BMverse.\n' +
-  'You can add multiple files at once.' +
-  'You can add from your cloud drive too.' +
-  'You can select a folder to add all music files in it.'
+  '**Select music files for adding to BMverse**\n' +
+  '- You can add multiple files at once\n' +
+  '- You can add from your cloud drive\n' +
+  '- A playlist is created, for several files\n' +
+  '- No playlist is created, for a single file  \n\n' +
+  '**ADVISE: Tag your files before adding!**'
+const deleteText = 'Here you can delete all added files'
 
 export default function PlayerLoadScreen() {
   const handleLoadMusic = async () => {
@@ -21,15 +24,27 @@ export default function PlayerLoadScreen() {
       console.error(e)
     }
   }
+  const handleDeleteAll = async () => {
+    try {
+      await deleteAllMusicFiles()
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   return (
     <AppScreen>
-      <Stack.Screen options={{ title: 'Add Music' }} />
+      <Stack.Screen options={{ title: 'Manage Files' }} />
       <View style={styles.container}>
         <AppBubbleText markup={loadText} orientation={'center'} />
         <AppButton
-          title={'Load Music File'}
+          title={'Load Music File(s)'}
           onPress={handleLoadMusic}
+        ></AppButton>
+        <AppBubbleText markup={deleteText} orientation={'center'} />
+        <AppButton
+          title={'Delete All Files'}
+          onPress={handleDeleteAll}
         ></AppButton>
       </View>
     </AppScreen>

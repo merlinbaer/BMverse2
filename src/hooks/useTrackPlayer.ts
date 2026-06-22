@@ -9,10 +9,10 @@ export const useTrackPlayer = (onFinished?: () => void) => {
 
   // Map local files to the source format required by useAudioPlaylist
   const sources = files.map(file => ({
-    uri: file.uri,
+    uri: file.audioUri,
     metadata: {
-      title: file.originalName,
-      artist: 'Local Track',
+      title: file.title,
+      artist: file.artist ?? 'Local Track',
     },
   }))
 

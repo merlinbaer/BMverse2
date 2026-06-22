@@ -48,10 +48,10 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
           style={styles.songTitle}
           numberOfLines={1}
         >
-          {currentTrack?.originalName || 'No track selected'}
+          {currentTrack?.title || 'No track selected'}
         </AppText>
         <AppText fontSize={FONT.SIZE.SM} style={styles.songArtist}>
-          {'Local Library'}
+          {currentTrack?.artist || 'Local Library'}
         </AppText>
       </View>
 

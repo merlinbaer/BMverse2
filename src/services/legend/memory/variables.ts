@@ -2,15 +2,8 @@ import { observable } from '@legendapp/state'
 
 import { PlayerStats, SongQuizType } from '@/types/games'
 import { SongListType, VideoListType } from '@/types/list'
-import { PreviewSong } from '@/types/player'
+import { MusicFile, PreviewSong } from '@/types/player'
 import { User } from '@/types/user'
-
-export interface LocalMusicFile {
-  id: string
-  name: string
-  uri: string
-  originalName: string
-}
 
 // App state
 export const isInstallDismissed$ = observable(false)
@@ -24,7 +17,7 @@ export const videoSort$ = observable<VideoListType>('Views')
 export const syncRefresh$ = observable<number>(60) // 1-minute
 // audio player state
 export const activePreviewSong$ = observable<PreviewSong | null>(null)
-export const localMusicFiles$ = observable<LocalMusicFile[]>([])
+export const localMusicFiles$ = observable<MusicFile[]>([])
 // game state
 export const songQuiz$ = observable<SongQuizType>('NEW')
 export const playerStats$ = observable<PlayerStats | null>(null)

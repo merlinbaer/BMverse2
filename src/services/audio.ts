@@ -1,7 +1,7 @@
 import { computed } from '@legendapp/state'
 import { setAudioModeAsync } from 'expo-audio'
 
-import coverSINGLE from '@/../assets/images/Single_200.png'
+import { IMAGES } from '@/constants/images'
 import { localMusicFiles$ } from '@/services/legend'
 import { ListItemType } from '@/types/list'
 
@@ -21,11 +21,11 @@ export const localMusicList$ = computed<ListItemType[]>(() => {
   return files.map(
     (file): ListItemType => ({
       id: file.id,
-      line1: file.originalName,
-      line2: 'Unknown',
-      icon: coverSINGLE,
+      line1: file.title,
+      line2: file.artist ?? 'Unknown',
+      icon: IMAGES.cover200.single,
       route: null,
-      value: file.uri,
+      value: file.audioUri,
     }),
   )
 })
