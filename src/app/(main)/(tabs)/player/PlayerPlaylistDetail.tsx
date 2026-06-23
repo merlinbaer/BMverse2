@@ -2,9 +2,8 @@ import { useObservable, useValue } from '@legendapp/state/react'
 import { Image } from 'expo-image'
 import { Stack, useLocalSearchParams } from 'expo-router'
 import React from 'react'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 
-import { AppBox } from '@/components/AppBox'
 import { AppFlatList } from '@/components/AppFlatList'
 import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
@@ -40,10 +39,21 @@ export default function PlayerPlaylistDetailScreen() {
       playlistNameUpdate(detail.id, newName)
     }
   }
+  const handleAddTrack = () => {
+    // Placeholder for adding track logic
+  }
+
+  const handleCopyList = () => {
+    // Placeholder for copying list logic
+  }
+
+  const handleDeleteList = () => {
+    // Placeholder for deleting list logic
+  }
 
   return (
     <AppScreen>
-      <Stack.Screen options={{ title: 'Playlist Details' }} />
+      <Stack.Screen options={{ title: 'Edit Playlist' }} />
       <View style={styles.container}>
         <View style={styles.headerImageContainer}>
           <Image
@@ -52,8 +62,7 @@ export default function PlayerPlaylistDetailScreen() {
             style={styles.headerImage}
           />
         </View>
-
-        <AppBox>
+        <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
             placeholder="Type here"
@@ -63,11 +72,47 @@ export default function PlayerPlaylistDetailScreen() {
             onSubmitEditing={handleUpdateName}
             onBlur={handleUpdateName}
           />
-          <AppText fontSize={FONT.SIZE.XS} style={{ color: COLORS.SECONDARY }}>
-            Tap to edit playlist name
-          </AppText>
-        </AppBox>
-
+          <View style={styles.iconRight}>
+            <IMAGES.vector.Octicons
+              name="pencil"
+              size={16}
+              color={COLORS.TEXT_MUTED}
+            />
+          </View>
+        </View>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleAddTrack}
+          >
+            <IMAGES.vector.Octicons name="plus" size={18} color={COLORS.TEXT} />
+            <AppText fontSize={FONT.SIZE.XS} style={styles.buttonText}>
+              Add Track
+            </AppText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleCopyList}
+          >
+            <IMAGES.vector.Octicons name="copy" size={18} color={COLORS.TEXT} />
+            <AppText fontSize={FONT.SIZE.XS} style={styles.buttonText}>
+              Copy List
+            </AppText>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={handleDeleteList}
+          >
+            <IMAGES.vector.Octicons
+              name="trash"
+              size={18}
+              color={COLORS.PRIMARY}
+            />
+            <AppText fontSize={FONT.SIZE.XS} style={styles.buttonTextDanger}>
+              Delete List
+            </AppText>
+          </TouchableOpacity>
+        </View>
         <View
           style={[styles.listContainer, { marginBottom: insets.bottom + 60 }]}
         >
@@ -79,25 +124,68 @@ export default function PlayerPlaylistDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  actionButton: {
+    alignItems: 'center',
+    backgroundColor: COLORS.BG_GREY,
+    borderColor: COLORS.MODAL_BORDER,
+    borderRadius: 8,
+    borderWidth: 1,
+    flex: 1,
+    gap: 4,
+    justifyContent: 'center',
+    paddingVertical: 10,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: 16,
+    marginVertical: 8,
+    paddingHorizontal: 16,
+  },
+  buttonText: {
+    color: COLORS.TEXT,
+    fontWeight: 'bold',
+  },
+  buttonTextDanger: {
+    color: COLORS.PRIMARY,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
-    gap: 12,
+    gap: 8,
     marginTop: 8,
   },
   headerImage: {
     borderRadius: 12,
-    height: 200,
-    width: 200,
+    height: 150,
+    width: 150,
   },
   headerImageContainer: {
     alignItems: 'center',
+    alignSelf: 'center',
+    backgroundColor: COLORS.MODAL_BACKGROUND,
+    borderColor: COLORS.MODAL_BORDER,
+    borderRadius: 12,
+    borderWidth: 1,
     marginVertical: 10,
-    width: '100%',
+    padding: 20,
+    width: 220,
+  },
+  iconRight: {
+    position: 'absolute',
+    right: 16,
   },
   input: {
     color: COLORS.TEXT,
     fontSize: FONT.SIZE.BASE,
-    paddingVertical: 8,
+    minWidth: 100,
+    paddingVertical: 4,
+    textAlign: 'center',
+  },
+  inputWrapper: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: 40, // Space for the icon so text stays centered
   },
   listContainer: {
     flex: 1,
