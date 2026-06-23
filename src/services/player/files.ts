@@ -76,7 +76,7 @@ const getFileMetadata = async (uri: string) => {
 export const pickAndSaveMusicFiles = async () => {
   if (Platform.OS === 'web') {
     console.warn('File picking is not supported on web in this implementation.')
-    return
+    return { count: 0, playlistCreated: false }
   }
   try {
     const result = await DocumentPicker.getDocumentAsync({
@@ -86,11 +86,12 @@ export const pickAndSaveMusicFiles = async () => {
     })
 
     if (result.canceled || !result.assets) {
-      return
+      return { count: 0, playlistCreated: false }
     }
 
     const docDir = Paths.document
     const newTrackIds: string[] = []
+    const importedCount = result.assets.length
 
     for (const asset of result.assets) {
       const uuid = generateId()
@@ -133,7 +134,8 @@ export const pickAndSaveMusicFiles = async () => {
     }
 
     // Create a playlist if more than one file is imported
-    if (result.assets.length > 1) {
+    let playlistCreated = false
+    if (importedCount > 1) {
       const now = new Date()
       playlists$.push({
         id: generateId(),
@@ -144,7 +146,9 @@ export const pickAndSaveMusicFiles = async () => {
           trackNum: index + 1,
         })),
       })
+      playlistCreated = true
     }
+    return { count: importedCount, playlistCreated }
   } catch (error) {
     console.error('pickAndSaveMusicFiles error:', error)
     throw error

@@ -21,9 +21,9 @@ const loadText =
   '**About tagging**\n' +
   '- MP3: ID3v2.2, ID3v2.3, or ID3v2.4\n' +
   '- M4A: MP4 metadata (iTunes)\n' +
-  '- Recommended: Title, Artist, Album,\n' +
-  '  Year and Track Number\n' +
-  '- Optional: Disk Number, Lyrics, Cover'
+  '- Used Tags: Title, Artist, Album, Year\n' +
+  '  Track Number, Disk Number(optional)'
+
 const deleteText = 'Here you can delete all imported music files.'
 
 export default function PlayerLoadScreen() {
@@ -31,11 +31,22 @@ export default function PlayerLoadScreen() {
 
   const handleLoadMusic = async () => {
     try {
-      await pickAndSaveMusicFiles()
+      const result = await pickAndSaveMusicFiles()
+      if (result.count > 0) {
+        const message = result.playlistCreated
+          ? `Successfully imported ${result.count} files. A new playlist has been created automatically.`
+          : `Successfully imported ${result.count} file.`
+        showAlert('Import Successful', message)
+      }
     } catch (e) {
       console.error(e)
+      showAlert(
+        'Import Error',
+        'An unexpected error occurred while importing your music.',
+      )
     }
   }
+
   const handleDeleteAll = () => {
     showAlert(
       'Delete All Data',
