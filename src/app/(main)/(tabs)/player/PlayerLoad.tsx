@@ -3,6 +3,7 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
+import { useAlert } from '@/hooks/useAlert'
 import {
   deleteAllMusicFiles,
   pickAndSaveMusicFiles,
@@ -17,12 +18,17 @@ const loadText =
   '- MP3 and M4A files supported\n' +
   '- A playlist is created, for multiple files\n' +
   '- No playlist is created, for a single file  \n\n' +
-  '**Supported tags**\n' +
+  '**About tagging**\n' +
   '- MP3: ID3v2.2, ID3v2.3, or ID3v2.4\n' +
-  '- M4A: MP4 metadata (iTunes)'
+  '- M4A: MP4 metadata (iTunes)\n' +
+  '- Recommended: Title, Artist, Album,\n' +
+  '  Year and Track Number\n' +
+  '- Optional: Disk Number, Lyrics, Cover'
 const deleteText = 'Here you can delete all imported music files.'
 
 export default function PlayerLoadScreen() {
+  const { showAlert } = useAlert()
+
   const handleLoadMusic = async () => {
     try {
       await pickAndSaveMusicFiles()
@@ -30,12 +36,25 @@ export default function PlayerLoadScreen() {
       console.error(e)
     }
   }
-  const handleDeleteAll = async () => {
-    try {
-      await deleteAllMusicFiles()
-    } catch (e) {
-      console.error(e)
-    }
+  const handleDeleteAll = () => {
+    showAlert(
+      'Delete All Data',
+      'Are you sure you want to delete all music files and all playlists? this action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAllMusicFiles()
+            } catch (e) {
+              console.error(e)
+            }
+          },
+        },
+      ],
+    )
   }
 
   return (
@@ -44,7 +63,7 @@ export default function PlayerLoadScreen() {
       <View style={styles.container}>
         <AppBubbleText markup={loadText} orientation={'center'} />
         <AppButton
-          title={'Load Music File(s)'}
+          title={'Add Music File(s)'}
           onPress={handleLoadMusic}
         ></AppButton>
         <AppBubbleText markup={deleteText} orientation={'center'} />

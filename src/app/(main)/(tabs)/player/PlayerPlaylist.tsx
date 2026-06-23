@@ -3,13 +3,13 @@ import { Stack } from 'expo-router'
 import React from 'react'
 
 import { AppListScreen } from '@/components/AppListScreen'
-import { musicPlaylist$ } from '@/services/legend'
+import { playlistList$ } from '@/services/legend'
 
 export default function PlayerPlaylistScreen() {
-  const localMusicList = useValue(musicPlaylist$)
+  const playlists = useValue(playlistList$)
   return (
-    <AppListScreen data={localMusicList}>
-      <Stack.Screen options={{ title: 'Playlist' }} />
+    <AppListScreen data={playlists}>
+      <Stack.Screen options={{ title: 'Playlists' }} />
     </AppListScreen>
   )
 }

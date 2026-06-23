@@ -13,7 +13,7 @@ export interface MusicFile {
   audioUri: string
   coverUri: string | null
 
-  // Debug/Diagnostics tags
+  // Diagnostics tags
   fileFormat: 'mp3' | 'm4a' | null
   tagVersion: string | null
   // Original meta tags
@@ -31,4 +31,16 @@ export interface MusicFile {
   album: string | null
   lyrics: string | null
   appCoverUri: string | null
+}
+
+export interface PlaylistTrack {
+  musicFileId: string // Reference to MusicFile.id
+  trackNum: number
+}
+
+export interface Playlist {
+  id: string
+  name: string
+  imageUri: string | null
+  tracks: PlaylistTrack[]
 }

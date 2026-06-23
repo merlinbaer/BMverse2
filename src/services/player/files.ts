@@ -4,13 +4,16 @@ import * as DocumentPicker from 'expo-document-picker'
 import { Directory, File, Paths } from 'expo-file-system'
 import { Platform } from 'react-native'
 
-import { musicFiles$ } from '@/services/legend'
+import { IMAGES } from '@/constants/images'
+import { musicFiles$, playlists$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import {
   parseM4aBufferMetadata,
   parseMp3BufferMetadata,
 } from '@/services/player/tagParser'
 import { MusicFile } from '@/types/player'
+
+import { getPlaylistTimestamp } from '../dateTimeHelper'
 
 /**
  * Extracts metadata from a local file URI.
@@ -86,11 +89,12 @@ export const pickAndSaveMusicFiles = async () => {
       return
     }
 
-    // Paths.document is the modern equivalent of documentDirectory
     const docDir = Paths.document
+    const newTrackIds: string[] = []
 
     for (const asset of result.assets) {
       const uuid = generateId()
+      newTrackIds.push(uuid)
       const importedAt = new Date().toISOString()
       const safeName = asset.name.replace(/[^a-zA-Z0-9. _-]/g, '')
       const newFileName = `${uuid}_${importedAt}_${safeName}`
@@ -125,6 +129,20 @@ export const pickAndSaveMusicFiles = async () => {
         album: common?.album ?? null,
         lyrics: common?.lyrics?.[0].text ?? null,
         appCoverUri: null,
+      })
+    }
+
+    // Create a playlist if more than one file is imported
+    if (result.assets.length > 1) {
+      const now = new Date()
+      playlists$.push({
+        id: generateId(),
+        name: getPlaylistTimestamp(now),
+        imageUri: IMAGES.cover200.notFound,
+        tracks: newTrackIds.map((id, index) => ({
+          musicFileId: id,
+          trackNum: index + 1,
+        })),
       })
     }
   } catch (error) {
@@ -209,6 +227,7 @@ export const deleteAllMusicFiles = async () => {
     }
 
     musicFiles$.set([])
+    playlists$.set([]) // Clear playlists as well
   } catch (error) {
     console.error('deleteAllMusicFiles error:', error)
     throw error
