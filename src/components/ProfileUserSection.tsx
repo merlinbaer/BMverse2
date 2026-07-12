@@ -133,15 +133,18 @@ export const ProfileUserSection = () => {
       {Platform.OS === 'web' && <Spacer size={16} />}
       <FieldGroup.Section title="User">
         <Row>
-          <Text>Status:</Text>
+          <Text textStyle={{ color: COLORS.TEXT_MUTED }}>Status:</Text>
           <Spacer flexible />
-          <Text>{user ? user.email : 'You are not logged in'}</Text>
+          <Text textStyle={{ color: COLORS.TEXT }}>
+            {user ? user.email : 'You are not logged in'}
+          </Text>
         </Row>
         {user ? (
           <>
             <Collapsible
               isOpen={openLogout}
               onOpenChange={setOpenLogout}
+              labelStyle={{ color: COLORS.TEXT_MUTED }}
               label="Logout"
             >
               <Row>
@@ -181,7 +184,7 @@ export const ProfileUserSection = () => {
               </Row>
             </Collapsible>
             <Row spacing={8}>
-              <Text>Nickname:</Text>
+              <Text textStyle={{ color: COLORS.TEXT_MUTED }}>Nickname:</Text>
               <TextInput
                 key={profile?.user_name ?? 'empty'}
                 ref={nameRef}
@@ -195,6 +198,7 @@ export const ProfileUserSection = () => {
             <Collapsible
               isOpen={openRegion}
               onOpenChange={setOpenRegion}
+              labelStyle={{ color: COLORS.TEXT_MUTED }}
               label={`Your Region: ${currentRegionLabel}`}
             >
               <Picker
@@ -214,19 +218,22 @@ export const ProfileUserSection = () => {
               {Platform.OS !== 'ios' && <Spacer size={8} />}
             </Collapsible>
             <Row>
-              <Text>Role:</Text>
+              <Text textStyle={{ color: COLORS.TEXT_MUTED }}>Role:</Text>
               <Spacer flexible />
-              <Text>{profile?.user_role ?? 'Unknown'}</Text>
+              <Text textStyle={{ color: COLORS.TEXT }}>
+                {profile?.user_role ?? 'Unknown'}
+              </Text>
             </Row>
           </>
         ) : (
           <Collapsible
             isOpen={openLogin}
             onOpenChange={setOpenLogin}
+            labelStyle={{ color: COLORS.TEXT_MUTED }}
             label="Login"
           >
             <Row spacing={8}>
-              <Text>Enter Email:</Text>
+              <Text textStyle={{ color: COLORS.TEXT_MUTED }}>Enter Email:</Text>
               <TextInput
                 ref={emailRef}
                 placeholder={isLoggingIn ? 'Verifying...' : 'Type here'}
@@ -239,7 +246,9 @@ export const ProfileUserSection = () => {
             </Row>
             {Platform.OS === 'web' && <Spacer size={8} />}
             <Row spacing={8}>
-              <Text>Received Passcode:</Text>
+              <Text textStyle={{ color: COLORS.TEXT_MUTED }}>
+                Received Passcode:
+              </Text>
               <TextInput
                 ref={codeRef}
                 keyboardType="number-pad"

@@ -32,7 +32,9 @@ export default function PlayerPlaylistDetailScreen() {
       </AppScreen>
     )
   }
-
+  const handleImagePress = () => {
+    // Placeholder for cover change/add menu
+  }
   const handleUpdateName = () => {
     const newName = draftName$.get().trim()
     if (detail.id && newName && newName !== detail.name) {
@@ -55,13 +57,24 @@ export default function PlayerPlaylistDetailScreen() {
     <AppScreen>
       <Stack.Screen options={{ title: 'Edit Playlist' }} />
       <View style={styles.container}>
-        <View style={styles.headerImageContainer}>
+        <TouchableOpacity
+          style={styles.headerImageContainer}
+          onPress={handleImagePress}
+          activeOpacity={0.7}
+        >
           <Image
             source={detail.imageUri || IMAGES.cover200.notFound}
             contentFit="cover"
             style={styles.headerImage}
           />
-        </View>
+          <View style={styles.kebabIconContainer}>
+            <IMAGES.vector.Octicons
+              name="kebab-horizontal"
+              size={16}
+              color={COLORS.TEXT_MUTED}
+            />
+          </View>
+        </TouchableOpacity>
         <View style={styles.inputWrapper}>
           <TextInput
             style={styles.input}
@@ -186,6 +199,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     paddingHorizontal: 40, // Space for the icon so text stays centered
+  },
+  kebabIconContainer: {
+    bottom: 8,
+    position: 'absolute',
+    right: 8,
   },
   listContainer: {
     flex: 1,

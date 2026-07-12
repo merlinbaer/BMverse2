@@ -4,6 +4,7 @@ import * as WebBrowser from 'expo-web-browser'
 import React, { useState } from 'react'
 import { Platform } from 'react-native'
 
+import { COLORS } from '@/constants/constants'
 import { localStore$ } from '@/services/legend'
 
 export const ProfileDocumentationSection = () => {
@@ -22,9 +23,10 @@ export const ProfileDocumentationSection = () => {
         <Collapsible
           isOpen={openDisclaimer}
           onOpenChange={setOpenDisclaimer}
+          labelStyle={{ color: COLORS.TEXT_MUTED }}
           label="Disclaimer"
         >
-          <Text>
+          <Text textStyle={{ color: COLORS.TEXT_MUTED }}>
             BMverse has no affiliation, association, endorsement, or any
             connection to BABYMETAL, or any of its subsidiaries or affiliates.
             BMverse makes no claim to and has no ownership interest in any
@@ -34,6 +36,7 @@ export const ProfileDocumentationSection = () => {
         <Collapsible
           isOpen={openLinks}
           onOpenChange={setOpenLinks}
+          labelStyle={{ color: COLORS.TEXT_MUTED }}
           label="Look at"
         >
           <Button

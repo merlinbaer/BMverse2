@@ -6,12 +6,11 @@ import { ProfileDocumentationSection } from '@/components/ProfileDocumentationSe
 import { ProfileStatsSection } from '@/components/ProfileStatisticsSection'
 import { ProfileUserSection } from '@/components/ProfileUserSection'
 import { ProfileVersionSection } from '@/components/ProfileVersionSection'
-import { COLORS } from '@/constants/constants'
 
 export default function ProfileScreen() {
   return (
-    <Host style={{ flex: 1 }} colorScheme="dark">
-      <FieldGroup style={{ backgroundColor: COLORS.BACKGROUND }}>
+    <Host style={{ flex: 1 }} colorScheme={'dark'}>
+      <FieldGroup>
         <ProfileVersionSection />
         <ProfileUserSection />
         <ProfileDocumentationSection />

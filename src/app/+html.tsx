@@ -34,7 +34,25 @@ export default function Root({ children }: { children: React.ReactNode }) {
                 height: 100% !important;
                 width: 100% !important;
               }
-          
+              
+              /* Style the disclosure triangle/indicator for details summary in Collapsibles on Web */
+              details summary::-webkit-details-marker,
+              details summary::marker,
+              details ::marker,
+              summary ::marker {
+                color: #a4a09d !important;
+              }
+
+              /* Target any SVG triangle/arrow/indicator inside a details or summary in dark mode */
+              details summary svg,
+              details svg,
+              summary svg,
+              summary i {
+                color: #a4a09d !important;
+                fill: #a4a09d !important;
+                stroke: #a4a09d !important;
+              }
+                         
               /* 2. Full-Screen PWA Splash Screen */
               #pwa-splash {
                 position: fixed;
