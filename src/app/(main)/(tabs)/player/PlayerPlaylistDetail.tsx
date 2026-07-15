@@ -11,6 +11,7 @@ import { AppStaticScreen } from '@/components/AppStaticScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
+import { useAlert } from '@/hooks/useAlert'
 import {
   playlistDetail$,
   playlistNameUpdate,
@@ -23,6 +24,7 @@ export default function PlayerPlaylistDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const detail = useValue(playlistDetail$(id ?? ''))
   const tracks = useValue(playlistTracksList$(id ?? ''))
+  const { showAlert } = useAlert()
 
   const draftName$ = useObservable(detail?.name ?? '')
 
@@ -45,11 +47,42 @@ export default function PlayerPlaylistDetailScreen() {
 
   const handleReorder = (newData: ListItemType[]) => {
     if (!id) return
-    const updatedTracks = newData.map((item, index) => ({
-      musicFileId: item.id,
-      trackNum: index + 1,
-    }))
+    // Remove the placeholder zone before saving to state
+    const updatedTracks = newData
+      .filter(t => t.id !== 'DELETE_ZONE')
+      .map((item, index) => ({
+        musicFileId: item.id,
+        trackNum: index + 1,
+      }))
     playlistTracksUpdate(id, updatedTracks)
+  }
+
+  const handleRemoveTrack = (item: ListItemType) => {
+    showAlert(
+      'Remove Track',
+      `Are you sure you want to remove "${item.line1}" from this playlist?`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            if (!id) return
+            // Filter global tracks state
+            const updatedTracks = tracks
+              .filter(t => t.id !== item.id)
+              .map((t, index) => ({
+                musicFileId: t.id,
+                trackNum: index + 1,
+              }))
+            playlistTracksUpdate(id, updatedTracks)
+          },
+        },
+      ],
+    )
   }
 
   const handleAddTrack = () => {
@@ -132,13 +165,26 @@ export default function PlayerPlaylistDetailScreen() {
     </View>
   )
 
+  // Prepend the delete zone to the track data
+  const listData: ListItemType[] = [
+    {
+      id: 'DELETE_ZONE',
+      line1: 'Move here to remove track',
+      line2: '',
+      icon: '',
+      route: null,
+    },
+    ...tracks,
+  ]
+
   return (
     <AppStaticScreen>
       <Stack.Screen options={{ title: 'Edit Playlist' }} />
       <View style={styles.container}>
         <AppDragList
-          data={tracks}
+          data={listData}
           onReorder={handleReorder}
+          onDeleteItem={handleRemoveTrack}
           ListHeaderComponent={Header}
         />
       </View>

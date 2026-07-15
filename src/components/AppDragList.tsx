@@ -11,11 +11,30 @@ import { ListItemType } from '@/types/list'
 interface AppDragListProps {
   data: ListItemType[]
   onReorder: (newData: ListItemType[]) => void
-  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null
+  onDeleteItem?: (item: ListItemType) => void
+  ListHeaderComponent?: React.ReactElement | null
 }
 
 function Item({ info }: { info: DragListRenderItemInfo<ListItemType> }) {
   const { item, onDragStart, onDragEnd, isActive } = info
+
+  // Render the Drop Zone (always the first item in the provided data)
+  if (item.id === 'DELETE_ZONE') {
+    return (
+      <View style={styles.deleteZoneContainer}>
+        <View style={styles.deleteZone}>
+          <IMAGES.vector.Octicons
+            name="trash"
+            size={20}
+            color={COLORS.PRIMARY}
+          />
+          <AppText fontSize={FONT.SIZE.XS} style={styles.deleteZoneText}>
+            {item.line1}
+          </AppText>
+        </View>
+      </View>
+    )
+  }
 
   return (
     <View style={[styles.pressable, isActive && styles.pressableActive]}>
@@ -47,11 +66,25 @@ function Item({ info }: { info: DragListRenderItemInfo<ListItemType> }) {
 export function AppDragList({
   data,
   onReorder,
+  onDeleteItem,
   ListHeaderComponent,
 }: AppDragListProps) {
+  const [resetKey, setResetKey] = React.useState(0)
   const keyExtractor = (item: ListItemType) => item.id
 
   const onReordered = (fromIndex: number, toIndex: number) => {
+    // 1. Check if dropped in Delete Zone
+    if (toIndex === 0 && onDeleteItem) {
+      // Increment key to force a hard visual reset of the VirtualizedList
+      setResetKey(prev => prev + 1)
+      // Delay the alert so the reset happens first
+      setTimeout(() => {
+        onDeleteItem(data[fromIndex])
+      }, 50)
+      return
+    }
+
+    // 2. perform regular reorder (adjusting for the fixed zone at index 0)
     const copy = [...data]
     const removed = copy.splice(fromIndex, 1)
     copy.splice(toIndex, 0, removed[0])
@@ -62,6 +95,7 @@ export function AppDragList({
 
   return (
     <DragList
+      key={`drag-list-${resetKey}`}
       data={data}
       keyExtractor={keyExtractor}
       onReordered={onReordered}
@@ -74,6 +108,26 @@ export function AppDragList({
 }
 
 const styles = StyleSheet.create({
+  deleteZone: {
+    alignItems: 'center',
+    backgroundColor: COLORS.BM_VERY_DARK_RED,
+    borderColor: COLORS.PRIMARY,
+    borderRadius: 12,
+    borderStyle: 'dashed',
+    borderWidth: 1,
+    flexDirection: 'row',
+    gap: 14,
+    justifyContent: 'center',
+    padding: 14,
+  },
+  deleteZoneContainer: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  deleteZoneText: {
+    color: COLORS.TEXT,
+    fontWeight: '600',
+  },
   divider: {
     backgroundColor: COLORS.PRIMARY,
     height: 1,
