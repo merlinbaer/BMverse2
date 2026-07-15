@@ -11,7 +11,6 @@ import { AppStaticScreen } from '@/components/AppStaticScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
-import { useBetterSafeAreaInsets } from '@/hooks/useBetterSafeAreaInsets'
 import {
   playlistDetail$,
   playlistNameUpdate,
@@ -24,7 +23,6 @@ export default function PlayerPlaylistDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
   const detail = useValue(playlistDetail$(id ?? ''))
   const tracks = useValue(playlistTracksList$(id ?? ''))
-  const insets = useBetterSafeAreaInsets()
 
   const draftName$ = useObservable(detail?.name ?? '')
 
@@ -66,84 +64,83 @@ export default function PlayerPlaylistDetailScreen() {
     // Placeholder for deleting list logic
   }
 
+  const Header = (
+    <View style={styles.headerContainer}>
+      <TouchableOpacity
+        style={styles.headerImageContainer}
+        onPress={handleImagePress}
+        activeOpacity={0.7}
+      >
+        <Image
+          source={detail.imageUri || IMAGES.cover200.notFound}
+          contentFit="cover"
+          style={styles.headerImage}
+        />
+        <View style={styles.kebabIconContainer}>
+          <IMAGES.vector.Octicons
+            name="kebab-horizontal"
+            size={16}
+            color={COLORS.TEXT_MUTED}
+          />
+        </View>
+      </TouchableOpacity>
+      <View style={styles.inputWrapper}>
+        <TextInput
+          style={styles.input}
+          placeholder="Type here"
+          placeholderTextColor={COLORS.TEXT_MUTED}
+          defaultValue={detail.name}
+          onChangeText={val => draftName$.set(val)}
+          onSubmitEditing={handleUpdateName}
+          onBlur={handleUpdateName}
+        />
+        <View style={styles.iconRight}>
+          <IMAGES.vector.Octicons
+            name="pencil"
+            size={16}
+            color={COLORS.TEXT_MUTED}
+          />
+        </View>
+      </View>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity style={styles.actionButton} onPress={handleAddTrack}>
+          <IMAGES.vector.Octicons name="plus" size={18} color={COLORS.TEXT} />
+          <AppText fontSize={FONT.SIZE.XS} style={styles.buttonText}>
+            Add Track
+          </AppText>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={handleCopyList}>
+          <IMAGES.vector.Octicons name="copy" size={18} color={COLORS.TEXT} />
+          <AppText fontSize={FONT.SIZE.XS} style={styles.buttonText}>
+            Copy List
+          </AppText>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={handleDeleteList}
+        >
+          <IMAGES.vector.Octicons
+            name="trash"
+            size={18}
+            color={COLORS.PRIMARY}
+          />
+          <AppText fontSize={FONT.SIZE.XS} style={styles.buttonTextDanger}>
+            Delete List
+          </AppText>
+        </TouchableOpacity>
+      </View>
+    </View>
+  )
+
   return (
     <AppStaticScreen>
       <Stack.Screen options={{ title: 'Edit Playlist' }} />
       <View style={styles.container}>
-        <TouchableOpacity
-          style={styles.headerImageContainer}
-          onPress={handleImagePress}
-          activeOpacity={0.7}
-        >
-          <Image
-            source={detail.imageUri || IMAGES.cover200.notFound}
-            contentFit="cover"
-            style={styles.headerImage}
-          />
-          <View style={styles.kebabIconContainer}>
-            <IMAGES.vector.Octicons
-              name="kebab-horizontal"
-              size={16}
-              color={COLORS.TEXT_MUTED}
-            />
-          </View>
-        </TouchableOpacity>
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Type here"
-            placeholderTextColor={COLORS.TEXT_MUTED}
-            defaultValue={detail.name}
-            onChangeText={val => draftName$.set(val)}
-            onSubmitEditing={handleUpdateName}
-            onBlur={handleUpdateName}
-          />
-          <View style={styles.iconRight}>
-            <IMAGES.vector.Octicons
-              name="pencil"
-              size={16}
-              color={COLORS.TEXT_MUTED}
-            />
-          </View>
-        </View>
-        <View style={styles.buttonRow}>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleAddTrack}
-          >
-            <IMAGES.vector.Octicons name="plus" size={18} color={COLORS.TEXT} />
-            <AppText fontSize={FONT.SIZE.XS} style={styles.buttonText}>
-              Add Track
-            </AppText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleCopyList}
-          >
-            <IMAGES.vector.Octicons name="copy" size={18} color={COLORS.TEXT} />
-            <AppText fontSize={FONT.SIZE.XS} style={styles.buttonText}>
-              Copy List
-            </AppText>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={handleDeleteList}
-          >
-            <IMAGES.vector.Octicons
-              name="trash"
-              size={18}
-              color={COLORS.PRIMARY}
-            />
-            <AppText fontSize={FONT.SIZE.XS} style={styles.buttonTextDanger}>
-              Delete List
-            </AppText>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={[styles.listContainer, { marginBottom: insets.bottom + 60 }]}
-        >
-          <AppDragList data={tracks} onReorder={handleReorder} />
-        </View>
+        <AppDragList
+          data={tracks}
+          onReorder={handleReorder}
+          ListHeaderComponent={Header}
+        />
       </View>
     </AppStaticScreen>
   )
@@ -179,6 +176,10 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 8,
     marginTop: 8,
+  },
+  headerContainer: {
+    gap: 8,
+    paddingBottom: 16,
   },
   headerImage: {
     borderRadius: 12,
@@ -217,8 +218,5 @@ const styles = StyleSheet.create({
     bottom: 8,
     position: 'absolute',
     right: 8,
-  },
-  listContainer: {
-    flex: 1,
   },
 })

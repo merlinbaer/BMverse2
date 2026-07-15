@@ -27,9 +27,9 @@ export function AppStaticScreen({
 const styles = StyleSheet.create({
   bottomSpacer: {
     height: Platform.select({
-      ios: 100,
-      android: 100,
-      default: 90,
+      ios: 80,
+      android: 70,
+      default: 70,
     }),
   },
   contentContainer: {

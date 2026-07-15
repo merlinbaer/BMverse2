@@ -11,6 +11,7 @@ import { ListItemType } from '@/types/list'
 interface AppDragListProps {
   data: ListItemType[]
   onReorder: (newData: ListItemType[]) => void
+  ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null
 }
 
 function Item({ info }: { info: DragListRenderItemInfo<ListItemType> }) {
@@ -43,7 +44,11 @@ function Item({ info }: { info: DragListRenderItemInfo<ListItemType> }) {
   )
 }
 
-export function AppDragList({ data, onReorder }: AppDragListProps) {
+export function AppDragList({
+  data,
+  onReorder,
+  ListHeaderComponent,
+}: AppDragListProps) {
   const keyExtractor = (item: ListItemType) => item.id
 
   const onReordered = (fromIndex: number, toIndex: number) => {
@@ -62,6 +67,7 @@ export function AppDragList({ data, onReorder }: AppDragListProps) {
       onReordered={onReordered}
       renderItem={info => <Item info={info} />}
       ItemSeparatorComponent={renderSeparator}
+      ListHeaderComponent={ListHeaderComponent}
       containerStyle={styles.flatList}
     />
   )
