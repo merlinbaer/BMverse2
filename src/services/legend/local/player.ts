@@ -72,18 +72,25 @@ export const playlistTracksList$ = (playlistId: string) =>
             (file?.artist ?? 'Unknown Artist'),
           icon: IMAGES.cover200.single,
           route: null,
+          value: track.trackNum,
         } as ListItemType
       })
-      .sort((a, b) => {
-        const trackA = playlist.tracks.find(t => t.musicFileId.get() === a.id)
-        const trackB = playlist.tracks.find(t => t.musicFileId.get() === b.id)
-        return (trackA?.trackNum.get() ?? 0) - (trackB?.trackNum.get() ?? 0)
-      })
+      .sort((a, b) => ((a.value as number) ?? 0) - ((b.value as number) ?? 0))
   })
 
 export const playlistNameUpdate = (playlistId: string, newName: string) => {
   const playlist$ = playlists$.find(p => p.id.get() === playlistId)
   if (playlist$) {
     playlist$.name.set(newName)
+  }
+}
+
+export const playlistTracksUpdate = (
+  playlistId: string,
+  newTracks: { musicFileId: string; trackNum: number }[],
+) => {
+  const playlist$ = playlists$.find(p => p.id.get() === playlistId)
+  if (playlist$) {
+    playlist$.tracks.set(newTracks)
   }
 }

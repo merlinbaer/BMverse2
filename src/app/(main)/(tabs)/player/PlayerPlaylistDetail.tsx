@@ -4,9 +4,10 @@ import { Stack, useLocalSearchParams } from 'expo-router'
 import React from 'react'
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 
-import { AppFlatList } from '@/components/AppFlatList'
+import { AppDragList } from '@/components/AppDragList'
 import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
+import { AppStaticScreen } from '@/components/AppStaticScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
@@ -15,7 +16,9 @@ import {
   playlistDetail$,
   playlistNameUpdate,
   playlistTracksList$,
+  playlistTracksUpdate,
 } from '@/services/legend'
+import { ListItemType } from '@/types/list'
 
 export default function PlayerPlaylistDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>()
@@ -41,6 +44,16 @@ export default function PlayerPlaylistDetailScreen() {
       playlistNameUpdate(detail.id, newName)
     }
   }
+
+  const handleReorder = (newData: ListItemType[]) => {
+    if (!id) return
+    const updatedTracks = newData.map((item, index) => ({
+      musicFileId: item.id,
+      trackNum: index + 1,
+    }))
+    playlistTracksUpdate(id, updatedTracks)
+  }
+
   const handleAddTrack = () => {
     // Placeholder for adding track logic
   }
@@ -54,7 +67,7 @@ export default function PlayerPlaylistDetailScreen() {
   }
 
   return (
-    <AppScreen>
+    <AppStaticScreen>
       <Stack.Screen options={{ title: 'Edit Playlist' }} />
       <View style={styles.container}>
         <TouchableOpacity
@@ -129,10 +142,10 @@ export default function PlayerPlaylistDetailScreen() {
         <View
           style={[styles.listContainer, { marginBottom: insets.bottom + 60 }]}
         >
-          <AppFlatList data={tracks} displayIconAsText={false} />
+          <AppDragList data={tracks} onReorder={handleReorder} />
         </View>
       </View>
-    </AppScreen>
+    </AppStaticScreen>
   )
 }
 
