@@ -51,6 +51,17 @@ export default function GlobalLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="PlaylistAddTrack"
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          contentStyle: {
+            backgroundColor: COLORS.TRANSPARENT,
+          },
+        }}
+      />
     </Stack>
   )
 }

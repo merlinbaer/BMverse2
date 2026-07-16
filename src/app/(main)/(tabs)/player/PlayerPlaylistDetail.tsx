@@ -1,6 +1,6 @@
 import { useObservable, useValue } from '@legendapp/state/react'
 import { Image } from 'expo-image'
-import { Stack, useLocalSearchParams } from 'expo-router'
+import { router, Stack, useLocalSearchParams } from 'expo-router'
 import React from 'react'
 import { StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 
@@ -13,28 +13,51 @@ import { COLORS, FONT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
 import { useAlert } from '@/hooks/useAlert'
 import {
+  playlistCreate,
+  playlistDelete,
   playlistDetail$,
   playlistNameUpdate,
   playlistTracksList$,
   playlistTracksUpdate,
 } from '@/services/legend'
+import { generateId } from '@/services/legend/config'
 import { ListItemType } from '@/types/list'
 
 export default function PlayerPlaylistDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>()
+  const { id: initialId } = useLocalSearchParams<{ id: string }>()
+  const [id] = React.useState(() => initialId || generateId())
+
   const detail = useValue(playlistDetail$(id ?? ''))
   const tracks = useValue(playlistTracksList$(id ?? ''))
   const { showAlert } = useAlert()
 
+  // Effect to create playlist if no ID exists
+  React.useEffect(() => {
+    if (!initialId && !detail) {
+      playlistCreate(undefined, id)
+    }
+  }, [initialId, detail, id])
+
   const draftName$ = useObservable(detail?.name ?? '')
 
-  if (!id || !detail) {
+  if (!detail && initialId) {
     return (
       <AppScreen>
+        <Stack.Screen options={{ title: 'Edit Playlist' }} />
         <AppLoadScreen message="Playlist not found" />
       </AppScreen>
     )
   }
+  // Handle loading state for new playlists
+  if (!detail) {
+    return (
+      <AppScreen>
+        <Stack.Screen options={{ title: 'Add Playlist' }} />
+        <AppLoadScreen message="Initializing Playlist..." />
+      </AppScreen>
+    )
+  }
+
   const handleImagePress = () => {
     // Placeholder for cover change/add menu
   }
@@ -86,7 +109,10 @@ export default function PlayerPlaylistDetailScreen() {
   }
 
   const handleAddTrack = () => {
-    // Placeholder for adding track logic
+    router.push({
+      pathname: '/(main)/(global)/PlaylistAddTrack',
+      params: { playlistId: id },
+    })
   }
 
   const handleCopyList = () => {
@@ -94,7 +120,23 @@ export default function PlayerPlaylistDetailScreen() {
   }
 
   const handleDeleteList = () => {
-    // Placeholder for deleting list logic
+    if (!detail) return
+
+    showAlert(
+      'Delete Playlist',
+      `Are you sure you want to delete "${detail.name}"? This action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            playlistDelete(id)
+            router.back()
+          },
+        },
+      ],
+    )
   }
 
   const Header = (
@@ -165,15 +207,19 @@ export default function PlayerPlaylistDetailScreen() {
     </View>
   )
 
-  // Prepend the delete zone to the track data
+  // Prepend the delete zone to the track data only if tracks exist
   const listData: ListItemType[] = [
-    {
-      id: 'DELETE_ZONE',
-      line1: 'Move here to remove track',
-      line2: '',
-      icon: '',
-      route: null,
-    },
+    ...(tracks.length > 0
+      ? [
+          {
+            id: 'DELETE_ZONE',
+            line1: 'Move here to remove track',
+            line2: '',
+            icon: '',
+            route: null,
+          } as ListItemType,
+        ]
+      : []),
     ...tracks,
   ]
 

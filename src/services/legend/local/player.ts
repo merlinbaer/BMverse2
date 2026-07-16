@@ -3,10 +3,11 @@ import { syncObservable } from '@legendapp/state/sync'
 import { Href } from 'expo-router'
 
 import { IMAGES } from '@/constants/images'
+import { getPlaylistTimestamp } from '@/services/dateTimeHelper'
 import { ListItemType } from '@/types/list'
 import { MusicFile, Playlist } from '@/types/player'
 
-import { persistLargeStore } from '../config'
+import { generateId, persistLargeStore } from '../config'
 
 // Store for local-only persisted music metadata
 export const musicFiles$ = observable<MusicFile[]>([])
@@ -50,6 +51,48 @@ export const playlistList$ = computed<ListItemType[]>(() => {
     )
 })
 
+export const musicFilesPickerList$ = (playlistId: string) =>
+  computed<ListItemType[]>(() => {
+    const allFiles = musicFiles$.get()
+    const playlist = playlists$.find(p => p.id.get() === playlistId)?.get()
+    if (!allFiles) return []
+
+    const existingTrackIds = new Set(
+      playlist?.tracks.map(t => t.musicFileId) || [],
+    )
+
+    return allFiles
+      .filter(file => !existingTrackIds.has(file.id))
+      .slice()
+      .sort((a, b) => {
+        return (
+          (a.album || a.origAlbum || '').localeCompare(
+            b.album || b.origAlbum || '',
+          ) ||
+          (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
+          (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+          a.title.localeCompare(b.title)
+        )
+      })
+      .map((file, index): ListItemType => {
+        const albumPart =
+          file.album ||
+          file.origAlbum ||
+          getPlaylistTimestamp(new Date(file.importedAt))
+        const discPart = file.origDisc ? `D/${file.origDisc}` : ''
+        const trackPart = file.origTrack ? `T/${file.origTrack}` : ''
+        const metaPrefix = [discPart, trackPart].filter(Boolean).join(' - ')
+
+        return {
+          id: file.id,
+          line1: `${albumPart}`,
+          line2: metaPrefix ? `${metaPrefix} - ${file.title}` : file.title,
+          icon: String(index + 1),
+          route: null,
+        }
+      })
+  })
+
 export const playlistDetail$ = (playlistId: string) =>
   computed(() => playlists$.find(p => p.id.get() === playlistId)?.get() ?? null)
 
@@ -82,6 +125,25 @@ export const playlistNameUpdate = (playlistId: string, newName: string) => {
   const playlist$ = playlists$.find(p => p.id.get() === playlistId)
   if (playlist$) {
     playlist$.name.set(newName)
+  }
+}
+
+export const playlistCreate = (name?: string, existingId?: string): string => {
+  const newId = existingId || generateId()
+  const newPlaylist: Playlist = {
+    id: newId,
+    name: name || getPlaylistTimestamp(new Date()),
+    imageUri: null,
+    tracks: [],
+  }
+  playlists$.push(newPlaylist)
+  return newId
+}
+
+export const playlistDelete = (playlistId: string) => {
+  const index = playlists$.get().findIndex(p => p.id === playlistId)
+  if (index !== -1) {
+    playlists$.splice(index, 1)
   }
 }
 

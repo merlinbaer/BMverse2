@@ -103,6 +103,18 @@ export const SortButton = ({ targetRoute }: { targetRoute: Href }) => (
   </TouchableOpacity>
 )
 
+export const PlayerListDetailButton = ({
+  targetRoute,
+}: {
+  targetRoute: Href
+}) => (
+  <TouchableOpacity onPress={() => router.push(targetRoute)}>
+    <View style={headerStyles.sortButton}>
+      <IMAGES.vector.MaterialIcons name="add" size={24} color="white" />
+    </View>
+  </TouchableOpacity>
+)
+
 export const headerStyles = StyleSheet.create({
   // eslint-disable-next-line react-native/no-unused-styles
   backButton: {
