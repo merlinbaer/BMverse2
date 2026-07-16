@@ -13,6 +13,7 @@ import { COLORS, FONT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
 import { useAlert } from '@/hooks/useAlert'
 import {
+  playlistCopy,
   playlistCreate,
   playlistDelete,
   playlistDetail$,
@@ -116,7 +117,13 @@ export default function PlayerPlaylistDetailScreen() {
   }
 
   const handleCopyList = () => {
-    // Placeholder for copying list logic
+    const newId = playlistCopy(id)
+    if (newId) {
+      router.replace({
+        pathname: '/(main)/(tabs)/player/PlayerPlaylistDetail',
+        params: { id: newId },
+      })
+    }
   }
 
   const handleDeleteList = () => {
@@ -225,7 +232,9 @@ export default function PlayerPlaylistDetailScreen() {
 
   return (
     <AppStaticScreen>
-      <Stack.Screen options={{ title: 'Edit Playlist' }} />
+      <Stack.Screen
+        options={{ title: initialId ? 'Edit Playlist' : 'New Playlist' }}
+      />
       <View style={styles.container}>
         <AppDragList
           data={listData}

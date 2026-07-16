@@ -140,6 +140,37 @@ export const playlistCreate = (name?: string, existingId?: string): string => {
   return newId
 }
 
+export const playlistCopy = (playlistId: string): string | null => {
+  const original = playlists$.find(p => p.id.get() === playlistId)?.get()
+  if (!original) return null
+
+  // logic for name suffix
+  let newName = original.name
+  const suffixMatch = newName.match(/_(\d)$/) // Matches _1 to _9 at the end
+
+  if (suffixMatch) {
+    const currentNum = parseInt(suffixMatch[1], 10)
+    if (currentNum < 9) {
+      newName = newName.replace(/_\d$/, `_${currentNum + 1}`)
+    } else {
+      newName = `${newName}_1`
+    }
+  } else {
+    newName = `${newName}_1`
+  }
+
+  const newId = generateId()
+  const duplicate: Playlist = {
+    id: newId,
+    name: newName,
+    imageUri: original.imageUri,
+    tracks: original.tracks.map(t => ({ ...t })),
+  }
+
+  playlists$.push(duplicate)
+  return newId
+}
+
 export const playlistDelete = (playlistId: string) => {
   const index = playlists$.get().findIndex(p => p.id === playlistId)
   if (index !== -1) {
