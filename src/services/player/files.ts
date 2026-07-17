@@ -237,3 +237,36 @@ export const deleteAllMusicFiles = async () => {
     throw error
   }
 }
+
+export const deleteSingleMusicFile = async (fileId: string) => {
+  if (Platform.OS === 'web') return
+  try {
+    const fileToDelete = musicFiles$.find(f => f.id.get() === fileId)?.get()
+    if (!fileToDelete) return
+
+    // 1. Delete physical file
+    const file = new File(fileToDelete.audioUri)
+    file.delete()
+
+    // 2. Remove from musicFiles store
+    const fileIndex = musicFiles$.get().findIndex(f => f.id === fileId)
+    if (fileIndex !== -1) musicFiles$.splice(fileIndex, 1)
+
+    // 3. Remove from all playlists and re-index track numbers
+    const currentPlaylists = playlists$.get()
+    currentPlaylists.forEach((playlist, pIndex) => {
+      const trackIndex = playlist.tracks.findIndex(
+        t => t.musicFileId === fileId,
+      )
+      if (trackIndex !== -1) {
+        const updatedTracks = playlist.tracks
+          .filter(t => t.musicFileId !== fileId)
+          .map((t, idx) => ({ ...t, trackNum: idx + 1 }))
+        playlists$[pIndex].tracks.set(updatedTracks)
+      }
+    })
+  } catch (error) {
+    console.error('deleteSingleMusicFile error:', error)
+    throw error
+  }
+}

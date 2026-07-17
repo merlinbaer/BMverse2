@@ -51,6 +51,44 @@ export const playlistList$ = computed<ListItemType[]>(() => {
     )
 })
 
+export const musicFilesFullList$ = computed<ListItemType[]>(() => {
+  const allFiles = musicFiles$.get()
+  if (!allFiles) return []
+
+  return allFiles
+    .slice()
+    .sort((a, b) => {
+      return (
+        (a.album || a.origAlbum || '').localeCompare(
+          b.album || b.origAlbum || '',
+        ) ||
+        (a.origYear ?? 0) - (b.origYear ?? 0) ||
+        (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
+        (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+        a.title.localeCompare(b.title)
+      )
+    })
+    .map((file, index): ListItemType => {
+      const playlistTimestamp = getPlaylistTimestamp(new Date(file.importedAt))
+      const albumName = file.album || file.origAlbum || playlistTimestamp
+      const line1 = albumName.includes(playlistTimestamp)
+        ? albumName
+        : `${albumName} - ${playlistTimestamp}`
+
+      const discPart = file.origDisc ? `D/${file.origDisc}` : ''
+      const trackPart = file.origTrack ? `T/${file.origTrack}` : ''
+      const metaPrefix = [discPart, trackPart].filter(Boolean).join(' - ')
+
+      return {
+        id: file.id,
+        line1,
+        line2: metaPrefix ? `${metaPrefix} - ${file.title}` : file.title,
+        icon: String(index + 1),
+        route: null,
+      }
+    })
+})
+
 export const musicFilesPickerList$ = (playlistId: string) =>
   computed<ListItemType[]>(() => {
     const allFiles = musicFiles$.get()

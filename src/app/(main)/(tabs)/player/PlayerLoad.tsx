@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router'
+import { router, Stack } from 'expo-router'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
@@ -13,9 +13,9 @@ import { AppScreen } from 'src/components/AppScreen'
 
 const loadText =
   '**Select your music files to add to BMverse**\n' +
+  '- MP3 and M4A files supported\n' +
   '- You can add multiple files at once\n' +
   '- You can add from your cloud drive\n' +
-  '- MP3 and M4A files supported\n' +
   '- A playlist is created, for multiple files\n' +
   '- No playlist is created, for a single file  \n\n' +
   '**About tagging**\n' +
@@ -25,6 +25,11 @@ const loadText =
   '  Track Number, Disk Number(optional)'
 
 const deleteText = 'Here you can delete all imported music files.'
+const deleteSingleText = 'Here you can delete a single music file.'
+
+const handleDeleteSingle = () => {
+  router.push('/(main)/(global)/MusicFileDelete')
+}
 
 export default function PlayerLoadScreen() {
   const { showAlert } = useAlert()
@@ -76,6 +81,11 @@ export default function PlayerLoadScreen() {
         <AppButton
           title={'Add Music File(s)'}
           onPress={handleLoadMusic}
+        ></AppButton>
+        <AppBubbleText markup={deleteSingleText} orientation={'center'} />
+        <AppButton
+          title={'Delete Single File'}
+          onPress={handleDeleteSingle}
         ></AppButton>
         <AppBubbleText markup={deleteText} orientation={'center'} />
         <AppButton

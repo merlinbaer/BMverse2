@@ -17,6 +17,16 @@ export const IMAGES = {
     single: require('@/../assets/images/Single_200.png'),
     notFound: require('@/../assets/images/unknown_track.png'),
   },
+  // no need to cache as asset because it is not used in web
+  cover600: {
+    babymetal: require('@/../assets/images/BM_Splatter_632.png'),
+    metalForth: require('@/../assets/images/Forth_Splatter_632.png'),
+    metalGalaxy: require('@/../assets/images/Galaxy_Splatter_632.png'),
+    theOne: require('@/../assets/images/One_Splatter_632.png'),
+    metalResistance: require('@/../assets/images/Resistance_Splatter_632.png'),
+    single: require('@/../assets/images/Single_632.png'),
+    notFound: require('@/../assets/images/unknown_track.png'),
+  },
   icons: {
     main: require('@/../assets/tabicons/main.png'),
     mainGrey: require('@/../assets/tabicons/mainGrey.png'),

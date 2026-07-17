@@ -6,6 +6,14 @@ export interface PreviewSong {
   song_preview_uri: string | null
 }
 
+export interface CoverFile {
+  id: string
+  importedAt: string
+  origFilename: string
+  // Diagnostics tag
+  fileFormat: 'png' | 'jpg' | null
+}
+
 export interface MusicFile {
   id: string
   importedAt: string

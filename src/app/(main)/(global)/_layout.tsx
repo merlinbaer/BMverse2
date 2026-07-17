@@ -62,6 +62,17 @@ export default function GlobalLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="MusicFileDelete"
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          contentStyle: {
+            backgroundColor: COLORS.TRANSPARENT,
+          },
+        }}
+      />
     </Stack>
   )
 }
