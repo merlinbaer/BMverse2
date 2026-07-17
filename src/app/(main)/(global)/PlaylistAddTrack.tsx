@@ -46,6 +46,7 @@ const PlaylistAddTrack = () => {
               pressAction={{ type: 'none' }}
               onPressItem={item => handleSelectTrack(item, dismiss)}
               scrollEnabled={true}
+              style={styles.flatList}
             />
           </View>
           <View style={styles.footer}>
@@ -69,6 +70,9 @@ const styles = StyleSheet.create({
     // Force the modal to be large by setting a height relative to the screen
     height: SCREEN_HEIGHT * 0.7,
     justifyContent: 'space-between',
+  },
+  flatList: {
+    backgroundColor: COLORS.BG_GREY,
   },
   footer: {
     paddingTop: 10,
