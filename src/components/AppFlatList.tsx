@@ -79,7 +79,7 @@ function Item({
         <Image source={item.icon} style={styles.image} />
       )}
       <View style={styles.textContainer}>
-        <AppText fontSize={FONT.SIZE.BASE} numberOfLines={1}>
+        <AppText fontSize={FONT.SIZE.SM} numberOfLines={1}>
           {item.line1}
         </AppText>
         <AppText fontSize={FONT.SIZE.XS} numberOfLines={1}>

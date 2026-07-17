@@ -75,17 +75,20 @@ export const musicFilesPickerList$ = (playlistId: string) =>
         )
       })
       .map((file, index): ListItemType => {
-        const albumPart =
-          file.album ||
-          file.origAlbum ||
-          getPlaylistTimestamp(new Date(file.importedAt))
+        const playlistTimestamp = getPlaylistTimestamp(
+          new Date(file.importedAt),
+        )
+        const albumName = file.album || file.origAlbum || playlistTimestamp
+        const line1 = albumName.includes(playlistTimestamp)
+          ? albumName
+          : `${albumName} - ${playlistTimestamp}`
         const discPart = file.origDisc ? `D/${file.origDisc}` : ''
         const trackPart = file.origTrack ? `T/${file.origTrack}` : ''
         const metaPrefix = [discPart, trackPart].filter(Boolean).join(' - ')
 
         return {
           id: file.id,
-          line1: `${albumPart}`,
+          line1,
           line2: metaPrefix ? `${metaPrefix} - ${file.title}` : file.title,
           icon: String(index + 1),
           route: null,
