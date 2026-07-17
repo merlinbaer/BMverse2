@@ -19,13 +19,12 @@ export const IMAGES = {
   },
   // no need to cache as asset because it is not used in web
   cover600: {
-    babymetal: require('@/../assets/images/BM_Splatter_632.png'),
-    metalForth: require('@/../assets/images/Forth_Splatter_632.png'),
-    metalGalaxy: require('@/../assets/images/Galaxy_Splatter_632.png'),
-    theOne: require('@/../assets/images/One_Splatter_632.png'),
-    metalResistance: require('@/../assets/images/Resistance_Splatter_632.png'),
-    single: require('@/../assets/images/Single_632.png'),
-    notFound: require('@/../assets/images/unknown_track.png'),
+    babymetal: require('../../assets/images/010_BM_Splatter_632.png'),
+    metalForth: require('../../assets/images/050_Forth_Splatter_632.png'),
+    metalGalaxy: require('../../assets/images/030_Galaxy_Splatter_632.png'),
+    theOne: require('../../assets/images/040_One_Splatter_632.png'),
+    metalResistance: require('../../assets/images/020_Resistance_Splatter_632.png'),
+    single: require('../../assets/images/900_Single_632.png'),
   },
   icons: {
     main: require('@/../assets/tabicons/main.png'),

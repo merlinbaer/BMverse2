@@ -5,7 +5,7 @@ import { Href } from 'expo-router'
 import { IMAGES } from '@/constants/images'
 import { getPlaylistTimestamp } from '@/services/dateTimeHelper'
 import { ListItemType } from '@/types/list'
-import { MusicFile, Playlist } from '@/types/player'
+import { CoverFile, MusicFile, Playlist } from '@/types/player'
 
 import { generateId, persistLargeStore } from '../config'
 
@@ -15,6 +15,16 @@ export const musicFiles$ = observable<MusicFile[]>([])
 syncObservable(musicFiles$, {
   persist: {
     name: 'musicFiles',
+    plugin: persistLargeStore,
+    retrySync: true,
+  },
+})
+
+export const coverFiles$ = observable<CoverFile[]>([])
+
+syncObservable(coverFiles$, {
+  persist: {
+    name: 'coverFiles',
     plugin: persistLargeStore,
     retrySync: true,
   },

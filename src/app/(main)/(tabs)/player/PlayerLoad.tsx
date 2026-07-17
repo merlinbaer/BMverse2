@@ -6,6 +6,7 @@ import { AppButton } from '@/components/AppButton'
 import { useAlert } from '@/hooks/useAlert'
 import {
   deleteAllMusicFiles,
+  pickAndSaveCoverFiles,
   pickAndSaveMusicFiles,
 } from '@/services/player/files'
 import { AppBubbleText } from 'src/components/AppBubbleText'
@@ -23,9 +24,13 @@ const loadText =
   '- M4A: MP4 metadata (iTunes)\n' +
   '- Used Tags: Title, Artist, Album, Year\n' +
   '  Track Number, Disk Number(optional)'
-
 const deleteText = 'Here you can delete all imported music files.'
 const deleteSingleText = 'Here you can delete a single music file.'
+
+const coverLoadText =
+  '**Select your cover images to add to BMverse**\n' +
+  '- PNG and JPG files are supported\n' +
+  '- Recommended image size is 600 pixel\n'
 
 const handleDeleteSingle = () => {
   router.push('/(main)/(global)/MusicFileDelete')
@@ -73,6 +78,24 @@ export default function PlayerLoadScreen() {
     )
   }
 
+  const handleLoadCovers = async () => {
+    try {
+      const result = await pickAndSaveCoverFiles()
+      if (result && result.count > 0) {
+        showAlert(
+          'Import Successful',
+          `Successfully imported ${result.count} cover image(s).`,
+        )
+      }
+    } catch (e) {
+      console.error(e)
+      showAlert(
+        'Import Error',
+        'An unexpected error occurred while importing your covers.',
+      )
+    }
+  }
+
   return (
     <AppScreen>
       <Stack.Screen options={{ title: 'Manage Files' }} />
@@ -91,6 +114,11 @@ export default function PlayerLoadScreen() {
         <AppButton
           title={'Delete All Files'}
           onPress={handleDeleteAll}
+        ></AppButton>
+        <AppBubbleText markup={coverLoadText} orientation={'center'} />
+        <AppButton
+          title={'Add Cover Image(s)'}
+          onPress={handleLoadCovers}
         ></AppButton>
       </View>
     </AppScreen>

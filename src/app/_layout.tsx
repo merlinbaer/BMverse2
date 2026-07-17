@@ -20,7 +20,10 @@ import {
   localStore$,
 } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
-import { refreshLocalMusicList } from '@/services/player/files'
+import {
+  refreshLocalCoverList,
+  refreshLocalMusicList,
+} from '@/services/player/files'
 import { isPWA, registerServiceWorker } from '@/services/pwa'
 
 SplashScreen.setOptions({
@@ -62,6 +65,7 @@ export default function RootLayout() {
     initializeStores() // Starting warming up table stores
     void initAssets()
     void refreshLocalMusicList()
+    void refreshLocalCoverList()
     startSyncCoordinator()
     initAudioMode()
     initPlayerStats()

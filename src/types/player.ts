@@ -11,7 +11,7 @@ export interface CoverFile {
   importedAt: string
   origFilename: string
   // Diagnostics tag
-  fileFormat: 'png' | 'jpg' | null
+  fileFormat: 'png' | 'jpg' | 'asset'
 }
 
 export interface MusicFile {
