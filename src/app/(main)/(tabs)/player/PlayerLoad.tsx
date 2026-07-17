@@ -30,7 +30,8 @@ const deleteSingleText = 'Here you can delete a single music file.'
 const coverLoadText =
   '**Select your cover images to add to BMverse**\n' +
   '- PNG and JPG files are supported\n' +
-  '- Recommended image size is 600 pixel\n'
+  '- Recommended image size is 600 pixel\n' +
+  '- Images are sorted by filename\n'
 
 const handleDeleteSingle = () => {
   router.push('/(main)/(global)/MusicFileDelete')

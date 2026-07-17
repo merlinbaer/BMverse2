@@ -238,3 +238,36 @@ export const playlistTracksUpdate = (
     playlist$.tracks.set(newTracks)
   }
 }
+
+export const playlistImageUpdate = (
+  playlistId: string,
+  imageUri: string | number,
+) => {
+  const playlist$ = playlists$.find(p => p.id.get() === playlistId)
+  if (playlist$) {
+    playlist$.imageUri.set(imageUri as string)
+  }
+}
+
+export const coverFilesFullList$ = computed<ListItemType[]>(() => {
+  const allCovers = coverFiles$.get()
+  if (!allCovers) return []
+
+  return allCovers
+    .slice()
+    .sort((a, b) => {
+      // Sort assets first, then by origFilename
+      if (a.fileFormat === 'asset' && b.fileFormat !== 'asset') return -1
+      if (a.fileFormat !== 'asset' && b.fileFormat === 'asset') return 1
+      return a.origFilename.localeCompare(b.origFilename)
+    })
+    .map(
+      (file): ListItemType => ({
+        id: file.id,
+        line1: file.origFilename,
+        line2: file.fileFormat === 'asset' ? 'App Asset' : 'Local File',
+        icon: file.coverUri,
+        route: null,
+      }),
+    )
+})

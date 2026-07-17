@@ -12,6 +12,7 @@ export interface CoverFile {
   origFilename: string
   // Diagnostics tag
   fileFormat: 'png' | 'jpg' | 'asset'
+  coverUri: string | number
 }
 
 export interface MusicFile {

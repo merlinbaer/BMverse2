@@ -306,6 +306,7 @@ export const pickAndSaveCoverFiles = async () => {
         importedAt,
         origFilename: asset.name,
         fileFormat: extension,
+        coverUri: destinationFile.uri,
       })
     }
     return { count: importedCount }
@@ -339,6 +340,7 @@ export const refreshLocalCoverList = async () => {
           importedAt: existing?.importedAt || new Date().toISOString(),
           origFilename: key,
           fileFormat: 'asset',
+          coverUri: value,
         }
       },
     )
@@ -364,6 +366,7 @@ export const refreshLocalCoverList = async () => {
           importedAt,
           origFilename,
           fileFormat: extension as 'png' | 'jpg',
+          coverUri: file.uri,
         } as CoverFile
       })
 

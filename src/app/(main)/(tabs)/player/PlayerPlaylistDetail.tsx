@@ -60,8 +60,12 @@ export default function PlayerPlaylistDetailScreen() {
   }
 
   const handleImagePress = () => {
-    // Placeholder for cover change/add menu
+    router.push({
+      pathname: '/(main)/(global)/PlaylistSelectCover',
+      params: { playlistId: id },
+    })
   }
+
   const handleUpdateName = () => {
     const newName = draftName$.get().trim()
     if (detail.id && newName && newName !== detail.name) {

@@ -73,6 +73,17 @@ export default function GlobalLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="PlaylistSelectCover"
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          contentStyle: {
+            backgroundColor: COLORS.TRANSPARENT,
+          },
+        }}
+      />
     </Stack>
   )
 }
