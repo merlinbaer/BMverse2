@@ -375,3 +375,44 @@ export const refreshLocalCoverList = async () => {
     console.error('refreshLocalCoverList error:', error)
   }
 }
+
+/**
+ * Deletes all imported cover images from the document directory.
+ * Keeps 'asset' type covers in the store.
+ * Resets playlist covers if they were using a deleted file.
+ */
+export const deleteAllCoverFiles = async () => {
+  if (Platform.OS === 'web') return
+  try {
+    const docDir = new Directory(Paths.document)
+    const contents = docDir.list()
+
+    // 1. Delete physical files from disk
+    const filesToDelete = contents.filter(
+      item => item instanceof File && item.name.startsWith('cover_'),
+    )
+
+    for (const item of filesToDelete) {
+      const file = item as File
+      void file.delete()
+    }
+
+    // 2. Filter store to keep only assets
+    const assetsOnly = coverFiles$.get().filter(f => f.fileFormat === 'asset')
+    coverFiles$.set(assetsOnly)
+
+    // 3. Reset playlist imageUri if it was a local file (starts with 'file://')
+    const currentPlaylists = playlists$.peek()
+    currentPlaylists.forEach((playlist, index) => {
+      if (
+        typeof playlist.imageUri === 'string' &&
+        playlist.imageUri.startsWith('file://')
+      ) {
+        playlists$[index].imageUri.set(null)
+      }
+    })
+  } catch (error) {
+    console.error('deleteAllCoverFiles error:', error)
+    throw error
+  }
+}

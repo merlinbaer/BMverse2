@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native'
 import { AppButton } from '@/components/AppButton'
 import { useAlert } from '@/hooks/useAlert'
 import {
+  deleteAllCoverFiles,
   deleteAllMusicFiles,
   pickAndSaveCoverFiles,
   pickAndSaveMusicFiles,
@@ -32,6 +33,7 @@ const coverLoadText =
   '- PNG and JPG files are supported\n' +
   '- Recommended image size is 600 pixel\n' +
   '- Images are sorted by filename\n'
+const deleteCoversText = 'Here you can delete all imported cover images.'
 
 const handleDeleteSingle = () => {
   router.push('/(main)/(global)/MusicFileDelete')
@@ -97,6 +99,27 @@ export default function PlayerLoadScreen() {
     }
   }
 
+  const handleDeleteCovers = () => {
+    showAlert(
+      'Delete All Covers',
+      'Are you sure you want to delete all imported cover images? App assets will remain.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete All',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteAllCoverFiles()
+            } catch (e) {
+              console.error(e)
+            }
+          },
+        },
+      ],
+    )
+  }
+
   return (
     <AppScreen>
       <Stack.Screen options={{ title: 'Manage Files' }} />
@@ -113,13 +136,18 @@ export default function PlayerLoadScreen() {
         ></AppButton>
         <AppBubbleText markup={deleteText} orientation={'center'} />
         <AppButton
-          title={'Delete All Files'}
+          title={'Delete All Music'}
           onPress={handleDeleteAll}
         ></AppButton>
         <AppBubbleText markup={coverLoadText} orientation={'center'} />
         <AppButton
           title={'Add Cover Image(s)'}
           onPress={handleLoadCovers}
+        ></AppButton>
+        <AppBubbleText markup={deleteCoversText} orientation={'center'} />
+        <AppButton
+          title={'Delete All Images'}
+          onPress={handleDeleteCovers}
         ></AppButton>
       </View>
     </AppScreen>
