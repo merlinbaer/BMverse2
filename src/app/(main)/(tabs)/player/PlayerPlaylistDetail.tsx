@@ -165,7 +165,7 @@ export default function PlayerPlaylistDetailScreen() {
         <View style={styles.kebabIconContainer}>
           <IMAGES.vector.Octicons
             name="kebab-horizontal"
-            size={16}
+            size={18}
             color={COLORS.TEXT_MUTED}
           />
         </View>
@@ -180,13 +180,12 @@ export default function PlayerPlaylistDetailScreen() {
           onSubmitEditing={handleUpdateName}
           onBlur={handleUpdateName}
         />
-        <View style={styles.iconRight}>
-          <IMAGES.vector.Octicons
-            name="pencil"
-            size={16}
-            color={COLORS.TEXT_MUTED}
-          />
-        </View>
+
+        <IMAGES.vector.Octicons
+          name="pencil"
+          size={16}
+          color={COLORS.TEXT_MUTED}
+        />
       </View>
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.actionButton} onPress={handleAddTrack}>
@@ -288,8 +287,8 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     borderRadius: 12,
-    height: 150,
-    width: 150,
+    height: 160,
+    width: 160,
   },
   headerImageContainer: {
     alignItems: 'center',
@@ -299,12 +298,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     marginVertical: 10,
-    padding: 20,
-    width: 220,
-  },
-  iconRight: {
-    position: 'absolute',
-    right: 16,
+    padding: 8,
+    width: 190,
   },
   input: {
     color: COLORS.TEXT,
@@ -316,12 +311,13 @@ const styles = StyleSheet.create({
   inputWrapper: {
     alignItems: 'center',
     flexDirection: 'row',
+    gap: 12,
     justifyContent: 'center',
     paddingHorizontal: 40, // Space for the icon so text stays centered
   },
   kebabIconContainer: {
     bottom: 8,
     position: 'absolute',
-    right: 8,
+    right: 20,
   },
 })
