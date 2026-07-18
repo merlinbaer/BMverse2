@@ -30,7 +30,7 @@ export function AppModalScreen({ children }: AppModalScreenProps) {
 
   const handleDismiss = React.useCallback(() => {
     translateY.set(
-      withTiming(startOffset, { duration: 250 }, finished => {
+      withTiming(startOffset, { duration: 250 }, (finished?: boolean) => {
         if (finished) {
           runOnJS(router.back)()
         }
