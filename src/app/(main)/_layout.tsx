@@ -23,7 +23,10 @@ export default function MainLayout() {
       <Stack.Screen name="(tabs)" />
       <Stack.Screen
         name="(global)"
-        options={{ presentation: 'transparentModal' }}
+        options={{
+          presentation: 'transparentModal',
+          contentStyle: { backgroundColor: 'transparent' },
+        }}
       />
     </Stack>
   )
