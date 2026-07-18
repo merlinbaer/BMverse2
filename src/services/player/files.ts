@@ -5,7 +5,12 @@ import { Directory, File, Paths } from 'expo-file-system'
 import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
-import { coverFiles$, musicFiles$, playlists$ } from '@/services/legend'
+import {
+  cleanupPlaylistImages,
+  coverFiles$,
+  musicFiles$,
+  playlists$,
+} from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import {
   parseM4aBufferMetadata,
@@ -401,18 +406,34 @@ export const deleteAllCoverFiles = async () => {
     const assetsOnly = coverFiles$.get().filter(f => f.fileFormat === 'asset')
     coverFiles$.set(assetsOnly)
 
-    // 3. Reset playlist imageUri if it was a local file (starts with 'file://')
-    const currentPlaylists = playlists$.peek()
-    currentPlaylists.forEach((playlist, index) => {
-      if (
-        typeof playlist.imageUri === 'string' &&
-        playlist.imageUri.startsWith('file://')
-      ) {
-        playlists$[index].imageUri.set(null)
-      }
-    })
+    // 3. Reset playlist imageUri for all local files
+    cleanupPlaylistImages()
   } catch (error) {
     console.error('deleteAllCoverFiles error:', error)
+    throw error
+  }
+}
+
+export const deleteSingleCoverFile = async (coverId: string) => {
+  if (Platform.OS === 'web') return
+  try {
+    const coverToDelete = coverFiles$.find(c => c.id.get() === coverId)?.get()
+    if (!coverToDelete || coverToDelete.fileFormat === 'asset') return
+
+    // 1. Delete a physical file
+    const file = new File(coverToDelete.coverUri as string)
+    file.delete()
+
+    // 2. Remove from store
+    const index = coverFiles$.get().findIndex(c => c.id === coverId)
+    if (index !== -1) {
+      coverFiles$.splice(index, 1)
+    }
+
+    // 3. Cleanup playlists using this specific image
+    cleanupPlaylistImages(coverToDelete.coverUri as string)
+  } catch (error) {
+    console.error('deleteSingleCoverFile error:', error)
     throw error
   }
 }

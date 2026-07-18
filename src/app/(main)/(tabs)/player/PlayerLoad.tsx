@@ -34,9 +34,14 @@ const coverLoadText =
   '- Recommended image size is 600 pixel\n' +
   '- Images are sorted by filename\n'
 const deleteCoversText = 'Here you can delete all imported cover images.'
+const deleteSingleCoverText = 'Here you can delete a single cover image.'
 
 const handleDeleteSingle = () => {
   router.push('/(main)/(global)/MusicFileDelete')
+}
+
+const handleDeleteSingleCover = () => {
+  router.push('/(main)/(global)/CoverFileDelete')
 }
 
 export default function PlayerLoadScreen() {
@@ -144,9 +149,14 @@ export default function PlayerLoadScreen() {
           title={'Add Cover Image(s)'}
           onPress={handleLoadCovers}
         ></AppButton>
+        <AppBubbleText markup={deleteSingleCoverText} orientation={'center'} />
+        <AppButton
+          title={'Delete Single Image'}
+          onPress={handleDeleteSingleCover}
+        ></AppButton>
         <AppBubbleText markup={deleteCoversText} orientation={'center'} />
         <AppButton
-          title={'Delete All Images'}
+          title={'Delete All Cover'}
           onPress={handleDeleteCovers}
         ></AppButton>
       </View>

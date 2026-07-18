@@ -213,23 +213,45 @@ export const playlistImageUpdate = (
   }
 }
 
-export const coverFilesFullList$ = computed<ListItemType[]>(() => {
-  const allCovers = coverFiles$.get()
-  if (!allCovers) return []
+/**
+ * Centralized helper to remove references to a specific image URI (or all local files) from playlists.
+ * If deletedUri is provided, only that specific URI is nulled.
+ * If deletedUri is omitted, all local file references (file://) are nulled.
+ */
+export const cleanupPlaylistImages = (deletedUri?: string) => {
+  const currentPlaylists = playlists$.peek()
+  currentPlaylists.forEach((playlist, index) => {
+    if (typeof playlist.imageUri === 'string') {
+      const shouldNull = deletedUri
+        ? playlist.imageUri === deletedUri
+        : playlist.imageUri.startsWith('file://')
 
-  return allCovers
-    .slice()
-    .sort((a, b) => {
-      // Sort assets first, then by origFilename
-      if (a.fileFormat === 'asset' && b.fileFormat !== 'asset') return -1
-      if (a.fileFormat !== 'asset' && b.fileFormat === 'asset') return 1
-      return a.origFilename.localeCompare(b.origFilename)
-    })
-    .map((file): ListItemType => ({
-      id: file.id,
-      line1: file.origFilename,
-      line2: file.fileFormat === 'asset' ? 'App Asset' : 'Local File',
-      icon: file.coverUri,
-      route: null,
-    }))
-})
+      if (shouldNull) {
+        playlists$[index].imageUri.set(null)
+      }
+    }
+  })
+}
+
+export const coverFilesFullList$ = (excludeAssets = false) =>
+  computed<ListItemType[]>(() => {
+    const allCovers = coverFiles$.get()
+    if (!allCovers) return []
+
+    return allCovers
+      .filter(file => !excludeAssets || file.fileFormat !== 'asset')
+      .slice()
+      .sort((a, b) => {
+        // Sort assets first, then by origFilename
+        if (a.fileFormat === 'asset' && b.fileFormat !== 'asset') return -1
+        if (a.fileFormat !== 'asset' && b.fileFormat === 'asset') return 1
+        return a.origFilename.localeCompare(b.origFilename)
+      })
+      .map((file): ListItemType => ({
+        id: file.id,
+        line1: file.origFilename,
+        line2: file.fileFormat === 'asset' ? 'App Asset' : 'Local File',
+        icon: file.coverUri,
+        route: null,
+      }))
+  })

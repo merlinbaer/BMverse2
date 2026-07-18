@@ -84,6 +84,17 @@ export default function GlobalLayout() {
           },
         }}
       />
+      <Stack.Screen
+        name="CoverFileDelete"
+        options={{
+          headerShown: false,
+          presentation: 'transparentModal',
+          gestureEnabled: true,
+          contentStyle: {
+            backgroundColor: COLORS.TRANSPARENT,
+          },
+        }}
+      />
     </Stack>
   )
 }
