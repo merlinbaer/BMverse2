@@ -8,14 +8,14 @@ import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
-import { musicFilesFullList$ } from '@/services/legend'
+import { musicFilesList$ } from '@/services/legend'
 import { deleteSingleMusicFile } from '@/services/player/files'
 import { ListItemType } from '@/types/list'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 
 const MusicFileDelete = () => {
-  const data = useValue(musicFilesFullList$)
+  const data = useValue(musicFilesList$())
   const { showAlert } = useAlert()
 
   const handleDelete = (item: ListItemType, dismiss: () => void) => {

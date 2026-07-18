@@ -47,63 +47,26 @@ export const playlistList$ = computed<ListItemType[]>(() => {
   return list
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map(
-      (item): ListItemType => ({
-        id: item.id,
-        line1: item.name,
-        line2: `${item.tracks.length} Tracks`,
-        icon: item.imageUri ?? IMAGES.cover200.notFound,
-        route: {
-          pathname: '/(main)/(tabs)/player/PlayerPlaylistDetail',
-          params: { id: item.id },
-        } as Href,
-      }),
-    )
+    .map((item): ListItemType => ({
+      id: item.id,
+      line1: item.name,
+      line2: `${item.tracks.length} Tracks`,
+      icon: item.imageUri ?? IMAGES.cover200.notFound,
+      route: {
+        pathname: '/(main)/(tabs)/player/PlayerPlaylistDetail',
+        params: { id: item.id },
+      } as Href,
+    }))
 })
 
-export const musicFilesFullList$ = computed<ListItemType[]>(() => {
-  const allFiles = musicFiles$.get()
-  if (!allFiles) return []
-
-  return allFiles
-    .slice()
-    .sort((a, b) => {
-      return (
-        (a.album || a.origAlbum || '').localeCompare(
-          b.album || b.origAlbum || '',
-        ) ||
-        (a.origYear ?? 0) - (b.origYear ?? 0) ||
-        (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
-        (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
-        a.title.localeCompare(b.title)
-      )
-    })
-    .map((file, index): ListItemType => {
-      const playlistTimestamp = getPlaylistTimestamp(new Date(file.importedAt))
-      const albumName = file.album || file.origAlbum || playlistTimestamp
-      const line1 = albumName.includes(playlistTimestamp)
-        ? albumName
-        : `${albumName} - ${playlistTimestamp}`
-
-      const discPart = file.origDisc ? `D/${file.origDisc}` : ''
-      const trackPart = file.origTrack ? `T/${file.origTrack}` : ''
-      const metaPrefix = [discPart, trackPart].filter(Boolean).join(' - ')
-
-      return {
-        id: file.id,
-        line1,
-        line2: metaPrefix ? `${metaPrefix} - ${file.title}` : file.title,
-        icon: String(index + 1),
-        route: null,
-      }
-    })
-})
-
-export const musicFilesPickerList$ = (playlistId: string) =>
+export const musicFilesList$ = (playlistId?: string) =>
   computed<ListItemType[]>(() => {
     const allFiles = musicFiles$.get()
-    const playlist = playlists$.find(p => p.id.get() === playlistId)?.get()
     if (!allFiles) return []
+
+    const playlist = playlistId
+      ? playlists$.find(p => p.id.get() === playlistId)?.get()
+      : null
 
     const existingTrackIds = new Set(
       playlist?.tracks.map(t => t.musicFileId) || [],
@@ -117,6 +80,7 @@ export const musicFilesPickerList$ = (playlistId: string) =>
           (a.album || a.origAlbum || '').localeCompare(
             b.album || b.origAlbum || '',
           ) ||
+          (a.origYear ?? 0) - (b.origYear ?? 0) ||
           (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
           (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
           a.title.localeCompare(b.title)
@@ -261,13 +225,11 @@ export const coverFilesFullList$ = computed<ListItemType[]>(() => {
       if (a.fileFormat !== 'asset' && b.fileFormat === 'asset') return 1
       return a.origFilename.localeCompare(b.origFilename)
     })
-    .map(
-      (file): ListItemType => ({
-        id: file.id,
-        line1: file.origFilename,
-        line2: file.fileFormat === 'asset' ? 'App Asset' : 'Local File',
-        icon: file.coverUri,
-        route: null,
-      }),
-    )
+    .map((file): ListItemType => ({
+      id: file.id,
+      line1: file.origFilename,
+      line2: file.fileFormat === 'asset' ? 'App Asset' : 'Local File',
+      icon: file.coverUri,
+      route: null,
+    }))
 })

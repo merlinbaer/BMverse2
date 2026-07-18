@@ -9,7 +9,7 @@ import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
 import {
-  musicFilesPickerList$,
+  musicFilesList$,
   playlistTracksList$,
   playlistTracksUpdate,
 } from '@/services/legend'
@@ -20,7 +20,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get('window')
 const PlaylistAddTrack = () => {
   const { playlistId } = useLocalSearchParams<{ playlistId: string }>()
   const tracks = useValue(playlistTracksList$(playlistId ?? ''))
-  const pickerTracks = useValue(musicFilesPickerList$(playlistId ?? ''))
+  const pickerTracks = useValue(musicFilesList$(playlistId ?? ''))
 
   const handleSelectTrack = (item: ListItemType, dismiss: () => void) => {
     if (!playlistId) return
