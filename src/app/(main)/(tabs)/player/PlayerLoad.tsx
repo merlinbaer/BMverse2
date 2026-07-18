@@ -3,6 +3,8 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
+import { AppText } from '@/components/AppText'
+import { COLORS, FONT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
 import {
   deleteAllCoverFiles,
@@ -129,36 +131,56 @@ export default function PlayerLoadScreen() {
     <AppScreen>
       <Stack.Screen options={{ title: 'Manage Files' }} />
       <View style={styles.container}>
-        <AppBubbleText markup={loadText} orientation={'center'} />
-        <AppButton
-          title={'Add Music File(s)'}
-          onPress={handleLoadMusic}
-        ></AppButton>
-        <AppBubbleText markup={deleteSingleText} orientation={'center'} />
-        <AppButton
-          title={'Delete Single File'}
-          onPress={handleDeleteSingle}
-        ></AppButton>
-        <AppBubbleText markup={deleteText} orientation={'center'} />
-        <AppButton
-          title={'Delete All Music'}
-          onPress={handleDeleteAll}
-        ></AppButton>
-        <AppBubbleText markup={coverLoadText} orientation={'center'} />
-        <AppButton
-          title={'Add Cover Image(s)'}
-          onPress={handleLoadCovers}
-        ></AppButton>
-        <AppBubbleText markup={deleteSingleCoverText} orientation={'center'} />
-        <AppButton
-          title={'Delete Single Image'}
-          onPress={handleDeleteSingleCover}
-        ></AppButton>
-        <AppBubbleText markup={deleteCoversText} orientation={'center'} />
-        <AppButton
-          title={'Delete All Cover'}
-          onPress={handleDeleteCovers}
-        ></AppButton>
+        {/* Music Section */}
+        <View style={styles.section}>
+          <View style={styles.headerRow}>
+            <View style={styles.dot} />
+            <AppText style={styles.header}>MUSIC FILE SECTION</AppText>
+            <View style={styles.dot} />
+          </View>
+          <AppBubbleText markup={loadText} orientation={'center'} />
+          <AppButton title={'Add Music File(s)'} onPress={handleLoadMusic} />
+
+          <View style={styles.deleteGroup}>
+            <AppText style={styles.deleteLabel}>{deleteSingleText}</AppText>
+            <AppButton
+              title={'Delete Single File'}
+              onPress={handleDeleteSingle}
+            />
+
+            <AppText style={styles.deleteLabel}>{deleteText}</AppText>
+            <AppButton title={'Delete All Music'} onPress={handleDeleteAll} />
+          </View>
+        </View>
+
+        <View style={styles.separator} />
+
+        {/* Covers Section */}
+        <View style={styles.section}>
+          <View style={styles.headerRow}>
+            <View style={styles.dot} />
+            <AppText style={styles.header}>COVER IMAGE SECTION</AppText>
+            <View style={styles.dot} />
+          </View>
+          <AppBubbleText markup={coverLoadText} orientation={'center'} />
+          <AppButton title={'Add Cover Image(s)'} onPress={handleLoadCovers} />
+
+          <View style={styles.deleteGroup}>
+            <AppText style={styles.deleteLabel}>
+              {deleteSingleCoverText}
+            </AppText>
+            <AppButton
+              title={'Delete Single Image'}
+              onPress={handleDeleteSingleCover}
+            />
+
+            <AppText style={styles.deleteLabel}>{deleteCoversText}</AppText>
+            <AppButton
+              title={'Delete All Covers'}
+              onPress={handleDeleteCovers}
+            />
+          </View>
+        </View>
       </View>
     </AppScreen>
   )
@@ -167,8 +189,50 @@ export default function PlayerLoadScreen() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 24,
     marginVertical: 40,
+    paddingBottom: 40,
     width: '100%',
+  },
+  deleteGroup: {
+    alignItems: 'center',
+    gap: 12,
+    marginTop: 10,
+    width: '100%',
+  },
+  deleteLabel: {
+    color: COLORS.TEXT_MUTED,
+    fontSize: FONT.SIZE.SM,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  dot: {
+    backgroundColor: COLORS.PRIMARY,
+    borderRadius: 4,
+    height: 8,
+    width: 8,
+  },
+  header: {
+    color: COLORS.PRIMARY,
+    fontSize: FONT.SIZE.BASE,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  headerRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 15,
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  section: {
+    alignItems: 'center',
+    gap: 20,
+    width: '100%',
+  },
+  separator: {
+    backgroundColor: COLORS.MODAL_BORDER,
+    height: 1,
+    marginVertical: 40,
+    width: '80%',
   },
 })
