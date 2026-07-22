@@ -5,7 +5,7 @@ import { StyleSheet, View } from 'react-native'
 import { AppButton } from '@/components/AppButton'
 import { AppScreen } from '@/components/AppScreen'
 
-export default function PlayerMetadataScreen() {
+export default function PlayerMetaScreen() {
   const router = useRouter()
 
   return (

@@ -21,7 +21,7 @@ export default function PlayerScreen() {
     {
       id: 'metadata',
       image: IMAGES.icons.playerMeta,
-      screen: '/player/PlayerMetadata' as Href,
+      screen: '/player/PlayerMeta' as Href,
       position: 'top-right',
       label: 'Metadata',
     },
