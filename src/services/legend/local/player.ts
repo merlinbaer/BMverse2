@@ -59,7 +59,7 @@ export const playlistList$ = computed<ListItemType[]>(() => {
     }))
 })
 
-export const musicFilesList$ = (playlistId?: string) =>
+export const musicFilesList$ = (playlistId?: string, enableRoute = false) =>
   computed<ListItemType[]>(() => {
     const allFiles = musicFiles$.get()
     if (!allFiles) return []
@@ -103,7 +103,12 @@ export const musicFilesList$ = (playlistId?: string) =>
           line1,
           line2: metaPrefix ? `${metaPrefix} - ${file.title}` : file.title,
           icon: String(index + 1),
-          route: null,
+          route: enableRoute
+            ? ({
+                pathname: '/(main)/(tabs)/player/PlayerMetaEdit',
+                params: { id: file.id },
+              } as Href)
+            : null,
         }
       })
   })

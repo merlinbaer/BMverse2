@@ -1,19 +1,23 @@
-import { Stack } from 'expo-router'
+import { Stack, useRouter } from 'expo-router'
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
-import { AppBubbleText } from 'src/components/AppBubbleText'
-import { AppScreen } from 'src/components/AppScreen'
+import { AppButton } from '@/components/AppButton'
+import { AppScreen } from '@/components/AppScreen'
 
 export default function PlayerMetadataScreen() {
+  const router = useRouter()
+
   return (
     <AppScreen>
-      <Stack.Screen options={{ title: 'Edit Metadata' }} />
+      <Stack.Screen options={{ title: 'Meta Main Selection' }} />
       <View style={styles.container}>
-        <AppBubbleText
-          markup={'Feature in Development. Coming soon'}
-          orientation={'center'}
+        <AppButton
+          title="Select Music File"
+          onPress={() => router.push('/(main)/(tabs)/player/PlayerMetaTracks')}
         />
+        <AppButton title="'Select from Album" />
+        <AppButton title="Select from Playlist" />
       </View>
     </AppScreen>
   )
@@ -22,7 +26,8 @@ export default function PlayerMetadataScreen() {
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    marginVertical: 40,
+    gap: 40,
+    marginVertical: 60,
     width: '100%',
   },
 })
