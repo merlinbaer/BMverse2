@@ -19,9 +19,8 @@ npx eas-cli submit -p ios --profile production
 ## Commands
 
 Generate supabase types:
-yarn supabase gen types typescript --project-id {project-ref} > ./database.types.ts
-or
-yarn supabase gen types typescript --local > ./database.types.ts
+yarn supabase gen types typescript --project-id {project-ref} > ./database.types.ts or yarn supabase gen types
+typescript --local > ./database.types.ts
 
 Build a development build and run on default (Simulator):
 yarn expo run:ios
@@ -46,6 +45,9 @@ eas build -p ios --local
 
 Submit to Appstore or Testflight:
 eas submit --platform ios
+
+Build web. Go to web dashboard and change alias "run" to newest build yarn expo export --platform web --clear && npx
+eas-cli deploy
 
 ## Get started
 
