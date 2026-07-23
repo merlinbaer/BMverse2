@@ -20,7 +20,7 @@ export interface MusicFile {
   importedAt: string
   origFilename: string
   audioUri: string
-  coverUri: string | null
+  coverUri: string | number | null
 
   // Diagnostics tags
   fileFormat: 'mp3' | 'm4a' | null
@@ -39,7 +39,7 @@ export interface MusicFile {
   artist: string | null
   album: string | null
   lyrics: string | null
-  appCoverUri: string | null
+  appCoverUri: string | number | null
 }
 
 export interface PlaylistTrack {
@@ -50,6 +50,6 @@ export interface PlaylistTrack {
 export interface Playlist {
   id: string
   name: string
-  imageUri: string | null
+  imageUri: string | number | null
   tracks: PlaylistTrack[]
 }

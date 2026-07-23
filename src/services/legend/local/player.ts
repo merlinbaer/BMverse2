@@ -59,6 +59,19 @@ export const playlistList$ = computed<ListItemType[]>(() => {
     }))
 })
 
+export const musicFile$ = (id: string) =>
+  computed(() => musicFiles$.find(f => f.id.get() === id)?.get() ?? null)
+
+export const musicFileUpdate = (
+  id: string,
+  data: Partial<Pick<MusicFile, 'title' | 'artist' | 'album' | 'appCoverUri'>>,
+) => {
+  const file$ = musicFiles$.find(f => f.id.get() === id)
+  if (file$) {
+    file$.assign(data)
+  }
+}
+
 export const musicFilesList$ = (playlistId?: string, enableRoute = false) =>
   computed<ListItemType[]>(() => {
     const allFiles = musicFiles$.get()
