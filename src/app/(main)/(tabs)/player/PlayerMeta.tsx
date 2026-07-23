@@ -16,7 +16,10 @@ export default function PlayerMetaScreen() {
           title="Select Music File"
           onPress={() => router.push('/(main)/(tabs)/player/PlayerMetaTracks')}
         />
-        <AppButton title="Select from Album" />
+        <AppButton
+          title="Select from Album"
+          onPress={() => router.push('/(main)/(tabs)/player/PlayerMetaAlbum')}
+        />
         <AppButton
           title="Select from Playlist"
           onPress={() =>

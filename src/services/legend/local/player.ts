@@ -160,6 +160,102 @@ export const playlistTracksList$ = (playlistId: string) =>
       .sort((a, b) => ((a.value as number) ?? 0) - ((b.value as number) ?? 0))
   })
 
+export const albumList$ = computed<ListItemType[]>(() => {
+  const allFiles = musicFiles$.get()
+  const allCovers = coverFiles$.get()
+  if (!allFiles) return []
+
+  const albumMap = new Map<
+    string,
+    { count: number; icons: Map<string | number, number> }
+  >()
+
+  allFiles.forEach(file => {
+    const albumName = file.album || file.origAlbum
+    if (!albumName) return
+
+    let data = albumMap.get(albumName)
+    if (!data) {
+      data = { count: 0, icons: new Map() }
+      albumMap.set(albumName, data)
+    }
+
+    data.count++
+    const icon = file.appCoverUri || file.coverUri
+    if (icon) {
+      data.icons.set(icon, (data.icons.get(icon) || 0) + 1)
+    }
+  })
+
+  const coverMap = new Map<string | number, string>()
+  if (allCovers) {
+    allCovers.forEach(c => {
+      coverMap.set(c.coverUri, c.origFilename)
+    })
+  }
+
+  return Array.from(albumMap.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([albumName, data]): ListItemType => {
+      let selectedIcon: string | number | null = null
+
+      if (data.icons.size > 0) {
+        const sortedIcons = Array.from(data.icons.entries()).sort((a, b) => {
+          if (b[1] !== a[1]) {
+            return b[1] - a[1]
+          }
+          const nameA = coverMap.get(a[0]) || ''
+          const nameB = coverMap.get(b[0]) || ''
+          return nameA.localeCompare(nameB)
+        })
+        selectedIcon = sortedIcons[0][0]
+      }
+
+      return {
+        id: albumName,
+        line1: albumName,
+        line2: `${data.count} songs`,
+        icon: selectedIcon ?? IMAGES.cover200.notFound,
+        route: {
+          pathname: '/(main)/(tabs)/player/PlayerMetaAlbumSongs',
+          params: { album: albumName },
+        } as Href,
+      }
+    })
+})
+
+export const albumTracksList$ = (albumName: string) =>
+  computed<ListItemType[]>(() => {
+    const allFiles = musicFiles$.get()
+    if (!allFiles) return []
+
+    return allFiles
+      .filter(file => (file.album || file.origAlbum) === albumName)
+      .slice()
+      .sort((a, b) => {
+        return (
+          (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
+          (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+          (a.title || a.origTitle || '').localeCompare(
+            b.title || b.origTitle || '',
+          )
+        )
+      })
+      .map((file): ListItemType => ({
+        id: file.id,
+        line1: file.title || file.origTitle || 'Unknown Title',
+        line2:
+          (file.album || file.origAlbum || 'Unknown Album') +
+          ' - ' +
+          (file.artist || file.origArtist || 'Unknown Artist'),
+        icon: file.appCoverUri || file.coverUri || IMAGES.cover200.notFound,
+        route: {
+          pathname: '/(main)/(tabs)/player/PlayerMetaEdit',
+          params: { id: file.id },
+        } as Href,
+      }))
+  })
+
 export const playlistNameUpdate = (playlistId: string, newName: string) => {
   const playlist$ = playlists$.find(p => p.id.get() === playlistId)
   if (playlist$) {
