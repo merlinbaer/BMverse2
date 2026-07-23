@@ -17,7 +17,12 @@ export default function PlayerMetaScreen() {
           onPress={() => router.push('/(main)/(tabs)/player/PlayerMetaTracks')}
         />
         <AppButton title="Select from Album" />
-        <AppButton title="Select from Playlist" />
+        <AppButton
+          title="Select from Playlist"
+          onPress={() =>
+            router.push('/(main)/(tabs)/player/PlayerMetaPlaylist')
+          }
+        />
       </View>
     </AppScreen>
   )

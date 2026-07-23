@@ -152,7 +152,7 @@ export const playlistTracksList$ = (playlistId: string) =>
             (file?.album ?? 'Unknown Album') +
             ' - ' +
             (file?.artist ?? 'Unknown Artist'),
-          icon: IMAGES.cover200.single,
+          icon: file?.appCoverUri ?? IMAGES.cover200.notFound,
           route: null,
           value: track.trackNum,
         } as ListItemType
