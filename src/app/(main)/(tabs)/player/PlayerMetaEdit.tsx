@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native'
 
+import { AppBubbleText } from '@/components/AppBubbleText'
 import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
@@ -25,7 +26,7 @@ interface MetaFieldProps {
   label: string
   field: 'title' | 'artist' | 'album'
   observable$: Observable<string>
-  file: MusicFile
+  musicFileId: string
   handleUpdate: (field: 'title' | 'artist' | 'album') => void
   handleRevert: (field: 'title' | 'artist' | 'album') => void
 }
@@ -34,11 +35,15 @@ const MetaField = ({
   label,
   field,
   observable$,
-  file,
+  musicFileId,
   handleUpdate,
   handleRevert,
 }: MetaFieldProps) => {
   const value = useValue(observable$)
+  const file = useValue(musicFile$(musicFileId))
+
+  if (!file) return null
+
   const origField =
     `orig${field.charAt(0).toUpperCase()}${field.slice(1)}` as keyof MusicFile
   const origValue = file[origField]
@@ -92,6 +97,10 @@ export default function PlayerMetaEditScreen() {
   const draftTitle$ = useObservable(file?.title ?? '')
   const draftArtist$ = useObservable(file?.artist ?? '')
   const draftAlbum$ = useObservable(file?.album ?? '')
+
+  const hintText =
+    '**Hint:**\n' +
+    'You can revert the metadata back to its original state when the music file was added.'
 
   // Sync draft values when file loads or changes
   React.useEffect(() => {
@@ -181,7 +190,7 @@ export default function PlayerMetaEditScreen() {
               label="Title"
               field="title"
               observable$={draftTitle$}
-              file={file}
+              musicFileId={id ?? ''}
               handleUpdate={handleUpdate}
               handleRevert={handleRevert}
             />
@@ -189,7 +198,7 @@ export default function PlayerMetaEditScreen() {
               label="Artist"
               field="artist"
               observable$={draftArtist$}
-              file={file}
+              musicFileId={id ?? ''}
               handleUpdate={handleUpdate}
               handleRevert={handleRevert}
             />
@@ -197,11 +206,12 @@ export default function PlayerMetaEditScreen() {
               label="Album"
               field="album"
               observable$={draftAlbum$}
-              file={file}
+              musicFileId={id ?? ''}
               handleUpdate={handleUpdate}
               handleRevert={handleRevert}
             />
           </View>
+          <AppBubbleText markup={hintText} orientation={'center'} />
         </ScrollView>
       </KeyboardAvoidingView>
     </AppScreen>
@@ -214,6 +224,7 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     gap: 20,
+    paddingBottom: 40,
     paddingHorizontal: LAYOUT.paddingHorizontal,
   },
   headerImage: {

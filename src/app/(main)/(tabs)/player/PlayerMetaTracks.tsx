@@ -6,7 +6,7 @@ import { AppListScreen } from '@/components/AppListScreen'
 import { musicFilesList$ } from '@/services/legend'
 
 export default function PlayerMetaTracksScreen() {
-  const list$ = useMemo(() => musicFilesList$(undefined, true), [])
+  const list$ = useMemo(() => musicFilesList$(undefined, true, true), [])
   const data = useValue(list$)
 
   return (

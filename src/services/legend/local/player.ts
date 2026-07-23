@@ -72,7 +72,11 @@ export const musicFileUpdate = (
   }
 }
 
-export const musicFilesList$ = (playlistId?: string, enableRoute = false) =>
+export const musicFilesList$ = (
+  playlistId?: string,
+  enableRoute = false,
+  showCover = false,
+) =>
   computed<ListItemType[]>(() => {
     const allFiles = musicFiles$.get()
     if (!allFiles) return []
@@ -115,7 +119,9 @@ export const musicFilesList$ = (playlistId?: string, enableRoute = false) =>
           id: file.id,
           line1,
           line2: metaPrefix ? `${metaPrefix} - ${file.title}` : file.title,
-          icon: String(index + 1),
+          icon: showCover
+            ? file.appCoverUri || file.coverUri || IMAGES.cover200.notFound
+            : String(index + 1),
           route: enableRoute
             ? ({
                 pathname: '/(main)/(tabs)/player/PlayerMetaEdit',
