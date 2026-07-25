@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   },
   screenWrapper: {
     alignItems: 'center',
-    backgroundColor: 'transparent', // COLORS.TRANSPARENT,
+    backgroundColor: COLORS.TRANSPARENT,
     flex: 1,
     justifyContent: 'flex-start',
   },
