@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect } from 'react'
 import { Platform, Pressable, StyleSheet, View } from 'react-native'
@@ -20,9 +21,13 @@ import { COLORS } from '@/constants/constants'
 
 interface AppModalScreenProps {
   children: (dismiss: () => void) => ReactNode
+  gradientColors?: readonly [string, string, ...string[]]
 }
 
-export function AppModalScreen({ children }: AppModalScreenProps) {
+export function AppModalScreen({
+  children,
+  gradientColors,
+}: AppModalScreenProps) {
   const router = useRouter()
   const { top } = useSafeAreaInsets()
   const startOffset = 600
@@ -78,8 +83,19 @@ export function AppModalScreen({ children }: AppModalScreenProps) {
       </Animated.View>
       <GestureDetector gesture={gesture}>
         <Animated.View
-          style={[styles.modalCard, { marginTop: top + 60 }, animatedStyle]}
+          style={[
+            styles.modalCard,
+            { marginTop: top + 60 },
+            animatedStyle,
+            gradientColors ? { backgroundColor: COLORS.TRANSPARENT } : {},
+          ]}
         >
+          {gradientColors && (
+            <LinearGradient
+              colors={gradientColors}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
           <View style={styles.handleContainer}>
             <View style={styles.handle} />
           </View>
@@ -114,6 +130,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 20,
     minHeight: 320,
+    overflow: 'hidden',
     padding: 24,
     width: '90%',
   },
