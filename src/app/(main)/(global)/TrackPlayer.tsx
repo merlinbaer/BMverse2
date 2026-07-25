@@ -118,7 +118,8 @@ const styles = StyleSheet.create({
   },
   artworkContainer: {
     alignItems: 'center',
-    marginVertical: 20,
+    marginBottom: 30,
+    marginTop: 10,
   },
   artworkPlaceholder: {
     alignItems: 'center',
