@@ -1,3 +1,4 @@
+import { Image } from 'expo-image'
 import React from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
 
@@ -30,16 +31,22 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
 
   return (
     <View style={styles.container}>
-      <AppText fontSize={FONT.SIZE.LG} style={styles.header}>
-        {'Track Player'}
-      </AppText>
-
-      <View style={styles.artworkPlaceholder}>
-        <IMAGES.vector.MaterialIcons
-          name="library-music"
-          size={80}
-          color={COLORS.PRIMARY}
-        />
+      <View style={styles.artworkContainer}>
+        {currentTrack?.appCoverUri ? (
+          <Image
+            source={currentTrack.appCoverUri}
+            contentFit="fill"
+            style={styles.artwork}
+          />
+        ) : (
+          <View style={styles.artworkPlaceholder}>
+            <IMAGES.vector.MaterialIcons
+              name="music-note"
+              size={80}
+              color={COLORS.PRIMARY}
+            />
+          </View>
+        )}
       </View>
 
       <View style={styles.infoContainer}>
@@ -48,10 +55,13 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
           style={styles.songTitle}
           numberOfLines={1}
         >
-          {currentTrack?.title || 'No track selected'}
+          {currentTrack?.title || currentTrack?.origTitle || 'Unknown track'}
         </AppText>
-        <AppText fontSize={FONT.SIZE.SM} style={styles.songArtist}>
-          {currentTrack?.artist || 'Local Library'}
+        <AppText fontSize={FONT.SIZE.SM} style={styles.songAlbum}>
+          {currentTrack?.album || currentTrack?.origAlbum || 'Unknown Album'}
+        </AppText>
+        <AppText fontSize={FONT.SIZE.XS} style={styles.songArtist}>
+          {currentTrack?.artist || currentTrack?.origArtist || 'Unknown Artist'}
         </AppText>
       </View>
 
@@ -101,6 +111,15 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
 }
 
 const styles = StyleSheet.create({
+  artwork: {
+    borderRadius: 8,
+    height: 180,
+    width: 180,
+  },
+  artworkContainer: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
   artworkPlaceholder: {
     alignItems: 'center',
     backgroundColor: COLORS.BG_GREY,
@@ -112,7 +131,7 @@ const styles = StyleSheet.create({
   },
   container: {
     alignItems: 'center',
-    paddingBottom: 24,
+    paddingBottom: 48,
     paddingHorizontal: 20,
   },
   controlsRow: {
@@ -121,15 +140,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-  header: {
-    color: COLORS.PRIMARY,
-    fontWeight: 'bold',
-    marginTop: 10,
-    textAlign: 'center',
-  },
   infoContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 50,
     width: '100%',
   },
   playButton: {
@@ -152,15 +165,20 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   progressContainer: {
-    marginBottom: 20,
+    marginBottom: 40,
     width: '100%',
   },
   skipButton: {
     padding: 10,
   },
+  songAlbum: {
+    color: COLORS.TEXT,
+    fontWeight: 'condensed',
+    marginTop: 8,
+  },
   songArtist: {
-    color: COLORS.TEXT_MUTED,
-    marginTop: 4,
+    color: COLORS.SECONDARY,
+    marginTop: 8,
   },
   songTitle: {
     color: COLORS.TEXT,
