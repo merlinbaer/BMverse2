@@ -32,21 +32,11 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
   return (
     <View style={styles.container}>
       <View style={styles.artworkContainer}>
-        {currentTrack?.appCoverUri ? (
-          <Image
-            source={currentTrack.appCoverUri}
-            contentFit="fill"
-            style={styles.artwork}
-          />
-        ) : (
-          <View style={styles.artworkPlaceholder}>
-            <IMAGES.vector.MaterialIcons
-              name="music-note"
-              size={80}
-              color={COLORS.PRIMARY}
-            />
-          </View>
-        )}
+        <Image
+          source={currentTrack.appCoverUri || IMAGES.cover200.notFound}
+          contentFit="fill"
+          style={styles.artwork}
+        />
       </View>
 
       <View style={styles.infoContainer}>
@@ -120,15 +110,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 30,
     marginTop: 10,
-  },
-  artworkPlaceholder: {
-    alignItems: 'center',
-    backgroundColor: COLORS.BG_GREY,
-    borderRadius: 8,
-    height: 180,
-    justifyContent: 'center',
-    marginVertical: 20,
-    width: 180,
   },
   container: {
     alignItems: 'center',

@@ -1,6 +1,7 @@
 import { useObserve } from '@legendapp/state/react'
 import { Stack } from 'expo-router'
 
+import { COLORS } from '@/constants/constants'
 import { authUser$, profile$, profileUserStoreLoad } from '@/services/legend'
 
 export default function MainLayout() {
@@ -24,8 +25,10 @@ export default function MainLayout() {
       <Stack.Screen
         name="(global)"
         options={{
+          headerShown: false,
           presentation: 'transparentModal',
-          contentStyle: { backgroundColor: 'transparent' },
+          animation: 'none',
+          contentStyle: { backgroundColor: COLORS.TRANSPARENT },
         }}
       />
     </Stack>

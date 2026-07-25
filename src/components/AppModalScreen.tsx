@@ -91,7 +91,10 @@ export function AppModalScreen({ children }: AppModalScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: COLORS.BACKDROP },
+  backdrop: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: COLORS.BACKDROP,
+  },
   handle: {
     backgroundColor: COLORS.MINIMUM_TRACK_TINT_COLOR,
     borderRadius: 3,
@@ -99,7 +102,11 @@ const styles = StyleSheet.create({
     opacity: 0.5,
     width: 50,
   },
-  handleContainer: { alignItems: 'center', marginBottom: 10, marginTop: -10 },
+  handleContainer: {
+    alignItems: 'center',
+    marginBottom: 10,
+    marginTop: -10,
+  },
   modalCard: {
     backgroundColor: COLORS.MODAL_BACKGROUND,
     borderColor: COLORS.MODAL_BORDER,
@@ -112,7 +119,7 @@ const styles = StyleSheet.create({
   },
   screenWrapper: {
     alignItems: 'center',
-    backgroundColor: COLORS.TRANSPARENT,
+    backgroundColor: 'transparent', // COLORS.TRANSPARENT,
     flex: 1,
     justifyContent: 'flex-start',
   },
