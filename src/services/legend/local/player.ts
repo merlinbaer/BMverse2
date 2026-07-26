@@ -12,6 +12,8 @@ import { generateId, persistLargeStore } from '../config'
 // Store for local-only persisted music metadata
 export const musicFiles$ = observable<MusicFile[]>([])
 
+export const activeTrackList$ = observable<MusicFile[]>([])
+
 syncObservable(musicFiles$, {
   persist: {
     name: 'musicFiles',
@@ -40,6 +42,17 @@ syncObservable(playlists$, {
   },
 })
 
+const mapPlaylistToListItem = (item: Playlist): ListItemType => ({
+  id: item.id,
+  line1: item.name,
+  line2: `${item.tracks.length} Tracks`,
+  icon: item.imageUri ?? IMAGES.cover200.notFound,
+  route: {
+    pathname: '/(main)/(tabs)/player/PlayerPlaylistDetail',
+    params: { id: item.id },
+  } as Href,
+})
+
 export const playlistList$ = computed<ListItemType[]>(() => {
   const list = playlists$.get()
   if (!list) return []
@@ -47,16 +60,18 @@ export const playlistList$ = computed<ListItemType[]>(() => {
   return list
     .slice()
     .sort((a, b) => a.name.localeCompare(b.name))
-    .map((item): ListItemType => ({
-      id: item.id,
-      line1: item.name,
-      line2: `${item.tracks.length} Tracks`,
-      icon: item.imageUri ?? IMAGES.cover200.notFound,
-      route: {
-        pathname: '/(main)/(tabs)/player/PlayerPlaylistDetail',
-        params: { id: item.id },
-      } as Href,
-    }))
+    .map(mapPlaylistToListItem)
+})
+
+export const playlistNonEmptyList$ = computed<ListItemType[]>(() => {
+  const list = playlists$.get()
+  if (!list) return []
+
+  return list
+    .slice()
+    .filter(item => item.tracks.length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map(mapPlaylistToListItem)
 })
 
 export const musicFile$ = (id: string) =>
@@ -269,6 +284,42 @@ export const albumTracksList$ = (albumName: string) =>
         } as Href,
       }))
   })
+
+export const playPlaylist = (playlistId: string) => {
+  const playlist = playlists$.find(p => p.id.peek() === playlistId)?.peek()
+  const allFiles = musicFiles$.peek()
+  if (!playlist || !allFiles) return
+
+  const tracks = playlist.tracks
+    .map(track => {
+      const file = allFiles.find(f => f.id === track.musicFileId)
+      return file ? { ...file, trackNum: track.trackNum } : null
+    })
+    .filter((f): f is MusicFile & { trackNum: number } => !!f)
+    .sort((a, b) => a.trackNum - b.trackNum)
+    .map(({ trackNum: _trackNum, ...file }) => file as MusicFile)
+
+  activeTrackList$.set(tracks)
+}
+
+export const playAlbum = (albumName: string) => {
+  const allFiles = musicFiles$.peek()
+  if (!allFiles) return
+
+  const tracks = allFiles
+    .filter(file => (file.album || file.origAlbum) === albumName)
+    .sort((a, b) => {
+      return (
+        (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
+        (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+        (a.title || a.origTitle || '').localeCompare(
+          b.title || b.origTitle || '',
+        )
+      )
+    })
+
+  activeTrackList$.set(tracks)
+}
 
 export const playlistNameUpdate = (playlistId: string, newName: string) => {
   const playlist$ = playlists$.find(p => p.id.get() === playlistId)

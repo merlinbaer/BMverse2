@@ -5,6 +5,7 @@ import { Dimensions, FlatList, Pressable, StyleSheet, View } from 'react-native'
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
+import { playAlbum, playPlaylist } from '@/services/legend'
 import { ListItemType } from '@/types/list'
 
 interface AppHorizontalListProps {
@@ -16,7 +17,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window')
 const GAP = 12
 const PADDING = LAYOUT.paddingHorizontal
 // Calculate item width to fit 3 items with gaps and outer padding
-const ITEM_WIDTH = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3
+const ITEM_SIZE = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3
 
 export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
   const router = useRouter()
@@ -26,7 +27,18 @@ export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
   const renderItem = ({ item }: { item: ListItemType }) => {
     const handlePress = () => {
       if (item.route) {
-        router.push(item.route)
+        const pathname =
+          typeof item.route === 'object' && true && 'pathname' in item.route
+            ? item.route.pathname
+            : item.route
+
+        if (pathname === '/(main)/(tabs)/player/PlayerPlaylistDetail') {
+          playPlaylist(item.id)
+        } else if (pathname === '/(main)/(tabs)/player/PlayerMetaAlbumSongs') {
+          playAlbum(item.id)
+        }
+
+        router.push('/(main)/(global)/TrackPlayer')
       }
     }
 
@@ -64,7 +76,7 @@ export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
         ItemSeparatorComponent={() => <View style={{ width: GAP }} />}
-        snapToInterval={ITEM_WIDTH + GAP}
+        snapToInterval={ITEM_SIZE + GAP}
         decelerationRate="fast"
       />
     </View>
@@ -79,11 +91,11 @@ const styles = StyleSheet.create({
   image: {
     backgroundColor: COLORS.BG_GREY,
     borderRadius: 8,
-    height: ITEM_WIDTH,
-    width: ITEM_WIDTH,
+    height: ITEM_SIZE,
+    width: ITEM_SIZE,
   },
   itemContainer: {
-    width: ITEM_WIDTH,
+    width: ITEM_SIZE,
   },
   line1: {
     color: COLORS.TEXT,

@@ -2,10 +2,13 @@ import { useValue } from '@legendapp/state/react'
 import { useAudioPlaylist, useAudioPlaylistStatus } from 'expo-audio'
 import { useEffect } from 'react'
 
-import { musicFiles$ } from '@/services/legend'
+import { activeTrackList$, musicFiles$ } from '@/services/legend'
 
 export const useTrackPlayer = (onFinished?: () => void) => {
-  const files = useValue(musicFiles$)
+  const activeTracks = useValue(activeTrackList$)
+  const allFiles = useValue(musicFiles$)
+
+  const files = activeTracks.length > 0 ? activeTracks : allFiles
 
   // Map local files to the source format required by useAudioPlaylist
   const sources = files.map(file => ({

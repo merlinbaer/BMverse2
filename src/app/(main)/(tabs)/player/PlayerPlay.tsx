@@ -4,10 +4,10 @@ import React from 'react'
 
 import { AppHorizontalList } from '@/components/AppHorizontalList'
 import { AppScreen } from '@/components/AppScreen'
-import { albumList$, playlistList$ } from '@/services/legend'
+import { albumList$, playlistNonEmptyList$ } from '@/services/legend'
 
 export default observer(function PlayerPlayScreen() {
-  const playlists = playlistList$.get()
+  const playlists = playlistNonEmptyList$.get()
   const albums = albumList$.get()
 
   return (

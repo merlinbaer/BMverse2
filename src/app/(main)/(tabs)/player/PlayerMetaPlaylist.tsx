@@ -3,10 +3,10 @@ import { Href, Stack } from 'expo-router'
 import React, { useMemo } from 'react'
 
 import { AppListScreen } from '@/components/AppListScreen'
-import { playlistList$ } from '@/services/legend'
+import { playlistNonEmptyList$ } from '@/services/legend'
 
 export default function PlayerMetaPlaylistScreen() {
-  const playlists = useValue(playlistList$)
+  const playlists = useValue(playlistNonEmptyList$)
 
   const data = useMemo(() => {
     return playlists.map(item => ({
