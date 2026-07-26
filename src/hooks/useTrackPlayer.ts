@@ -48,6 +48,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
 
   const next = () => player.next()
   const previous = () => player.previous()
+  const seek = (time: number) => player.seekTo(time)
 
   return {
     player,
@@ -56,6 +57,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     handlePlayPause,
     next,
     previous,
+    seek,
     isPlaying: status?.playing ?? false,
     progress:
       (status?.duration ?? 0) > 0

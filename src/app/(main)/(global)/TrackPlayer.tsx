@@ -1,7 +1,13 @@
 import { useValue } from '@legendapp/state/react'
 import { Image } from 'expo-image'
-import React, { useEffect, useMemo } from 'react'
-import { ColorValue, Pressable, StyleSheet, View } from 'react-native'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  ColorValue,
+  PanResponder,
+  Pressable,
+  StyleSheet,
+  View,
+} from 'react-native'
 
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
@@ -36,13 +42,78 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
     handlePlayPause,
     next,
     previous,
+    seek,
     isPlaying,
-    progress,
-    currentTime,
+    progress: playerProgress,
+    currentTime: playerCurrentTime,
     duration,
   } = useTrackPlayer(dismiss)
 
   const coverFiles = useValue(coverFiles$)
+
+  const [isSeeking, setIsSeeking] = useState(false)
+  const [seekProgress, setSeekProgress] = useState(0)
+
+  const progressBarWidthRef = useRef(0)
+  const durationRef = useRef(duration)
+  const seekRef = useRef(seek)
+  const initialLocationX = useRef(0)
+
+  useEffect(() => {
+    durationRef.current = duration
+  }, [duration])
+
+  useEffect(() => {
+    seekRef.current = seek
+  }, [seek])
+
+  const progress = isSeeking ? seekProgress : playerProgress
+  const currentTime = isSeeking ? seekProgress * duration : playerCurrentTime
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: () => true,
+        onPanResponderGrant: evt => {
+          setIsSeeking(true)
+          const x = evt.nativeEvent.locationX
+          initialLocationX.current = x
+          if (progressBarWidthRef.current > 0) {
+            const newProgress = Math.max(
+              0,
+              Math.min(1, x / progressBarWidthRef.current),
+            )
+            setSeekProgress(newProgress)
+          }
+        },
+        onPanResponderMove: (evt, gestureState) => {
+          if (progressBarWidthRef.current > 0) {
+            const x = initialLocationX.current + gestureState.dx
+            const newProgress = Math.max(
+              0,
+              Math.min(1, x / progressBarWidthRef.current),
+            )
+            setSeekProgress(newProgress)
+          }
+        },
+        onPanResponderRelease: (evt, gestureState) => {
+          if (progressBarWidthRef.current > 0) {
+            const x = initialLocationX.current + gestureState.dx
+            const newProgress = Math.max(
+              0,
+              Math.min(1, x / progressBarWidthRef.current),
+            )
+            seekRef.current(newProgress * durationRef.current)
+          }
+          setIsSeeking(false)
+        },
+        onPanResponderTerminate: () => {
+          setIsSeeking(false)
+        },
+      }),
+    [],
+  )
 
   useEffect(() => {
     if (currentTrack?.appCoverUri) {
@@ -89,18 +160,27 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
         </AppText>
       </View>
 
-      <View style={styles.progressContainer}>
-        <View style={styles.progressBarBg}>
+      <View
+        style={styles.progressContainer}
+        {...panResponder.panHandlers}
+        onLayout={e => {
+          progressBarWidthRef.current = e.nativeEvent.layout.width
+        }}
+      >
+        <View style={styles.progressBarBg} pointerEvents="none">
           <View
             style={[styles.progressBarFill, { width: `${progress * 100}%` }]}
           />
+          <View
+            style={[styles.progressHandle, { left: `${progress * 100}%` }]}
+          />
         </View>
-        <View style={styles.timeRow}>
+        <View style={styles.timeRow} pointerEvents="none">
           <AppText fontSize={FONT.SIZE.XS} style={styles.timeText}>
             {formatAudioTime(currentTime)}
           </AppText>
           <AppText fontSize={FONT.SIZE.XS} style={styles.timeText}>
-            {formatAudioTime(duration)}
+            {`-${formatAudioTime(duration - currentTime)}`}
           </AppText>
         </View>
       </View>
@@ -182,7 +262,17 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     marginBottom: 40,
+    paddingVertical: 10,
     width: '100%',
+  },
+  progressHandle: {
+    backgroundColor: COLORS.TEXT,
+    borderRadius: 6,
+    height: 12,
+    marginLeft: -6,
+    marginTop: -3,
+    position: 'absolute',
+    width: 12,
   },
   skipButton: {
     padding: 10,
