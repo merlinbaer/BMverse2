@@ -353,6 +353,26 @@ export const cleanupPlaylistImages = (deletedUri?: string) => {
   })
 }
 
+/**
+ * Centralized helper to remove references to a specific image URI (or all local files) from music files.
+ * If deletedUri is provided, only that specific URI is nulled.
+ * If deletedUri is omitted, all local file references (file://) are nulled.
+ */
+export const cleanupMusicFileCovers = (deletedUri?: string) => {
+  const currentMusicFiles = musicFiles$.peek()
+  currentMusicFiles.forEach((file, index) => {
+    if (typeof file.appCoverUri === 'string') {
+      const shouldNull = deletedUri
+        ? file.appCoverUri === deletedUri
+        : file.appCoverUri.startsWith('file://')
+
+      if (shouldNull) {
+        musicFiles$[index].appCoverUri.set(null)
+      }
+    }
+  })
+}
+
 export const coverFilesFullList$ = (excludeAssets = false) =>
   computed<ListItemType[]>(() => {
     const allCovers = coverFiles$.get()

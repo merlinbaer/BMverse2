@@ -7,7 +7,11 @@ import Canvas, { Image as CanvasImage } from 'react-native-canvas'
 
 import { COLORS } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
-import { cleanupPlaylistImages, coverFiles$ } from '@/services/legend'
+import {
+  cleanupMusicFileCovers,
+  cleanupPlaylistImages,
+  coverFiles$,
+} from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import { CoverFile } from '@/types/player'
 
@@ -138,7 +142,6 @@ export const pickAndSaveCoverFiles = async (
       if (canvasRef) {
         try {
           const colors = await processImage(destinationFile.uri, canvasRef)
-          console.log(`BMverse: Dominant colors for ${asset.name}:`, colors)
           if (colors.length > 0) {
             dominantColor = colors[2] || colors[0]
           }
@@ -254,8 +257,9 @@ export const deleteAllCoverFiles = async () => {
     const assetsOnly = coverFiles$.get().filter(f => f.fileFormat === 'asset')
     coverFiles$.set(assetsOnly)
 
-    // 3. Reset playlist imageUri for all local files
+    // 3. Reset playlist and music file imageUri for all local files
     cleanupPlaylistImages()
+    cleanupMusicFileCovers()
   } catch (error) {
     console.error('deleteAllCoverFiles error:', error)
     throw error
@@ -278,8 +282,9 @@ export const deleteSingleCoverFile = async (coverId: string) => {
       coverFiles$.splice(index, 1)
     }
 
-    // 3. Cleanup playlists using this specific image
+    // 3. Cleanup playlists and music files using this specific image
     cleanupPlaylistImages(coverToDelete.coverUri as string)
+    cleanupMusicFileCovers(coverToDelete.coverUri as string)
   } catch (error) {
     console.error('deleteSingleCoverFile error:', error)
     throw error
