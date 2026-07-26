@@ -5,115 +5,88 @@ sessionId: session-260726-154505-1u5w
 # Requirements
 
 ### Overview & Goals
-The goal is to implement dominant color calculation for cover images when they are imported into the app via the `pickAndSaveCoverFiles` service. This will allow the app to eventually use these colors for UI styling (e.g., background gradients in the player).
+The goal is to implement a dynamic background gradient for the `TrackPlayer` modal. The top color of the gradient should match the dominant color of the currently playing track's cover image, while the bottom color should be a standard dark transparent color.
 
 ### Scope
-*   **In Scope**:
-    *   Calculating the top 5 dominant colors for iOS and Android targets during the file import process.
-    *   Refactoring existing image processing code in `src/services/player/cover.ts` to support sequential async processing.
-    *   Integrating a hidden `Canvas` component in the `PlayerLoad` screen to perform the calculation.
-    *   Logging the results to the console for verification.
-*   **Out of Scope**:
-    *   Dominant color calculation for the Web target.
-    *   Calculation for online/remote image sources.
-    *   Persisting the dominant color to the `CoverFile` record (to be implemented after the user decides which color to use).
-    *   Adding new native dependencies (the solution must work with standard Expo Go).
+- **In Scope**:
+    - Extending `AppModalScreen` to support custom background gradients via props.
+    - Updating `TrackPlayer` to calculate the dominant color of the current track from the `coverFiles$` store.
+    - Synchronizing the track's dominant color with the `AppModalScreen` background using a Legend State observable.
+- **Out of Scope**:
+    - Changing the background of other modals (they will retain their default behavior).
+    - Persisting the "current dominant color" across app restarts (it's purely for the active UI).
 
 ### User Stories
-*   As a user, I want the app to analyze my imported cover images so that it can later provide a more immersive and color-coordinated experience.
-*   As a developer, I want to see the extracted dominant colors in the logs so that I can evaluate the accuracy of the extraction algorithm.
+- As a user, I want the track player to have a background that matches the album artwork so that the experience feels more immersive.
+- As a developer, I want a generic way to customize the modal background gradient while keeping the component reusable.
 
 ### Functional Requirements
-*   When a user selects cover images to import, the app must process each image to extract dominant colors.
-*   The extraction must happen after the image is saved to the internal filesystem.
-*   The top 5 dominant colors must be printed to the console for each imported image.
-*   The import process should remain robust and handle cases where color extraction might fail (e.g., corrupted images).
-
+- `AppModalScreen` must accept an optional `gradientColors` prop.
+- When the track in `TrackPlayer` changes, the `AppModalScreen` background must smoothly update (via React rendering) to use the new dominant color.
+- If no dominant color is found, the modal should fall back to its default background color.
+- The dominant color calculation must use `currentTrack.appCoverUri` to find the matching `CoverFile` in the `coverFiles$` store.
 
 # Technical Design
 
 ### Current Implementation
-*   `pickAndSaveCoverFiles` in `src/services/player/cover.ts` handles the picking and saving of images but does not currently perform any analysis.
-*   `processImage` and `getTop5DominantColors` are partially implemented in `cover.ts` but are not integrated into the import flow.
-*   `processImage` currently relies on a `Canvas` reference which is not passed to the service.
+- `AppModalScreen` has a hardcoded solid background gradient using `COLORS.MODAL_BACKGROUND`.
+- `TrackPlayer` uses `AppModalScreen` but doesn't pass any specific styling information to it.
+- `coverFiles$` stores `dominantColor` for both app assets and imported covers.
 
 ### Key Decisions
-*   **Use `react-native-canvas`**: Since development builds are not allowed, we use the WebView-based `react-native-canvas` which is compatible with Expo Go and provides access to raw pixel data via the standard HTML5 Canvas API.
-*   **Sequential Processing**: We will process images one by one using a single hidden canvas. This avoids overloading the WebView and simplifies state management during the extraction loop.
-*   **Hidden Canvas in UI**: A hidden `Canvas` component will be added to the `PlayerLoad` screen. This is necessary because `react-native-canvas` requires a component to be present in the view hierarchy to function.
+- **Use Legend State for UI synchronization**: We will use a memory-based Legend State observable `currentPlayerDominantColor$` to pass the color from the `TrackContent` (where the player state lives) to the `TrackPlayerScreen` (where `AppModalScreen` is rendered). This avoids prop drilling and complex lifting of the `useTrackPlayer` hook.
+- **Generic `AppModalScreen` Props**: We will add a `gradientColors` prop to `AppModalScreen` to keep it generic and reusable for other features that might need custom backgrounds in the future.
 
 ### Proposed Changes
 
-#### Image Processing Refactoring (`src/services/player/cover.ts`)
-*   Convert `processImage` into a Promise-based utility that resolves with an array of hex colors.
-*   Add error handling for image loading and data extraction.
+#### Legend State (`src/services/legend/memory/variables.ts`)
+- Add `currentPlayerDominantColor$` observable.
 
-#### Service Integration (`src/services/player/cover.ts`)
-*   Update `pickAndSaveCoverFiles` to accept `canvasRef`.
-*   Wait for the file copy operation to complete before initiating extraction.
-*   Iterate through assets, extract colors, and log them.
+#### Generic Component (`src/components/AppModalScreen.tsx`)
+- Add `gradientColors?: readonly (string | number)[]` to `AppModalScreenProps`.
+- Use this prop if provided; otherwise, use the default solid `COLORS.MODAL_BACKGROUND` gradient.
 
-#### UI Integration (`src/app/(main)/(tabs)/player/PlayerLoad.tsx`)
-*   Add a `Canvas` component with hidden styles.
-*   Provide the `canvasRef` to the import handler.
+#### Track Player (`src/app/(main)/(global)/TrackPlayer.tsx`)
+- In `TrackContent`, use `useEffect` to find the current track's dominant color in `coverFiles$` and update `currentPlayerDominantColor$`.
+- In `TrackPlayerScreen`, use `useValue(currentPlayerDominantColor$)` to retrieve the color and construct the `gradientColors` array `[color, COLORS.MODAL_GRADIENT_BOTTOM]`.
+- Pass the constructed colors to `AppModalScreen`.
 
 ### File Structure
-*   `src/services/player/cover.ts`: Refactored `processImage` and updated `pickAndSaveCoverFiles`.
-*   `src/app/(main)/(tabs)/player/PlayerLoad.tsx`: Added hidden `Canvas` and ref management.
-
-### Architecture Diagram
-```mermaid
-graph TD
-    User[User] -->|Selects Images| Picker[Document Picker]
-    Picker -->|Assets| Service[pickAndSaveCoverFiles]
-    Service -->|Save| FS[FileSystem]
-    Service -->|Process Image| Canvas[Hidden Canvas Component]
-    Canvas -->|getImageData| Colors[Dominant Color Extraction]
-    Colors -->|Log| Console[Console Log]
-    Service -->|Update State| Store[Legend State Store]
-```
+- `src/services/legend/memory/variables.ts`: Added `currentPlayerDominantColor$`.
+- `src/components/AppModalScreen.tsx`: Updated `AppModalScreen` to support `gradientColors` prop.
+- `src/app/(main)/(global)/TrackPlayer.tsx`: Integrated dominant color syncing and custom gradient.
 
 ### Risks
-*   **Performance**: Processing many high-resolution images might be slow due to the overhead of passing pixel data through the React Native bridge from the WebView. We mitigate this by resizing images to 50x50 on the canvas before extraction.
-*   **Memory**: Large images converted to base64 for the canvas might consume significant memory. Sequential processing helps manage this by ensuring only one image is handled at a time.
-
+- **Performance**: Frequent updates to `currentPlayerDominantColor$` might trigger re-renders. However, this only happens when the track changes, which is infrequent.
+- **Color Contrast**: Some dominant colors might be too bright or have poor contrast with the player controls. Using `COLORS.MODAL_GRADIENT_BOTTOM` as the bottom color helps ensure a dark base for the controls at the bottom of the screen.
 
 # Testing
 
 ### Validation Approach
-Verification will be performed by importing various images and observing the console output in an Expo Go environment (iOS or Android).
+Verification will be done by opening the `TrackPlayer` and switching between tracks with different cover arts.
 
 ### Key Scenarios
-*   **Single Image Import**: Import one JPEG image. Verify that exactly 5 dominant colors are logged.
-*   **Multiple Image Import**: Import a batch of mixed JPEG and PNG images. Verify that colors are logged sequentially for each image.
-*   **Dark/Black Images**: Import a mostly black image. Verify that the fallback mechanism in `getTop5DominantColors` returns `#000000`.
-*   **Transparent Images**: Import a PNG with transparency. Verify that the algorithm correctly ignores transparent pixels as per the `a < 128` check.
+- **Dynamic Color Update**: Start playback and open the player modal. Verify that the background gradient top color matches the artwork. Skip to the next track and verify the background color updates.
+- **Default Fallback**: Play a track that has no cover or whose cover color extraction failed. Verify that the modal uses the default background.
+- **Other Modals**: Open another modal (e.g., `SongSort`). Verify that its background remains the default solid color.
 
 ### Edge Cases
-*   **Missing Canvas Ref**: Verify that the import still completes successfully (without color extraction) if the canvas ref is not available for some reason.
-*   **Unsupported File Format**: Verify that the picker filters for only JPEG and PNG, preventing issues with other formats.
-*   **Web Target**: Verify that no color extraction is attempted on the web, preserving existing functionality.
-
+- **Closing Modal**: Ensure that `currentPlayerDominantColor$` is cleared when the `TrackPlayer` is unmounted.
+- **Rapid Track Skipping**: Verify that the background updates correctly even if tracks are skipped quickly.
 
 # Delivery Steps
 
-### ✓ Step 1: Refactor processImage to be Promise-based
-Refactor the `processImage` function in `src/services/player/cover.ts` to be async and return a Promise.
-- Update `processImage` to return `Promise<string[]>`.
-- Implement `image.addEventListener('load', ...)` to resolve the Promise with the extracted colors.
-- Implement `image.addEventListener('error', ...)` to reject the Promise on failure.
-- Ensure `ctx.getImageData` is properly awaited and the result is passed to `getTop5DominantColors`.
+### ✓ Step 1: Add currentPlayerDominantColor$ observable
+Add `currentPlayerDominantColor$` to the memory variables store.
+- Edit `src/services/legend/memory/variables.ts` to add `export const currentPlayerDominantColor$ = observable<string | null>(null)`.
 
-### ✓ Step 2: Integrate color extraction into pickAndSaveCoverFiles
-Update `pickAndSaveCoverFiles` to accept a `canvasRef` and perform color extraction during the import process.
-- Update the function signature in `src/services/player/cover.ts` to accept `canvasRef?: React.RefObject<Canvas | null>`.
-- Change `void sourceFile.copy(destinationFile)` to `await sourceFile.copy(destinationFile)` to ensure the file is available before processing.
-- Within the loop, call `await processImage(destinationFile.uri, canvasRef)` for each imported image.
-- Log the extracted dominant colors for each file using `console.log`.
+### ✓ Step 2: Update AppModalScreen to support custom gradients
+Modify `AppModalScreen` to accept an optional `gradientColors` prop and use it for the background.
+- Update `AppModalScreenProps` in `src/components/AppModalScreen.tsx` to include `gradientColors?: readonly (string | number)[]`.
+- Update the component logic to use the provided `gradientColors` or fall back to the default `COLORS.MODAL_BACKGROUND` solid gradient.
 
-### ✓ Step 3: Implement hidden Canvas in PlayerLoadScreen
-Add a hidden `Canvas` component to the `PlayerLoadScreen` to facilitate image processing.
-- Import `Canvas` from `react-native-canvas` in `src/app/(main)/(tabs)/player/PlayerLoad.tsx`.
-- Create a `canvasRef` using `useRef<Canvas>(null)`.
-- Render a hidden `Canvas` component (using absolute positioning off-screen) within the screen's layout.
-- Pass the `canvasRef` to the `pickAndSaveCoverFiles` call in `handleLoadCovers`.
+### ✓ Step 3: Update TrackPlayer to sync dominant color and use custom gradient
+Integrate dominant color extraction and synchronization into the `TrackPlayer` screen.
+- Update `TrackPlayerScreen` in `src/app/(main)/(global)/TrackPlayer.tsx` to use `useValue(currentPlayerDominantColor$)` and pass the calculated gradient to `AppModalScreen`.
+- Update `TrackContent` to use `useEffect` and `useValue(coverFiles$)` to find the current track's dominant color and update `currentPlayerDominantColor$`.
+- Ensure the observable is cleared when the component unmounts.

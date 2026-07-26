@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect } from 'react'
-import { Platform, Pressable, StyleSheet, View } from 'react-native'
+import { ColorValue, Platform, Pressable, StyleSheet, View } from 'react-native'
 import {
   Gesture,
   GestureDetector,
@@ -21,18 +21,21 @@ import { COLORS } from '@/constants/constants'
 
 interface AppModalScreenProps {
   children: (dismiss: () => void) => ReactNode
+  gradientColors?: readonly [ColorValue, ColorValue, ...ColorValue[]]
 }
 
-export function AppModalScreen({ children }: AppModalScreenProps) {
+export function AppModalScreen({
+  children,
+  gradientColors: propGradientColors,
+}: AppModalScreenProps) {
   const router = useRouter()
   const { top } = useSafeAreaInsets()
   const startOffset = 600
   const translateY = useSharedValue(Platform.OS === 'ios' ? 0 : startOffset)
 
-  const gradientColors = [
-    COLORS.MODAL_BACKGROUND,
-    COLORS.MODAL_BACKGROUND,
-  ] as const
+  const gradientColors =
+    propGradientColors ||
+    ([COLORS.MODAL_BACKGROUND, COLORS.MODAL_BACKGROUND] as const)
 
   const handleDismiss = React.useCallback(() => {
     translateY.set(

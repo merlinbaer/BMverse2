@@ -20,3 +20,5 @@ export const activePreviewSong$ = observable<PreviewSong | null>(null)
 // game state
 export const songQuiz$ = observable<SongQuizType>('NEW')
 export const playerStats$ = observable<PlayerStats | null>(null)
+// current player dominant color
+export const currentPlayerDominantColor$ = observable<string | null>(null)

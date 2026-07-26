@@ -11,7 +11,7 @@ import { cleanupPlaylistImages, coverFiles$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import { CoverFile } from '@/types/player'
 
-function getTop5DominantColors(data: any): string[] {
+function getTop5DominantColors(data: Uint8ClampedArray | number[]): string[] {
   const counts: Record<string, number> = {}
   const dataArray = Array.isArray(data) ? data : Object.values(data)
 
@@ -49,7 +49,7 @@ export const processImage = (
   imageUri: string,
   canvasRef: React.RefObject<Canvas | null>,
 ): Promise<string[]> => {
-  return new Promise(async (resolve, reject) => {
+  return new Promise((resolve, reject) => {
     const canvas = canvasRef.current
     if (!canvas) {
       return reject(new Error('Canvas ref not available.'))
@@ -57,44 +57,46 @@ export const processImage = (
     if (!imageUri) {
       return reject(new Error('No imageUri provided.'))
     }
-
-    try {
-      if (!imageUri.startsWith('data:')) {
-        const base64 = await FileSystem.readAsStringAsync(imageUri, {
-          encoding: FileSystem.EncodingType.Base64,
-        })
-        const extension = imageUri.split('.').pop()?.toLowerCase() || 'jpeg'
-        const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
-        imageUri = `data:${mime};base64,${base64}`
-      }
-
-      const ctx = canvas.getContext('2d')
-      const size = 50
-      canvas.width = size
-      canvas.height = size
-
-      const image = new CanvasImage(canvas)
-
-      image.addEventListener('load', async () => {
-        try {
-          ctx.clearRect(0, 0, size, size)
-          ctx.drawImage(image, 0, 0, size, size)
-          const imageData = await ctx.getImageData(0, 0, size, size)
-          const colors = getTop5DominantColors(imageData.data)
-          resolve(colors)
-        } catch (err) {
-          reject(err)
+    const run = async () => {
+      try {
+        if (!imageUri.startsWith('data:')) {
+          const base64 = await FileSystem.readAsStringAsync(imageUri, {
+            encoding: FileSystem.EncodingType.Base64,
+          })
+          const extension = imageUri.split('.').pop()?.toLowerCase() || 'jpeg'
+          const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
+          imageUri = `data:${mime};base64,${base64}`
         }
-      })
 
-      image.addEventListener('error', err => {
-        reject(err)
-      })
+        const ctx = canvas.getContext('2d')
+        const size = 50
+        canvas.width = size
+        canvas.height = size
 
-      image.src = imageUri
-    } catch (error) {
-      reject(error)
+        const image = new CanvasImage(canvas)
+
+        image.addEventListener('load', async () => {
+          try {
+            ctx.clearRect(0, 0, size, size)
+            ctx.drawImage(image, 0, 0, size, size)
+            const imageData = await ctx.getImageData(0, 0, size, size)
+            const colors = getTop5DominantColors(imageData.data)
+            resolve(colors)
+          } catch (err) {
+            reject(err)
+          }
+        })
+
+        image.addEventListener('error', err => {
+          reject(err)
+        })
+
+        image.src = imageUri
+      } catch (error) {
+        reject(error instanceof Error ? error : new Error(String(error)))
+      }
     }
+    void run()
   })
 }
 
@@ -147,7 +149,6 @@ export const pickAndSaveCoverFiles = async (
           )
         }
       }
-
       coverFiles$.push({
         id: uuid,
         importedAt,

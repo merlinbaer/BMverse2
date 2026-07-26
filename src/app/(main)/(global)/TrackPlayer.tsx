@@ -1,6 +1,7 @@
+import { useValue } from '@legendapp/state/react'
 import { Image } from 'expo-image'
-import React from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
+import React, { useEffect, useMemo } from 'react'
+import { ColorValue, Pressable, StyleSheet, View } from 'react-native'
 
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
@@ -8,10 +9,22 @@ import { COLORS, FONT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
 import { useTrackPlayer } from '@/hooks/useTrackPlayer'
 import { formatAudioTime } from '@/services/dateTimeHelper'
+import { coverFiles$ } from '@/services/legend/local/player'
+import { currentPlayerDominantColor$ } from '@/services/legend/memory/variables'
 
 export default function TrackPlayerScreen() {
+  const dominantColor = useValue(currentPlayerDominantColor$)
+
+  const gradientColors = useMemo(():
+    readonly [ColorValue, ColorValue, ...ColorValue[]] | undefined => {
+    if (dominantColor) {
+      return [dominantColor, COLORS.MODAL_GRADIENT_BOTTOM] as const
+    }
+    return undefined
+  }, [dominantColor])
+
   return (
-    <AppModalScreen>
+    <AppModalScreen gradientColors={gradientColors}>
       {dismiss => <TrackContent dismiss={dismiss} />}
     </AppModalScreen>
   )
@@ -28,6 +41,27 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
     currentTime,
     duration,
   } = useTrackPlayer(dismiss)
+
+  const coverFiles = useValue(coverFiles$)
+
+  useEffect(() => {
+    if (currentTrack?.appCoverUri) {
+      const coverFile = coverFiles.find(
+        f => f.coverUri === currentTrack.appCoverUri,
+      )
+      if (coverFile?.dominantColor) {
+        currentPlayerDominantColor$.set(coverFile.dominantColor)
+      } else {
+        currentPlayerDominantColor$.set(null)
+      }
+    } else {
+      currentPlayerDominantColor$.set(null)
+    }
+
+    return () => {
+      currentPlayerDominantColor$.set(null)
+    }
+  }, [currentTrack, coverFiles])
 
   return (
     <View style={styles.container}>
