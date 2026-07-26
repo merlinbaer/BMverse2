@@ -2,7 +2,7 @@ import { useValue } from '@legendapp/state/react'
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
 import Constants, { ExecutionEnvironment } from 'expo-constants'
 import { useEffect } from 'react'
-import { Platform } from 'react-native'
+import { Image, Platform } from 'react-native'
 
 import { activePreviewSong$ } from '@/services/legend'
 
@@ -30,10 +30,19 @@ export const usePreviewPlayer = (onFinished?: () => void) => {
 
       if (shouldSetLockScreen) {
         try {
+          let artworkUrl: string | undefined = undefined
+          if (typeof previewSong.song_preview_artwork === 'string') {
+            artworkUrl = previewSong.song_preview_artwork
+          } else if (typeof previewSong.song_preview_artwork === 'number') {
+            artworkUrl = Image.resolveAssetSource(
+              previewSong.song_preview_artwork,
+            ).uri
+          }
+
           player.setActiveForLockScreen(true, {
             title: previewSong.song_title ?? 'Unknown Song',
             artist: previewSong.song_artist ?? 'Unknown Artist',
-            artworkUrl: previewSong.song_preview_artwork ?? undefined,
+            artworkUrl,
           })
         } catch (e) {
           console.warn('usePreviewPlayer: setActiveForLockScreen failed', e)

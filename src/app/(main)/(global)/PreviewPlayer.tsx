@@ -38,7 +38,11 @@ function PlayerContent({ dismiss }: { dismiss: () => void }) {
       <View style={styles.artworkContainer}>
         {previewSong?.song_preview_artwork ? (
           <Image
-            source={{ uri: previewSong.song_preview_artwork }}
+            source={
+              typeof previewSong.song_preview_artwork === 'number'
+                ? previewSong.song_preview_artwork
+                : { uri: previewSong.song_preview_artwork }
+            }
             style={styles.artwork}
           />
         ) : (
