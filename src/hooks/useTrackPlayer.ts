@@ -1,42 +1,85 @@
 import { useValue } from '@legendapp/state/react'
-import { useAudioPlaylist, useAudioPlaylistStatus } from 'expo-audio'
-import { useEffect } from 'react'
+import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
+import { useEffect, useRef } from 'react'
+import { Image } from 'react-native'
 
-import { activeTrackList$, musicFiles$ } from '@/services/legend'
+import {
+  activeTrackIndex$,
+  activeTrackList$,
+  musicFiles$,
+} from '@/services/legend'
 
 export const useTrackPlayer = (onFinished?: () => void) => {
   const activeTracks = useValue(activeTrackList$)
   const allFiles = useValue(musicFiles$)
+  const activeIndex = useValue(activeTrackIndex$)
 
   const files = activeTracks.length > 0 ? activeTracks : allFiles
+  const currentTrack = files[activeIndex]
 
-  // Map local files to the source format required by useAudioPlaylist
-  const sources = files.map(file => ({
-    uri: file.audioUri,
-    metadata: {
-      title: file.title,
-      artist: file.artist ?? 'Local Track',
-    },
-  }))
+  // useAudioPlayer(null) gives a stable player instance that unmounts with the component.
+  const player = useAudioPlayer()
+  const status = useAudioPlayerStatus(player)
 
-  const player = useAudioPlaylist({
-    sources,
-    loop: 'all',
-  })
+  // Use a ref to track the last loaded URI to avoid redundant replaces
+  const lastLoadedUriRef = useRef<string | null>(null)
 
-  const status = useAudioPlaylistStatus(player)
-
+  // Track change handling
   useEffect(() => {
-    if (player && sources.length > 0) {
+    if (
+      currentTrack?.audioUri &&
+      currentTrack.audioUri !== lastLoadedUriRef.current
+    ) {
+      player.replace(currentTrack.audioUri)
+      lastLoadedUriRef.current = currentTrack.audioUri
       player.play()
     }
-  }, [player, sources.length])
+  }, [currentTrack?.audioUri, player])
 
+  // Lockscreen handling
   useEffect(() => {
-    if (status?.didJustFinish && onFinished) {
-      onFinished()
+    if (!currentTrack || !player) return
+
+    let artworkUrl: string | undefined = undefined
+    if (typeof currentTrack.appCoverUri === 'string') {
+      artworkUrl = currentTrack.appCoverUri
+    } else if (typeof currentTrack.appCoverUri === 'number') {
+      artworkUrl = Image.resolveAssetSource(currentTrack.appCoverUri).uri
     }
-  }, [status?.didJustFinish, onFinished])
+
+    try {
+      player.setActiveForLockScreen(true, {
+        title: currentTrack.title || 'Unknown Title',
+        artist: currentTrack.artist || 'Unknown Artist',
+        albumTitle: currentTrack.album || 'Unknown Album',
+        artworkUrl,
+      })
+    } catch (e) {
+      console.log('useTrackPlayer: setActiveForLockScreen failed', e)
+    }
+  }, [currentTrack, player])
+
+  // Auto-advance
+  useEffect(() => {
+    if (status?.didJustFinish) {
+      if (onFinished) {
+        onFinished()
+      }
+      next()
+    }
+  }, [status?.didJustFinish])
+
+  const next = () => {
+    if (files.length === 0) return
+    const nextIndex = (activeIndex + 1) % files.length
+    activeTrackIndex$.set(nextIndex)
+  }
+
+  const previous = () => {
+    if (files.length === 0) return
+    const prevIndex = (activeIndex - 1 + files.length) % files.length
+    activeTrackIndex$.set(prevIndex)
+  }
 
   const handlePlayPause = () => {
     if (status?.playing) {
@@ -46,14 +89,12 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     }
   }
 
-  const next = () => player.next()
-  const previous = () => player.previous()
   const seek = (time: number) => player.seekTo(time)
 
   return {
     player,
     status,
-    currentTrack: files[status?.currentIndex ?? 0],
+    currentTrack,
     handlePlayPause,
     next,
     previous,

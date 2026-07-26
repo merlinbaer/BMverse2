@@ -13,6 +13,7 @@ import { generateId, persistLargeStore } from '../config'
 export const musicFiles$ = observable<MusicFile[]>([])
 
 export const activeTrackList$ = observable<MusicFile[]>([])
+export const activeTrackIndex$ = observable<number>(0)
 
 syncObservable(musicFiles$, {
   persist: {
@@ -300,6 +301,7 @@ export const playPlaylist = (playlistId: string) => {
     .map(({ trackNum: _trackNum, ...file }) => file as MusicFile)
 
   activeTrackList$.set(tracks)
+  activeTrackIndex$.set(0)
 }
 
 export const playAlbum = (albumName: string) => {
@@ -319,6 +321,7 @@ export const playAlbum = (albumName: string) => {
     })
 
   activeTrackList$.set(tracks)
+  activeTrackIndex$.set(0)
 }
 
 export const playlistNameUpdate = (playlistId: string, newName: string) => {
