@@ -167,7 +167,11 @@ export const albumList$ = computed<ListItemType[]>(() => {
 
   const albumMap = new Map<
     string,
-    { count: number; icons: Map<string | number, number> }
+    {
+      count: number
+      icons: Map<string | number, number>
+      oldestYear: number
+    }
   >()
 
   allFiles.forEach(file => {
@@ -176,11 +180,16 @@ export const albumList$ = computed<ListItemType[]>(() => {
 
     let data = albumMap.get(albumName)
     if (!data) {
-      data = { count: 0, icons: new Map() }
+      data = { count: 0, icons: new Map(), oldestYear: Infinity }
       albumMap.set(albumName, data)
     }
 
     data.count++
+
+    if (file.origYear && file.origYear < data.oldestYear) {
+      data.oldestYear = file.origYear
+    }
+
     const icon = file.appCoverUri || file.coverUri
     if (icon) {
       data.icons.set(icon, (data.icons.get(icon) || 0) + 1)
@@ -195,7 +204,12 @@ export const albumList$ = computed<ListItemType[]>(() => {
   }
 
   return Array.from(albumMap.entries())
-    .sort((a, b) => a[0].localeCompare(b[0]))
+    .sort((a, b) => {
+      if (a[1].oldestYear !== b[1].oldestYear) {
+        return a[1].oldestYear - b[1].oldestYear
+      }
+      return a[0].localeCompare(b[0])
+    })
     .map(([albumName, data]): ListItemType => {
       let selectedIcon: string | number | null = null
 
