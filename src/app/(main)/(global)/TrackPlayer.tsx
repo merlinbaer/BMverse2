@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ColorValue,
   PanResponder,
+  PanResponderInstance,
   Pressable,
   StyleSheet,
   View,
@@ -70,8 +71,12 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
   const progress = isSeeking ? seekProgress : playerProgress
   const currentTime = isSeeking ? seekProgress * duration : playerCurrentTime
 
-  const panResponder = useMemo(
-    () =>
+  const [panResponder, setPanResponder] = useState<PanResponderInstance | null>(
+    null,
+  )
+
+  useEffect(() => {
+    setPanResponder(
       PanResponder.create({
         onStartShouldSetPanResponder: () => true,
         onMoveShouldSetPanResponder: () => true,
@@ -111,9 +116,10 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
         onPanResponderTerminate: () => {
           setIsSeeking(false)
         },
+        onPanResponderTerminationRequest: () => false,
       }),
-    [],
-  )
+    )
+  }, [])
 
   useEffect(() => {
     if (currentTrack?.appCoverUri) {
@@ -162,7 +168,7 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
 
       <View
         style={styles.progressContainer}
-        {...panResponder.panHandlers}
+        {...(panResponder?.panHandlers || {})}
         onLayout={e => {
           progressBarWidthRef.current = e.nativeEvent.layout.width
         }}
