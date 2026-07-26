@@ -127,11 +127,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
   },
-  hiddenCanvas: {
-    left: -1000,
-    position: 'absolute',
-    top: -1000,
-  },
   infoContainer: {
     alignItems: 'center',
     marginBottom: 50,

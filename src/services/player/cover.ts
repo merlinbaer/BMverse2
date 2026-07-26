@@ -50,6 +50,11 @@ export const processImage = async (
     <View style={styles.hiddenCanvas}>
         <Canvas ref={canvasRef} />
     </View>
+    hiddenCanvas: {
+     left: -1000,
+     position: 'absolute',
+     top: -1000,
+  },
   */
   currentTrack: {
     appCoverUri: string | number | null
