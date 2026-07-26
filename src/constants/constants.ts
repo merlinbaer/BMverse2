@@ -23,6 +23,7 @@ export const COLORS = {
   MESSAGE_BUBBLE: '#1a1a1a',
   TRANSPARENT: 'transparent',
   MODAL_BACKGROUND: 'rgba(30, 30, 30, 0.9)',
+  MODAL_GRADIENT_BOTTOM: 'rgba(0, 0, 0, 0.9)',
   MODAL_BORDER: 'rgba(255, 255, 255, 0.1)',
   BACKDROP: 'rgba(0, 0, 0, 0.7)',
   IMAGE_ARROW: 'rgba(0, 0, 0, 0.5)',

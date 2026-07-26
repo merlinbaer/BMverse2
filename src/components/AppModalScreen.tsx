@@ -30,8 +30,8 @@ export function AppModalScreen({ children }: AppModalScreenProps) {
   const translateY = useSharedValue(Platform.OS === 'ios' ? 0 : startOffset)
 
   const gradientColors = [
-    'rgba(156, 158, 164, 0.9)',
-    'rgba(0, 0, 0, 0.9)',
+    COLORS.MODAL_BACKGROUND,
+    COLORS.MODAL_BACKGROUND,
   ] as const
 
   const handleDismiss = React.useCallback(() => {
