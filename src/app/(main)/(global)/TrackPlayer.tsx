@@ -9,14 +9,9 @@ import { IMAGES } from '@/constants/images'
 import { useTrackPlayer } from '@/hooks/useTrackPlayer'
 import { formatAudioTime } from '@/services/dateTimeHelper'
 
-const GRADIENT_COLORS = [
-  'rgba(156, 158, 164, 0.9)',
-  'rgba(0, 0, 0, 0.9)',
-] as const
-
 export default function TrackPlayerScreen() {
   return (
-    <AppModalScreen gradientColors={GRADIENT_COLORS}>
+    <AppModalScreen>
       {dismiss => <TrackContent dismiss={dismiss} />}
     </AppModalScreen>
   )

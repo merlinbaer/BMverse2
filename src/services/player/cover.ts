@@ -3,9 +3,9 @@ import { Directory, File, Paths } from 'expo-file-system'
 import * as FileSystem from 'expo-file-system/legacy'
 import React from 'react'
 import { Platform } from 'react-native'
-import { Image as RNImage } from 'react-native/Libraries/Image/Image'
 import Canvas, { Image as CanvasImage } from 'react-native-canvas'
 
+import { COLORS } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
 import { cleanupPlaylistImages, coverFiles$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
@@ -45,75 +45,65 @@ function getTop5DominantColors(data: any): string[] {
   return sorted.length > 0 ? sorted : ['#000000']
 }
 
-export const processImage = async (
-  /* Use in hidden canvas
-    <View style={styles.hiddenCanvas}>
-        <Canvas ref={canvasRef} />
-    </View>
-    hiddenCanvas: {
-     left: -1000,
-     position: 'absolute',
-     top: -1000,
-  },
-  */
-  currentTrack: {
-    appCoverUri: string | number | null
-  },
+export const processImage = (
+  imageUri: string,
   canvasRef: React.RefObject<Canvas | null>,
-) => {
-  const canvas = canvasRef.current
-  if (!canvas) {
-    console.log('BMverse Debug: Canvas ref not available yet.')
-    return
-  }
-  const source = currentTrack?.appCoverUri || IMAGES.cover200.notFound
-  let imageUri =
-    typeof source === 'number' ? RNImage.resolveAssetSource(source).uri : source
-  console.log('BMVerse Debug ImageUri =', imageUri)
-  if (!imageUri) {
-    console.log('BMverse Debug: No imageUri found, skipping.')
-    return
-  }
-
-  try {
-    if (!imageUri.startsWith('data:')) {
-      const base64 = await FileSystem.readAsStringAsync(imageUri, {
-        encoding: FileSystem.EncodingType.Base64,
-      })
-      const extension = imageUri.split('.').pop()?.toLowerCase() || 'jpeg'
-      const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
-      imageUri = `data:${mime};base64,${base64}`
+): Promise<string[]> => {
+  return new Promise(async (resolve, reject) => {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      return reject(new Error('Canvas ref not available.'))
+    }
+    if (!imageUri) {
+      return reject(new Error('No imageUri provided.'))
     }
 
-    const ctx = canvas.getContext('2d')
-    const size = 50
-    canvas.width = size
-    canvas.height = size
-
-    const image = new CanvasImage(canvas)
-
-    image.addEventListener('load', async () => {
-      try {
-        ctx.clearRect(0, 0, size, size)
-        ctx.drawImage(image, 0, 0, size, size)
-        const imageData = await ctx.getImageData(0, 0, size, size)
-        const colors = getTop5DominantColors(imageData.data)
-        console.log('BMverse Result: Extracted dominant colors:', colors)
-      } catch (err) {
-        console.log('BMverse Error during color extraction:', err)
+    try {
+      if (!imageUri.startsWith('data:')) {
+        const base64 = await FileSystem.readAsStringAsync(imageUri, {
+          encoding: FileSystem.EncodingType.Base64,
+        })
+        const extension = imageUri.split('.').pop()?.toLowerCase() || 'jpeg'
+        const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
+        imageUri = `data:${mime};base64,${base64}`
       }
-    })
 
-    image.src = imageUri
-  } catch (error) {
-    console.log('BMverse Error: ProcessImage main block failed:', error)
-  }
+      const ctx = canvas.getContext('2d')
+      const size = 50
+      canvas.width = size
+      canvas.height = size
+
+      const image = new CanvasImage(canvas)
+
+      image.addEventListener('load', async () => {
+        try {
+          ctx.clearRect(0, 0, size, size)
+          ctx.drawImage(image, 0, 0, size, size)
+          const imageData = await ctx.getImageData(0, 0, size, size)
+          const colors = getTop5DominantColors(imageData.data)
+          resolve(colors)
+        } catch (err) {
+          reject(err)
+        }
+      })
+
+      image.addEventListener('error', err => {
+        reject(err)
+      })
+
+      image.src = imageUri
+    } catch (error) {
+      reject(error)
+    }
+  })
 }
 
 /**
  * Picks image files (PNG/JPG) and saves them to the app's document directory.
  */
-export const pickAndSaveCoverFiles = async () => {
+export const pickAndSaveCoverFiles = async (
+  canvasRef?: React.RefObject<Canvas | null>,
+) => {
   if (Platform.OS === 'web') return { count: 0 }
   try {
     const result = await DocumentPicker.getDocumentAsync({
@@ -138,7 +128,25 @@ export const pickAndSaveCoverFiles = async () => {
 
       const sourceFile = new File(asset.uri)
       const destinationFile = new File(docDir, newFileName)
-      void sourceFile.copy(destinationFile)
+      await sourceFile.copy(destinationFile)
+
+      let dominantColor = COLORS.MODAL_BACKGROUND
+
+      // Extract dominant colors if canvasRef is provided
+      if (canvasRef) {
+        try {
+          const colors = await processImage(destinationFile.uri, canvasRef)
+          console.log(`BMverse: Dominant colors for ${asset.name}:`, colors)
+          if (colors.length > 0) {
+            dominantColor = colors[2] || colors[0]
+          }
+        } catch (colorError) {
+          console.log(
+            `BMverse: Error extracting colors for ${asset.name}:`,
+            colorError,
+          )
+        }
+      }
 
       coverFiles$.push({
         id: uuid,
@@ -146,6 +154,7 @@ export const pickAndSaveCoverFiles = async () => {
         origFilename: asset.name,
         fileFormat: extension,
         coverUri: destinationFile.uri,
+        dominantColor,
       })
     }
     return { count: importedCount }
@@ -179,7 +188,8 @@ export const refreshLocalCoverList = async () => {
           importedAt: existing?.importedAt || new Date().toISOString(),
           origFilename: key,
           fileFormat: 'asset',
-          coverUri: value,
+          coverUri: value.cover,
+          dominantColor: value.dominantColor,
         }
       },
     )
@@ -200,12 +210,15 @@ export const refreshLocalCoverList = async () => {
           ? 'png'
           : 'jpg'
 
+        const existing = currentStore.find(f => f.id === id)
+
         return {
           id,
           importedAt,
           origFilename,
           fileFormat: extension as 'png' | 'jpg',
           coverUri: file.uri,
+          dominantColor: existing?.dominantColor || COLORS.MODAL_BACKGROUND,
         } as CoverFile
       })
 

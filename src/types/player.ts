@@ -13,6 +13,7 @@ export interface CoverFile {
   // Diagnostics tag
   fileFormat: 'png' | 'jpg' | 'asset'
   coverUri: string | number
+  dominantColor: string
 }
 
 export interface MusicFile {

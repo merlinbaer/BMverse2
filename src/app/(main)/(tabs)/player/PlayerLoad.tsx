@@ -1,6 +1,7 @@
 import { router, Stack } from 'expo-router'
-import React from 'react'
+import React, { useRef } from 'react'
 import { StyleSheet, View } from 'react-native'
+import Canvas from 'react-native-canvas'
 
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
@@ -50,6 +51,7 @@ const handleDeleteSingleCover = () => {
 
 export default function PlayerLoadScreen() {
   const { showAlert } = useAlert()
+  const canvasRef = useRef<Canvas>(null)
 
   const handleLoadMusic = async () => {
     try {
@@ -92,7 +94,7 @@ export default function PlayerLoadScreen() {
 
   const handleLoadCovers = async () => {
     try {
-      const result = await pickAndSaveCoverFiles()
+      const result = await pickAndSaveCoverFiles(canvasRef)
       if (result && result.count > 0) {
         showAlert(
           'Import Successful',
@@ -133,6 +135,9 @@ export default function PlayerLoadScreen() {
     <AppScreen>
       <Stack.Screen options={{ title: 'Manage Files' }} />
       <View style={styles.container}>
+        <View style={styles.hiddenCanvas}>
+          <Canvas ref={canvasRef} />
+        </View>
         {/* Music Section */}
         <View style={styles.section}>
           <View style={styles.headerRow}>
@@ -225,6 +230,11 @@ const styles = StyleSheet.create({
     gap: 15,
     justifyContent: 'center',
     marginBottom: 10,
+  },
+  hiddenCanvas: {
+    left: -1000,
+    position: 'absolute',
+    top: -1000,
   },
   section: {
     alignItems: 'center',

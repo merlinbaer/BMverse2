@@ -21,17 +21,18 @@ import { COLORS } from '@/constants/constants'
 
 interface AppModalScreenProps {
   children: (dismiss: () => void) => ReactNode
-  gradientColors?: readonly [string, string, ...string[]]
 }
 
-export function AppModalScreen({
-  children,
-  gradientColors,
-}: AppModalScreenProps) {
+export function AppModalScreen({ children }: AppModalScreenProps) {
   const router = useRouter()
   const { top } = useSafeAreaInsets()
   const startOffset = 600
   const translateY = useSharedValue(Platform.OS === 'ios' ? 0 : startOffset)
+
+  const gradientColors = [
+    'rgba(156, 158, 164, 0.9)',
+    'rgba(0, 0, 0, 0.9)',
+  ] as const
 
   const handleDismiss = React.useCallback(() => {
     translateY.set(

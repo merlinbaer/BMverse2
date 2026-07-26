@@ -17,14 +17,32 @@ export const IMAGES = {
     single: require('@/../assets/images/Single_200.png'),
     notFound: require('@/../assets/images/unknown_track.png'),
   },
-  // no need to cache as asset because it is not used in web
+  // no need to cache as asset because it is not used on web
   cover600: {
-    a_babymetal: require('../../assets/images/BM_Splatter_632.png'),
-    e_metalForth: require('../../assets/images/Forth_Splatter_632.png'),
-    c_metalGalaxy: require('../../assets/images/Galaxy_Splatter_632.png'),
-    d_theOne: require('../../assets/images/One_Splatter_632.png'),
-    b_metalResistance: require('../../assets/images/Resistance_Splatter_632.png'),
-    f_single: require('../../assets/images/Single_632.png'),
+    a_babymetal: {
+      cover: require('../../assets/images/BM_Splatter_632.png'),
+      dominantColor: 'rgba(203, 88, 83, 0.9)',
+    },
+    e_metalForth: {
+      cover: require('../../assets/images/Forth_Splatter_632.png'),
+      dominantColor: 'rgba(177, 180, 187, 0.9)',
+    },
+    c_metalGalaxy: {
+      cover: require('../../assets/images/Galaxy_Splatter_632.png'),
+      dominantColor: 'rgba(87, 130, 177, 0.9)',
+    },
+    d_theOne: {
+      cover: require('../../assets/images/One_Splatter_632.png'),
+      dominantColor: 'rgba(163, 171, 184, 0.9)',
+    },
+    b_metalResistance: {
+      cover: require('../../assets/images/Resistance_Splatter_632.png'),
+      dominantColor: 'rgba(132, 117, 63, 0.9)',
+    },
+    f_single: {
+      cover: require('../../assets/images/Single_632.png'),
+      dominantColor: 'rgba(15, 16, 17, 0.9)',
+    },
   },
   icons: {
     main: require('@/../assets/tabicons/main.png'),
