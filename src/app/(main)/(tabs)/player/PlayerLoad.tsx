@@ -8,8 +8,10 @@ import { COLORS, FONT } from '@/constants/constants'
 import { useAlert } from '@/hooks/useAlert'
 import {
   deleteAllCoverFiles,
-  deleteAllMusicFiles,
   pickAndSaveCoverFiles,
+} from '@/services/player/cover'
+import {
+  deleteAllMusicFiles,
   pickAndSaveMusicFiles,
 } from '@/services/player/files'
 import { AppBubbleText } from 'src/components/AppBubbleText'

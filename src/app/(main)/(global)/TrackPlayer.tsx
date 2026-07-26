@@ -9,7 +9,10 @@ import { IMAGES } from '@/constants/images'
 import { useTrackPlayer } from '@/hooks/useTrackPlayer'
 import { formatAudioTime } from '@/services/dateTimeHelper'
 
-const GRADIENT_COLORS = ['rgba(95, 10, 6, 0.9)', 'rgba(0, 0, 0, 0.9)'] as const
+const GRADIENT_COLORS = [
+  'rgba(156, 158, 164, 0.9)',
+  'rgba(0, 0, 0, 0.9)',
+] as const
 
 export default function TrackPlayerScreen() {
   return (
@@ -35,7 +38,7 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
     <View style={styles.container}>
       <View style={styles.artworkContainer}>
         <Image
-          source={currentTrack.appCoverUri || IMAGES.cover200.notFound}
+          source={currentTrack?.appCoverUri || IMAGES.cover200.notFound}
           contentFit="fill"
           style={styles.artwork}
         />
@@ -123,6 +126,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     width: '100%',
+  },
+  hiddenCanvas: {
+    left: -1000,
+    position: 'absolute',
+    top: -1000,
   },
   infoContainer: {
     alignItems: 'center',

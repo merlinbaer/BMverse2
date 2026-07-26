@@ -1741,6 +1741,14 @@
   resolved "https://registry.yarnpkg.com/@types/react-dom/-/react-dom-19.2.3.tgz#c1e305d15a52a3e508d54dca770d202cb63abf2c"
   integrity sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==
 
+"@types/react-native-canvas@^0.1.14":
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/@types/react-native-canvas/-/react-native-canvas-0.1.14.tgz#9f9bd27ea343e56a0dfb4eec40ac7c3f4a8cbc7b"
+  integrity sha512-LhbDgomSZXYYjTzd5I8SYoeiGK1dMZPmFIpAlzckC14xJbu8eNcibu0+9BcDZs4SUVojjS8sXlAjMz07M68Fow==
+  dependencies:
+    "@types/react" "*"
+    react-native "*"
+
 "@types/react-test-renderer@^19.1.0":
   version "19.1.0"
   resolved "https://registry.yarnpkg.com/@types/react-test-renderer/-/react-test-renderer-19.1.0.tgz#1d0af8f2e1b5931e245b8b5b234d1502b854dc10"
@@ -5789,7 +5797,7 @@ react-native-youtube-iframe@^2.4.1:
   dependencies:
     events "^3.3.0"
 
-react-native@0.86.0:
+react-native@*, react-native@0.86.0:
   version "0.86.0"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.86.0.tgz#a5d62adbf350010ad7a61617b9bc300b2ff12870"
   integrity sha512-17ALh/dd6AO4pgOVmOO5Axll5PbErEo3XFyLokyzW6usyi+OShIEPwUW26wLPlhVifgSOIfECCH0WN+0IqtJ1w==

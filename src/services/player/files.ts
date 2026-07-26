@@ -5,18 +5,13 @@ import { Directory, File, Paths } from 'expo-file-system'
 import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
-import {
-  cleanupPlaylistImages,
-  coverFiles$,
-  musicFiles$,
-  playlists$,
-} from '@/services/legend'
+import { musicFiles$, playlists$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import {
   parseM4aBufferMetadata,
   parseMp3BufferMetadata,
 } from '@/services/player/tagParser'
-import { CoverFile, MusicFile } from '@/types/player'
+import { MusicFile } from '@/types/player'
 
 import { getPlaylistTimestamp } from '../dateTimeHelper'
 
@@ -272,168 +267,6 @@ export const deleteSingleMusicFile = async (fileId: string) => {
     })
   } catch (error) {
     console.error('deleteSingleMusicFile error:', error)
-    throw error
-  }
-}
-
-/**
- * Picks image files (PNG/JPG) and saves them to the app's document directory.
- */
-export const pickAndSaveCoverFiles = async () => {
-  if (Platform.OS === 'web') return { count: 0 }
-  try {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: ['image/png', 'image/jpeg'],
-      copyToCacheDirectory: true,
-      multiple: true,
-    })
-
-    if (result.canceled || !result.assets) return { count: 0 }
-
-    const docDir = Paths.document
-    const importedCount = result.assets.length
-
-    for (const asset of result.assets) {
-      const uuid = generateId()
-      const importedAt = new Date().toISOString()
-      const extension = asset.name.toLowerCase().endsWith('.png')
-        ? 'png'
-        : 'jpg'
-      const safeName = asset.name.replace(/[^a-zA-Z0-9. _-]/g, '')
-      const newFileName = `cover_${uuid}_${importedAt}_${safeName}`
-
-      const sourceFile = new File(asset.uri)
-      const destinationFile = new File(docDir, newFileName)
-      void sourceFile.copy(destinationFile)
-
-      coverFiles$.push({
-        id: uuid,
-        importedAt,
-        origFilename: asset.name,
-        fileFormat: extension,
-        coverUri: destinationFile.uri,
-      })
-    }
-    return { count: importedCount }
-  } catch (error) {
-    console.error('pickAndSaveCoverFiles error:', error)
-    throw error
-  }
-}
-
-/**
- * Refresh cover list: ensures assets are present and reloads document-stored images
- */
-export const refreshLocalCoverList = async () => {
-  if (Platform.OS === 'web') return
-  try {
-    const docDir = new Directory(Paths.document)
-    const contents = docDir.list()
-    const currentStore = coverFiles$.peek() || []
-
-    // 1. Process App Assets
-    const assets = IMAGES.cover600
-    const assetList: CoverFile[] = Object.entries(assets).map(
-      ([key, value]) => {
-        // Check if this asset already exists in our persistent store to keep its metadata
-        const existing = currentStore.find(
-          f => f.fileFormat === 'asset' && f.origFilename === key,
-        )
-
-        return {
-          id: existing?.id || String(value),
-          importedAt: existing?.importedAt || new Date().toISOString(),
-          origFilename: key,
-          fileFormat: 'asset',
-          coverUri: value,
-        }
-      },
-    )
-
-    // 2. Load from Filesystem using structured filenames
-    const loadedFiles = contents
-      .filter(item => item instanceof File && item.name.startsWith('cover_'))
-      .map(item => {
-        const file = item as File
-        // Pattern: cover_{uuid}_{importedAt}_{origFilename}
-        const nameWithoutPrefix = file.name.replace(/^cover_/, '')
-        const parts = nameWithoutPrefix.split('_')
-
-        const id = parts[0]
-        const importedAt = parts[1]
-        const origFilename = parts.slice(2).join('_')
-        const extension = file.name.toLowerCase().endsWith('.png')
-          ? 'png'
-          : 'jpg'
-
-        return {
-          id,
-          importedAt,
-          origFilename,
-          fileFormat: extension as 'png' | 'jpg',
-          coverUri: file.uri,
-        } as CoverFile
-      })
-
-    coverFiles$.set([...assetList, ...loadedFiles])
-  } catch (error) {
-    console.error('refreshLocalCoverList error:', error)
-  }
-}
-
-/**
- * Deletes all imported cover images from the document directory.
- * Keeps 'asset' type covers in the store.
- * Resets playlist covers if they were using a deleted file.
- */
-export const deleteAllCoverFiles = async () => {
-  if (Platform.OS === 'web') return
-  try {
-    const docDir = new Directory(Paths.document)
-    const contents = docDir.list()
-
-    // 1. Delete physical files from disk
-    const filesToDelete = contents.filter(
-      item => item instanceof File && item.name.startsWith('cover_'),
-    )
-
-    for (const item of filesToDelete) {
-      const file = item as File
-      void file.delete()
-    }
-
-    // 2. Filter store to keep only assets
-    const assetsOnly = coverFiles$.get().filter(f => f.fileFormat === 'asset')
-    coverFiles$.set(assetsOnly)
-
-    // 3. Reset playlist imageUri for all local files
-    cleanupPlaylistImages()
-  } catch (error) {
-    console.error('deleteAllCoverFiles error:', error)
-    throw error
-  }
-}
-
-export const deleteSingleCoverFile = async (coverId: string) => {
-  if (Platform.OS === 'web') return
-  try {
-    const coverToDelete = coverFiles$.find(c => c.id.get() === coverId)?.get()
-    if (!coverToDelete || coverToDelete.fileFormat === 'asset') return
-
-    // 1. Delete a physical file
-    const file = new File(coverToDelete.coverUri as string)
-    file.delete()
-
-    // 2. Remove from store
-    const index = coverFiles$.get().findIndex(c => c.id === coverId)
-    if (index !== -1) {
-      coverFiles$.splice(index, 1)
-    }
-
-    // 3. Cleanup playlists using this specific image
-    cleanupPlaylistImages(coverToDelete.coverUri as string)
-  } catch (error) {
-    console.error('deleteSingleCoverFile error:', error)
     throw error
   }
 }

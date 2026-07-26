@@ -20,10 +20,8 @@ import {
   localStore$,
 } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
-import {
-  refreshLocalCoverList,
-  refreshLocalMusicList,
-} from '@/services/player/files'
+import { refreshLocalCoverList } from '@/services/player/cover'
+import { refreshLocalMusicList } from '@/services/player/files'
 import { isPWA, registerServiceWorker } from '@/services/pwa'
 
 SplashScreen.setOptions({

@@ -6,7 +6,7 @@ import { AppImageGrid } from '@/components/AppImageGrid'
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { useAlert } from '@/hooks/useAlert'
 import { coverFilesFullList$ } from '@/services/legend'
-import { deleteSingleCoverFile } from '@/services/player/files'
+import { deleteSingleCoverFile } from '@/services/player/cover'
 import { ListItemType } from '@/types/list'
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window')
