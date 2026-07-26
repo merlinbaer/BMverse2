@@ -1,45 +1,20 @@
-import { Stack, useRouter } from 'expo-router'
+import { observer } from '@legendapp/state/react'
+import { Stack } from 'expo-router'
 import React from 'react'
-import { StyleSheet, View } from 'react-native'
 
-import { AppButton } from '@/components/AppButton'
-import { AppBubbleText } from 'src/components/AppBubbleText'
-import { AppScreen } from 'src/components/AppScreen'
+import { AppHorizontalList } from '@/components/AppHorizontalList'
+import { AppScreen } from '@/components/AppScreen'
+import { albumList$, playlistList$ } from '@/services/legend'
 
-export default function PlayerPlayScreen() {
-  const router = useRouter()
-
-  const handleOpenTrackPlayer = () => {
-    router.push('/(main)/(global)/TrackPlayer')
-  }
+export default observer(function PlayerPlayScreen() {
+  const playlists = playlistList$.get()
+  const albums = albumList$.get()
 
   return (
-    <AppScreen>
+    <AppScreen contentContainerStyle={{ paddingHorizontal: 0 }}>
       <Stack.Screen options={{ title: 'Play Music' }} />
-      <View style={styles.container}>
-        <AppBubbleText
-          markup={'Open the Track Player to listen to your local library.'}
-          orientation={'center'}
-        />
-        <AppButton
-          title="Open Track Player"
-          onPress={handleOpenTrackPlayer}
-          style={styles.button}
-        />
-      </View>
+      <AppHorizontalList title="Playlists" data={playlists} />
+      <AppHorizontalList title="Albums" data={albums} />
     </AppScreen>
   )
-}
-
-const styles = StyleSheet.create({
-  button: {
-    width: '100%',
-  },
-  container: {
-    alignItems: 'center',
-    gap: 24,
-    marginVertical: 40,
-    paddingHorizontal: 20,
-    width: '100%',
-  },
 })
