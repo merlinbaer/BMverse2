@@ -118,12 +118,12 @@ export const PlayerListDetailButton = ({
 export const headerStyles = StyleSheet.create({
   // eslint-disable-next-line react-native/no-unused-styles
   backButton: {
-    paddingBottom: 2,
+    paddingBottom: 6,
     paddingLeft: Platform.select({
       web: 12,
       default: 0,
     }),
-    paddingRight: 12,
+    paddingRight: 4,
     paddingTop: Platform.select({
       android: (StatusBar.currentHeight ?? 0) + androidHeaderTopPadding,
       default: 8,

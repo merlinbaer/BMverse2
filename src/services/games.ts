@@ -14,6 +14,7 @@ export const initPlayerStats = () => {
     currentStreak: 0,
     bestStreak: 0,
   })
+  console.log('BMverse: Player stats initialized')
 }
 
 export const getMoaMessage = (songQuizState: string) => {

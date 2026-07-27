@@ -20,14 +20,68 @@ import { getPlaylistTimestamp } from '../dateTimeHelper'
  */
 const getFileMetadata = async (uri: string, fileName?: string) => {
   try {
-    const base64 = await FileSystem.readAsStringAsync(uri, {
-      encoding: FileSystem.EncodingType.Base64,
-    })
-    const buffer = Buffer.from(base64, 'base64')
-
     const checkString = (fileName || uri || '').toLowerCase()
     const isM4a = checkString.endsWith('.m4a') || checkString.endsWith('.mp4')
     const isMp3 = checkString.endsWith('.mp3')
+
+    let buffer: Buffer
+
+    if (isMp3) {
+      // Read first 10 bytes to check for ID3 tag size
+      const headBase64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+        length: 10,
+      })
+      const headBuffer = Buffer.from(headBase64, 'base64')
+
+      if (
+        headBuffer.toString('ascii', 0, 3) === 'ID3' &&
+        headBuffer.length >= 10
+      ) {
+        const sizeBytes = [
+          headBuffer.readUInt8(6),
+          headBuffer.readUInt8(7),
+          headBuffer.readUInt8(8),
+          headBuffer.readUInt8(9),
+        ]
+        // ID3v2 size is 4 bytes, each with 7 bits.
+        // We shift according to the spec to get the full tag size.
+        const tagSize =
+          (sizeBytes[0] << 21) |
+          (sizeBytes[1] << 14) |
+          (sizeBytes[2] << 7) |
+          sizeBytes[3]
+
+        // Read the tag + header (10 bytes header + tagSize)
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+          length: tagSize + 10,
+        })
+        buffer = Buffer.from(base64, 'base64')
+      } else {
+        // No ID3v2 tag at start, read a small chunk for ID3v1 or other info
+        const base64 = await FileSystem.readAsStringAsync(uri, {
+          encoding: FileSystem.EncodingType.Base64,
+          length: 4096,
+        })
+        buffer = Buffer.from(base64, 'base64')
+      }
+    } else if (isM4a) {
+      // M4A atoms can be scattered, but 'moov' is typically at the start or end.
+      // Reading the whole file is slow, so we try the first 1 MB, which covers most cases.
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+        length: 1024 * 1024, // 1MB
+      })
+      buffer = Buffer.from(base64, 'base64')
+    } else {
+      // Unknown type, read a reasonable chunk
+      const base64 = await FileSystem.readAsStringAsync(uri, {
+        encoding: FileSystem.EncodingType.Base64,
+        length: 1024 * 1024, // 1MB
+      })
+      buffer = Buffer.from(base64, 'base64')
+    }
 
     if (isM4a) {
       const m4aTags = parseM4aBufferMetadata(buffer)
@@ -115,7 +169,10 @@ export const pickAndSaveMusicFiles = async () => {
           to: destinationUri,
         })
       } catch (copyError) {
-        console.error(`BMverse: copyAsync failed for ${asset.uri}, trying read/write fallback:`, copyError)
+        console.error(
+          `BMverse: copyAsync failed for ${asset.uri}, trying read/write fallback:`,
+          copyError,
+        )
         // Fallback: Read as Base64 and write to destination
         const base64 = await FileSystem.readAsStringAsync(asset.uri, {
           encoding: FileSystem.EncodingType.Base64,
@@ -187,47 +244,61 @@ export const refreshLocalMusicList = async () => {
     const contents = await FileSystem.readDirectoryAsync(docDir)
     const currentStore = musicFiles$.peek() || []
 
-    const musicFiles = await Promise.all(
-      contents
-        .filter(name => /^[0-9a-f-]{36}/.test(name))
-        .map(async name => {
-          const fileUri = `${docDir}${name}`
-          // Parts: 0: ID, 1: ImportedAt, 2+: Filename
-          const parts = name.split('_')
-          const id = parts[0]
-          const timestamp = parts[1]
-          const importedAt = /^\d+$/.test(timestamp)
-            ? new Date(parseInt(timestamp, 10)).toISOString()
-            : timestamp // Fallback for old format
-          const filename = parts.slice(2).join('_')
-          const existing = currentStore.find(f => f.id === id)
-          const metadata = await getFileMetadata(fileUri)
-          // console.log('metadata:', metadata)
-          const common = metadata?.common
+    const musicFiles: MusicFile[] = []
 
-          return {
-            id,
-            audioUri: fileUri,
-            coverUri: existing?.coverUri ?? null,
-            origFilename: filename,
-            importedAt,
-            fileFormat: metadata?.fileFormat ?? null,
-            tagVersion: metadata?.tagVersion ?? null,
-            origTitle: common?.title ?? null,
-            origArtist: common?.artist ?? null,
-            origAlbum: common?.album ?? null,
-            origTrack: common?.track.no ?? null,
-            origDisc: common?.disk.no ?? null,
-            origYear: common?.year ?? null,
-            origLyrics: common?.lyrics?.[0].text ?? null,
-            title: existing?.title ?? common?.title ?? filename,
-            artist: existing?.artist ?? common?.artist ?? null,
-            album: existing?.album ?? common?.album ?? null,
-            lyrics: existing?.lyrics ?? common?.lyrics?.[0].text ?? null,
-            appCoverUri: existing?.appCoverUri ?? null,
-          } as MusicFile
-        }),
-    )
+    // Process files sequentially to avoid memory pressure and bridge congestion
+    const relevantFiles = contents.filter(name => /^[0-9a-f-]{36}/.test(name))
+
+    for (const name of relevantFiles) {
+      const fileUri = `${docDir}${name}`
+      // Parts: 0: ID, 1: ImportedAt, 2+: Filename
+      const parts = name.split('_')
+      const id = parts[0]
+      const timestamp = parts[1]
+      const importedAt = /^\d+$/.test(timestamp)
+        ? new Date(parseInt(timestamp, 10)).toISOString()
+        : timestamp // Fallback for old format
+      const filename = parts.slice(2).join('_')
+
+      const existing = currentStore.find(f => f.id === id)
+
+      // Skip parsing if we already have this file and its metadata in the store
+      if (existing && existing.fileFormat) {
+        musicFiles.push({
+          ...existing,
+          audioUri: fileUri, // Always update URI in case docDir path changed
+          origFilename: filename,
+          importedAt,
+        })
+        continue
+      }
+
+      const metadata = await getFileMetadata(fileUri, filename)
+      const common = metadata?.common
+
+      musicFiles.push({
+        id,
+        audioUri: fileUri,
+        coverUri: existing?.coverUri ?? null,
+        origFilename: filename,
+        importedAt,
+        fileFormat: metadata?.fileFormat ?? null,
+        tagVersion: metadata?.tagVersion ?? null,
+        origTitle: common?.title ?? null,
+        origArtist: common?.artist ?? null,
+        origAlbum: common?.album ?? null,
+        origTrack: common?.track.no ?? null,
+        origDisc: common?.disk.no ?? null,
+        origYear: common?.year ?? null,
+        origLyrics: common?.lyrics?.[0].text ?? null,
+        title: existing?.title ?? common?.title ?? filename,
+        artist: existing?.artist ?? common?.artist ?? null,
+        album: existing?.album ?? common?.album ?? null,
+        lyrics: existing?.lyrics ?? common?.lyrics?.[0].text ?? null,
+        appCoverUri: existing?.appCoverUri ?? null,
+      } as MusicFile)
+    }
+
     musicFiles$.set(musicFiles)
   } catch (error) {
     console.error('refreshLocalMusicList error:', error)

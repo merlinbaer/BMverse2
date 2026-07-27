@@ -7,4 +7,5 @@ export const initAudioMode = () => {
     shouldPlayInBackground: true,
     interruptionMode: 'doNotMix',
   })
+  console.log('BMverse: Audio mode initialized')
 }

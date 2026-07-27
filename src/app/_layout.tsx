@@ -62,12 +62,12 @@ export default function RootLayout() {
     initAuth()
     initializeStores() // Starting warming up table stores
     void initAssets()
+    startSyncCoordinator()
     void refreshLocalMusicList()
     void refreshLocalCoverList()
-    startSyncCoordinator()
+    void registerServiceWorker()
     initAudioMode()
     initPlayerStats()
-    void registerServiceWorker()
   }, [])
 
   // 6. Can run several times

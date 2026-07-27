@@ -254,6 +254,7 @@ export const refreshLocalCoverList = async () => {
   } catch (error) {
     console.error('refreshLocalCoverList error:', error)
   }
+  console.log('BMverse: Cover images refreshed.')
 }
 
 /**

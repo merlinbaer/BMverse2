@@ -16,6 +16,7 @@ export async function registerServiceWorker() {
     !('serviceWorker' in navigator)
   ) {
     swReadyResolve(true) // Resolve immediately on non-web
+    console.log('BMverse: Service Worker not available')
     return
   }
 
