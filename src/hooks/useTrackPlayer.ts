@@ -1,7 +1,8 @@
 import { useValue } from '@legendapp/state/react'
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
+import Constants, { ExecutionEnvironment } from 'expo-constants'
 import { useEffect, useRef } from 'react'
-import { Image } from 'react-native'
+import { Image, Platform } from 'react-native'
 
 import {
   activeTrackIndex$,
@@ -47,15 +48,25 @@ export const useTrackPlayer = (onFinished?: () => void) => {
       artworkUrl = Image.resolveAssetSource(currentTrack.appCoverUri).uri
     }
 
-    try {
-      player.setActiveForLockScreen(true, {
-        title: currentTrack.title || 'Unknown Title',
-        artist: currentTrack.artist || 'Unknown Artist',
-        albumTitle: currentTrack.album || 'Unknown Album',
-        artworkUrl,
-      })
-    } catch (e) {
-      console.log('useTrackPlayer: setActiveForLockScreen failed', e)
+    const isExpoGo =
+      Constants.executionEnvironment === ExecutionEnvironment.StoreClient
+
+    const shouldSetLockScreen =
+      Platform.OS === 'web' ||
+      Platform.OS === 'ios' ||
+      (Platform.OS === 'android' && !isExpoGo)
+
+    if (shouldSetLockScreen) {
+      try {
+        player.setActiveForLockScreen(true, {
+          title: currentTrack.title || 'Unknown Title',
+          artist: currentTrack.artist || 'Unknown Artist',
+          albumTitle: currentTrack.album || 'Unknown Album',
+          artworkUrl,
+        })
+      } catch (e) {
+        console.log('useTrackPlayer: setActiveForLockScreen failed', e)
+      }
     }
   }, [currentTrack, player])
 

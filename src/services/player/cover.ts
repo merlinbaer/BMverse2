@@ -144,7 +144,10 @@ export const pickAndSaveCoverFiles = async (
           to: destinationUri,
         })
       } catch (copyError) {
-        console.error(`BMverse: cover copyAsync failed for ${asset.uri}, trying read/write fallback:`, copyError)
+        console.error(
+          `BMverse: cover copyAsync failed for ${asset.uri}, trying read/write fallback:`,
+          copyError,
+        )
         // Fallback: Read as Base64 and write to destination
         const base64 = await FileSystem.readAsStringAsync(asset.uri, {
           encoding: FileSystem.EncodingType.Base64,
@@ -208,7 +211,7 @@ export const refreshLocalCoverList = async () => {
         )
 
         return {
-          id: existing?.id || String(value),
+          id: key,
           importedAt: existing?.importedAt || new Date().toISOString(),
           origFilename: key,
           fileFormat: 'asset',
@@ -233,9 +236,7 @@ export const refreshLocalCoverList = async () => {
           ? new Date(parseInt(timestamp, 10)).toISOString()
           : timestamp // Fallback for old format
         const origFilename = parts.slice(2).join('_')
-        const extension = name.toLowerCase().endsWith('.png')
-          ? 'png'
-          : 'jpg'
+        const extension = name.toLowerCase().endsWith('.png') ? 'png' : 'jpg'
 
         const existing = currentStore.find(f => f.id === id)
 
