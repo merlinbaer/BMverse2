@@ -113,7 +113,6 @@ export const musicFilesList$ = (
           (a.album || a.origAlbum || '').localeCompare(
             b.album || b.origAlbum || '',
           ) ||
-          (a.origYear ?? 0) - (b.origYear ?? 0) ||
           (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
           (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
           a.title.localeCompare(b.title)
