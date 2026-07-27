@@ -135,8 +135,12 @@ const styles = StyleSheet.create({
     gap: 20,
     minHeight: 320,
     overflow: 'hidden',
-    padding: 24,
-    width: '90%',
+    paddingVertical: 24,
+    paddingHorizontal: Platform.select({
+      ios: 44,
+      android: 32,
+      default: 32,
+    }),
   },
   screenWrapper: {
     alignItems: 'center',

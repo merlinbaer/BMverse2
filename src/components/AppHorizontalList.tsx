@@ -89,7 +89,6 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   image: {
-    backgroundColor: COLORS.BG_GREY,
     borderRadius: 8,
     height: ITEM_SIZE,
     width: ITEM_SIZE,
