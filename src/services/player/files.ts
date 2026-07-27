@@ -150,12 +150,11 @@ export const pickAndSaveMusicFiles = async () => {
       return { count: 0, playlistCreated: false }
     }
 
-    const newTrackIds: string[] = []
+    const importedMusicFiles: MusicFile[] = []
     const importedCount = result.assets.length
 
     for (const asset of result.assets) {
       const uuid = generateId()
-      newTrackIds.push(uuid)
       const importedAt = new Date().toISOString()
       const timestamp = Date.now()
       const safeName = asset.name.replace(/[^a-zA-Z0-9. _-]/g, '')
@@ -187,7 +186,7 @@ export const pickAndSaveMusicFiles = async () => {
       const common = metadata?.common
 
       // Add to LegendState memory observable
-      musicFiles$.push({
+      const musicFile: MusicFile = {
         id: uuid,
         audioUri: destinationUri,
         coverUri: null,
@@ -207,19 +206,33 @@ export const pickAndSaveMusicFiles = async () => {
         album: common?.album ?? null,
         lyrics: common?.lyrics?.[0].text ?? null,
         appCoverUri: null,
-      })
+      }
+      musicFiles$.push(musicFile)
+      importedMusicFiles.push(musicFile)
     }
 
     // Create a playlist if more than one file is imported
     let playlistCreated = false
     if (importedCount > 1) {
       const now = new Date()
+
+      // Sort imported files by album, disc, and track
+      importedMusicFiles.sort((a, b) => {
+        const albumA = a.album || a.origAlbum || ''
+        const albumB = b.album || b.origAlbum || ''
+        return (
+          albumA.localeCompare(albumB) ||
+          (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
+          (a.origTrack ?? 0) - (b.origTrack ?? 0)
+        )
+      })
+
       playlists$.push({
         id: generateId(),
         name: getPlaylistTimestamp(now),
         imageUri: IMAGES.cover200.notFound,
-        tracks: newTrackIds.map((id, index) => ({
-          musicFileId: id,
+        tracks: importedMusicFiles.map((file, index) => ({
+          musicFileId: file.id,
           trackNum: index + 1,
         })),
       })
