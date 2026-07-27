@@ -22,7 +22,14 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#000000"
       },
-      "package": "eu.bruu.bmverse2"
+      "package": "eu.bruu.bmverse2",
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "READ_MEDIA_AUDIO",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +45,12 @@
       "orientation": "portrait"
     },
     "plugins": [
-      "expo-router",
+      [
+        "expo-router",
+        {
+          "origin": "https://bmverse2.bruu.eu"
+        }
+      ],
       [
         "expo-splash-screen",
         {
@@ -81,7 +93,7 @@
     },
     "extra": {
       "router": {
-        "origin": false
+        "origin": "https://bmverse2.bruu.eu"
       },
       "eas": {
         "projectId": "777dff8d-b5cb-401c-8fe8-045f75656806"

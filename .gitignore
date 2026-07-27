@@ -2,6 +2,9 @@
 
 # dependencies
 node_modules/
+# IDE
+sshConfigs.xml
+webServers.xml
 
 # Expo
 .expo/
