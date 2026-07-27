@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer'
 
 import * as DocumentPicker from 'expo-document-picker'
-import { Directory, File, Paths } from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/legacy'
 import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
@@ -18,15 +18,16 @@ import { getPlaylistTimestamp } from '../dateTimeHelper'
 /**
  * Extracts metadata from a local file URI.
  */
-const getFileMetadata = async (uri: string) => {
+const getFileMetadata = async (uri: string, fileName?: string) => {
   try {
-    const file = new File(uri)
-    const uint8Array = await file.bytes()
-    const buffer = Buffer.from(uint8Array)
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    })
+    const buffer = Buffer.from(base64, 'base64')
 
-    const decodedUri = decodeURIComponent(uri).toLowerCase()
-    const isM4a = decodedUri.endsWith('.m4a') || decodedUri.endsWith('.mp4')
-    const isMp3 = decodedUri.endsWith('.mp3')
+    const checkString = (fileName || uri || '').toLowerCase()
+    const isM4a = checkString.endsWith('.m4a') || checkString.endsWith('.mp4')
+    const isMp3 = checkString.endsWith('.mp3')
 
     if (isM4a) {
       const m4aTags = parseM4aBufferMetadata(buffer)
@@ -78,10 +79,16 @@ export const pickAndSaveMusicFiles = async () => {
     console.warn('File picking is not supported on web in this implementation.')
     return { count: 0, playlistCreated: false }
   }
+
+  const docDir = FileSystem.documentDirectory
+  if (!docDir) {
+    throw new Error('Document directory not available')
+  }
+
   try {
     const result = await DocumentPicker.getDocumentAsync({
       type: ['audio/mpeg', 'audio/x-m4a', 'audio/mp4'],
-      copyToCacheDirectory: true,
+      copyToCacheDirectory: false,
       multiple: true,
     })
 
@@ -89,7 +96,6 @@ export const pickAndSaveMusicFiles = async () => {
       return { count: 0, playlistCreated: false }
     }
 
-    const docDir = Paths.document
     const newTrackIds: string[] = []
     const importedCount = result.assets.length
 
@@ -97,22 +103,36 @@ export const pickAndSaveMusicFiles = async () => {
       const uuid = generateId()
       newTrackIds.push(uuid)
       const importedAt = new Date().toISOString()
+      const timestamp = Date.now()
       const safeName = asset.name.replace(/[^a-zA-Z0-9. _-]/g, '')
-      const newFileName = `${uuid}_${importedAt}_${safeName}`
+      const newFileName = `${uuid}_${timestamp}_${safeName}`
 
       // Copy the file to the persistent document area
-      const sourceFile = new File(asset.uri)
-      const destinationFile = new File(docDir, newFileName)
-      void sourceFile.copy(destinationFile)
+      const destinationUri = `${docDir}${newFileName}`
+      try {
+        await FileSystem.copyAsync({
+          from: asset.uri,
+          to: destinationUri,
+        })
+      } catch (copyError) {
+        console.error(`BMverse: copyAsync failed for ${asset.uri}, trying read/write fallback:`, copyError)
+        // Fallback: Read as Base64 and write to destination
+        const base64 = await FileSystem.readAsStringAsync(asset.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        })
+        await FileSystem.writeAsStringAsync(destinationUri, base64, {
+          encoding: FileSystem.EncodingType.Base64,
+        })
+      }
 
       // get meta tags
-      const metadata = await getFileMetadata(asset.uri)
+      const metadata = await getFileMetadata(destinationUri, asset.name)
       const common = metadata?.common
 
       // Add to LegendState memory observable
       musicFiles$.push({
         id: uuid,
-        audioUri: destinationFile.uri,
+        audioUri: destinationUri,
         coverUri: null,
         origFilename: asset.name,
         importedAt,
@@ -161,30 +181,33 @@ export const pickAndSaveMusicFiles = async () => {
 export const refreshLocalMusicList = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = new Directory(Paths.document)
-    const contents = docDir.list()
+    const docDir = FileSystem.documentDirectory
+    if (!docDir) return
+
+    const contents = await FileSystem.readDirectoryAsync(docDir)
     const currentStore = musicFiles$.peek() || []
 
     const musicFiles = await Promise.all(
       contents
-        .filter(
-          item => item instanceof File && /^[0-9a-f-]{36}/.test(item.name),
-        )
-        .map(async item => {
-          const file = item as File
+        .filter(name => /^[0-9a-f-]{36}/.test(name))
+        .map(async name => {
+          const fileUri = `${docDir}${name}`
           // Parts: 0: ID, 1: ImportedAt, 2+: Filename
-          const parts = file.name.split('_')
+          const parts = name.split('_')
           const id = parts[0]
-          const importedAt = parts[1]
+          const timestamp = parts[1]
+          const importedAt = /^\d+$/.test(timestamp)
+            ? new Date(parseInt(timestamp, 10)).toISOString()
+            : timestamp // Fallback for old format
           const filename = parts.slice(2).join('_')
           const existing = currentStore.find(f => f.id === id)
-          const metadata = await getFileMetadata(file.uri)
+          const metadata = await getFileMetadata(fileUri)
           // console.log('metadata:', metadata)
           const common = metadata?.common
 
           return {
             id,
-            audioUri: file.uri,
+            audioUri: fileUri,
             coverUri: existing?.coverUri ?? null,
             origFilename: filename,
             importedAt,
@@ -218,16 +241,15 @@ export const refreshLocalMusicList = async () => {
 export const deleteAllMusicFiles = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = new Directory(Paths.document)
-    const contents = docDir.list()
+    const docDir = FileSystem.documentDirectory
+    if (!docDir) return
 
-    const filesToDelete = contents.filter(
-      item => item instanceof File && /^[0-9a-f-]{36}/.test(item.name),
-    )
+    const contents = await FileSystem.readDirectoryAsync(docDir)
 
-    for (const item of filesToDelete) {
-      const file = item as File
-      void file.delete()
+    const filesToDelete = contents.filter(name => /^[0-9a-f-]{36}/.test(name))
+
+    for (const name of filesToDelete) {
+      await FileSystem.deleteAsync(`${docDir}${name}`, { idempotent: true })
     }
 
     musicFiles$.set([])
@@ -245,8 +267,7 @@ export const deleteSingleMusicFile = async (fileId: string) => {
     if (!fileToDelete) return
 
     // 1. Delete a physical file
-    const file = new File(fileToDelete.audioUri)
-    file.delete()
+    await FileSystem.deleteAsync(fileToDelete.audioUri, { idempotent: true })
 
     // 2. Remove from musicFiles store
     const fileIndex = musicFiles$.get().findIndex(f => f.id === fileId)

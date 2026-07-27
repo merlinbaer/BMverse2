@@ -1,5 +1,4 @@
 import * as DocumentPicker from 'expo-document-picker'
-import { Directory, File, Paths } from 'expo-file-system'
 import * as FileSystem from 'expo-file-system/legacy'
 import React from 'react'
 import { Platform } from 'react-native'
@@ -111,37 +110,56 @@ export const pickAndSaveCoverFiles = async (
   canvasRef?: React.RefObject<Canvas | null>,
 ) => {
   if (Platform.OS === 'web') return { count: 0 }
+
+  const docDir = FileSystem.documentDirectory
+  if (!docDir) {
+    throw new Error('Document directory not available')
+  }
+
   try {
     const result = await DocumentPicker.getDocumentAsync({
       type: ['image/png', 'image/jpeg'],
-      copyToCacheDirectory: true,
+      copyToCacheDirectory: false,
       multiple: true,
     })
 
     if (result.canceled || !result.assets) return { count: 0 }
 
-    const docDir = Paths.document
     const importedCount = result.assets.length
 
     for (const asset of result.assets) {
       const uuid = generateId()
       const importedAt = new Date().toISOString()
+      const timestamp = Date.now()
       const extension = asset.name.toLowerCase().endsWith('.png')
         ? 'png'
         : 'jpg'
       const safeName = asset.name.replace(/[^a-zA-Z0-9. _-]/g, '')
-      const newFileName = `cover_${uuid}_${importedAt}_${safeName}`
+      const newFileName = `cover_${uuid}_${timestamp}_${safeName}`
 
-      const sourceFile = new File(asset.uri)
-      const destinationFile = new File(docDir, newFileName)
-      await sourceFile.copy(destinationFile)
+      const destinationUri = `${docDir}${newFileName}`
+      try {
+        await FileSystem.copyAsync({
+          from: asset.uri,
+          to: destinationUri,
+        })
+      } catch (copyError) {
+        console.error(`BMverse: cover copyAsync failed for ${asset.uri}, trying read/write fallback:`, copyError)
+        // Fallback: Read as Base64 and write to destination
+        const base64 = await FileSystem.readAsStringAsync(asset.uri, {
+          encoding: FileSystem.EncodingType.Base64,
+        })
+        await FileSystem.writeAsStringAsync(destinationUri, base64, {
+          encoding: FileSystem.EncodingType.Base64,
+        })
+      }
 
       let dominantColor = COLORS.MODAL_BACKGROUND
 
       // Extract dominant colors if canvasRef is provided
       if (canvasRef) {
         try {
-          const colors = await processImage(destinationFile.uri, canvasRef)
+          const colors = await processImage(destinationUri, canvasRef)
           if (colors.length > 0) {
             dominantColor = colors[2] || colors[0]
           }
@@ -157,7 +175,7 @@ export const pickAndSaveCoverFiles = async (
         importedAt,
         origFilename: asset.name,
         fileFormat: extension,
-        coverUri: destinationFile.uri,
+        coverUri: destinationUri,
         dominantColor,
       })
     }
@@ -174,8 +192,10 @@ export const pickAndSaveCoverFiles = async (
 export const refreshLocalCoverList = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = new Directory(Paths.document)
-    const contents = docDir.list()
+    const docDir = FileSystem.documentDirectory
+    if (!docDir) return
+
+    const contents = await FileSystem.readDirectoryAsync(docDir)
     const currentStore = coverFiles$.peek() || []
 
     // 1. Process App Assets
@@ -200,17 +220,20 @@ export const refreshLocalCoverList = async () => {
 
     // 2. Load from Filesystem using structured filenames
     const loadedFiles = contents
-      .filter(item => item instanceof File && item.name.startsWith('cover_'))
-      .map(item => {
-        const file = item as File
+      .filter(name => name.startsWith('cover_'))
+      .map(name => {
+        const fileUri = `${docDir}${name}`
         // Pattern: cover_{uuid}_{importedAt}_{origFilename}
-        const nameWithoutPrefix = file.name.replace(/^cover_/, '')
+        const nameWithoutPrefix = name.replace(/^cover_/, '')
         const parts = nameWithoutPrefix.split('_')
 
         const id = parts[0]
-        const importedAt = parts[1]
+        const timestamp = parts[1]
+        const importedAt = /^\d+$/.test(timestamp)
+          ? new Date(parseInt(timestamp, 10)).toISOString()
+          : timestamp // Fallback for old format
         const origFilename = parts.slice(2).join('_')
-        const extension = file.name.toLowerCase().endsWith('.png')
+        const extension = name.toLowerCase().endsWith('.png')
           ? 'png'
           : 'jpg'
 
@@ -221,7 +244,7 @@ export const refreshLocalCoverList = async () => {
           importedAt,
           origFilename,
           fileFormat: extension as 'png' | 'jpg',
-          coverUri: file.uri,
+          coverUri: fileUri,
           dominantColor: existing?.dominantColor || COLORS.MODAL_BACKGROUND,
         } as CoverFile
       })
@@ -240,17 +263,16 @@ export const refreshLocalCoverList = async () => {
 export const deleteAllCoverFiles = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = new Directory(Paths.document)
-    const contents = docDir.list()
+    const docDir = FileSystem.documentDirectory
+    if (!docDir) return
+
+    const contents = await FileSystem.readDirectoryAsync(docDir)
 
     // 1. Delete physical files from the disk
-    const filesToDelete = contents.filter(
-      item => item instanceof File && item.name.startsWith('cover_'),
-    )
+    const filesToDelete = contents.filter(name => name.startsWith('cover_'))
 
-    for (const item of filesToDelete) {
-      const file = item as File
-      void file.delete()
+    for (const name of filesToDelete) {
+      await FileSystem.deleteAsync(`${docDir}${name}`, { idempotent: true })
     }
 
     // 2. Filter store to keep only assets
@@ -273,8 +295,9 @@ export const deleteSingleCoverFile = async (coverId: string) => {
     if (!coverToDelete || coverToDelete.fileFormat === 'asset') return
 
     // 1. Delete a physical file
-    const file = new File(coverToDelete.coverUri as string)
-    file.delete()
+    await FileSystem.deleteAsync(coverToDelete.coverUri as string, {
+      idempotent: true,
+    })
 
     // 2. Remove from store
     const index = coverFiles$.get().findIndex(c => c.id === coverId)
