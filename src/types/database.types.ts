@@ -436,6 +436,36 @@ export type Database = {
         }
         Relationships: []
       }
+      gl_jobs: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          message: string | null
+          name: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          message?: string | null
+          name: string
+          status: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          message?: string | null
+          name?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gl_profiles: {
         Row: {
           created_at: string
@@ -532,6 +562,7 @@ export type Database = {
           version: string
           version_id: number
           version_info: string | null
+          version_target: Database['public']['Enums']['version_target']
         }
         Insert: {
           created_at?: string
@@ -541,6 +572,7 @@ export type Database = {
           version: string
           version_id?: number
           version_info?: string | null
+          version_target: Database['public']['Enums']['version_target']
         }
         Update: {
           created_at?: string
@@ -550,12 +582,418 @@ export type Database = {
           version?: string
           version_id?: number
           version_info?: string | null
+          version_target?: Database['public']['Enums']['version_target']
+        }
+        Relationships: []
+      }
+      ld_setlist: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          setlist_artist_mbid: string
+          setlist_artist_name: string
+          setlist_artist_sortname: string | null
+          setlist_artist_url: string
+          setlist_artwork: string
+          setlist_eventdate: string
+          setlist_eventyear: number
+          setlist_id: string
+          setlist_info: string | null
+          setlist_lastupdated: string
+          setlist_tour_name: string | null
+          setlist_url: string
+          setlist_venue_city_coords_lat: number | null
+          setlist_venue_city_coords_long: number | null
+          setlist_venue_city_country_code: string
+          setlist_venue_city_country_name: string
+          setlist_venue_city_id: string
+          setlist_venue_city_name: string
+          setlist_venue_city_state: string | null
+          setlist_venue_city_statecode: string | null
+          setlist_venue_id: string
+          setlist_venue_name: string | null
+          setlist_venue_url: string
+          setlist_versionid: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_artist_mbid: string
+          setlist_artist_name: string
+          setlist_artist_sortname?: string | null
+          setlist_artist_url: string
+          setlist_artwork: string
+          setlist_eventdate: string
+          setlist_eventyear: number
+          setlist_id: string
+          setlist_info?: string | null
+          setlist_lastupdated: string
+          setlist_tour_name?: string | null
+          setlist_url: string
+          setlist_venue_city_coords_lat?: number | null
+          setlist_venue_city_coords_long?: number | null
+          setlist_venue_city_country_code: string
+          setlist_venue_city_country_name: string
+          setlist_venue_city_id: string
+          setlist_venue_city_name: string
+          setlist_venue_city_state?: string | null
+          setlist_venue_city_statecode?: string | null
+          setlist_venue_id: string
+          setlist_venue_name?: string | null
+          setlist_venue_url: string
+          setlist_versionid: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_artist_mbid?: string
+          setlist_artist_name?: string
+          setlist_artist_sortname?: string | null
+          setlist_artist_url?: string
+          setlist_artwork?: string
+          setlist_eventdate?: string
+          setlist_eventyear?: number
+          setlist_id?: string
+          setlist_info?: string | null
+          setlist_lastupdated?: string
+          setlist_tour_name?: string | null
+          setlist_url?: string
+          setlist_venue_city_coords_lat?: number | null
+          setlist_venue_city_coords_long?: number | null
+          setlist_venue_city_country_code?: string
+          setlist_venue_city_country_name?: string
+          setlist_venue_city_id?: string
+          setlist_venue_city_name?: string
+          setlist_venue_city_state?: string | null
+          setlist_venue_city_statecode?: string | null
+          setlist_venue_id?: string
+          setlist_venue_name?: string | null
+          setlist_venue_url?: string
+          setlist_versionid?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ld_setlist_songs: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          setlist_id: string
+          setlist_versionid: string
+          song_artwork: string | null
+          song_encore: boolean
+          song_info: string | null
+          song_name: string | null
+          song_name_original: string
+          song_nr: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_id: string
+          setlist_versionid: string
+          song_artwork?: string | null
+          song_encore: boolean
+          song_info?: string | null
+          song_name?: string | null
+          song_name_original: string
+          song_nr: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_id?: string
+          setlist_versionid?: string
+          song_artwork?: string | null
+          song_encore?: boolean
+          song_info?: string | null
+          song_name?: string | null
+          song_name_original?: string
+          song_nr?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ld_setlist_upcoming: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          setlist_artist_mbid: string
+          setlist_artist_name: string
+          setlist_artist_sortname: string | null
+          setlist_artist_url: string
+          setlist_artwork: string
+          setlist_eventdate: string
+          setlist_eventyear: number
+          setlist_id: string
+          setlist_info: string | null
+          setlist_lastupdated: string
+          setlist_tickets: string | null
+          setlist_tour_name: string | null
+          setlist_url: string
+          setlist_venue_city_coords_lat: number | null
+          setlist_venue_city_coords_long: number | null
+          setlist_venue_city_country_code: string
+          setlist_venue_city_country_name: string
+          setlist_venue_city_id: string
+          setlist_venue_city_name: string
+          setlist_venue_city_state: string | null
+          setlist_venue_city_statecode: string | null
+          setlist_venue_id: string
+          setlist_venue_name: string | null
+          setlist_venue_url: string
+          setlist_versionid: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_artist_mbid: string
+          setlist_artist_name: string
+          setlist_artist_sortname?: string | null
+          setlist_artist_url: string
+          setlist_artwork: string
+          setlist_eventdate: string
+          setlist_eventyear: number
+          setlist_id: string
+          setlist_info?: string | null
+          setlist_lastupdated: string
+          setlist_tickets?: string | null
+          setlist_tour_name?: string | null
+          setlist_url: string
+          setlist_venue_city_coords_lat?: number | null
+          setlist_venue_city_coords_long?: number | null
+          setlist_venue_city_country_code: string
+          setlist_venue_city_country_name: string
+          setlist_venue_city_id: string
+          setlist_venue_city_name: string
+          setlist_venue_city_state?: string | null
+          setlist_venue_city_statecode?: string | null
+          setlist_venue_id: string
+          setlist_venue_name?: string | null
+          setlist_venue_url: string
+          setlist_versionid: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_artist_mbid?: string
+          setlist_artist_name?: string
+          setlist_artist_sortname?: string | null
+          setlist_artist_url?: string
+          setlist_artwork?: string
+          setlist_eventdate?: string
+          setlist_eventyear?: number
+          setlist_id?: string
+          setlist_info?: string | null
+          setlist_lastupdated?: string
+          setlist_tickets?: string | null
+          setlist_tour_name?: string | null
+          setlist_url?: string
+          setlist_venue_city_coords_lat?: number | null
+          setlist_venue_city_coords_long?: number | null
+          setlist_venue_city_country_code?: string
+          setlist_venue_city_country_name?: string
+          setlist_venue_city_id?: string
+          setlist_venue_city_name?: string
+          setlist_venue_city_state?: string | null
+          setlist_venue_city_statecode?: string | null
+          setlist_venue_id?: string
+          setlist_venue_name?: string | null
+          setlist_venue_url?: string
+          setlist_versionid?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ld_song_mapping: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          song_name_original: string
+          song_title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          song_name_original: string
+          song_title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          song_name_original?: string
+          song_title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ld_upcoming_concerts: {
+        Row: {
+          created_at: string
+          deleted: boolean | null
+          id: string
+          setlist_eventdate: string
+          setlist_id: string
+          setlist_tickets: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_eventdate: string
+          setlist_id: string
+          setlist_tickets?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          setlist_eventdate?: string
+          setlist_id?: string
+          setlist_tickets?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ld_video_selection: {
+        Row: {
+          channel_id: string
+          channel_type: string
+          created_at: string
+          deleted: boolean | null
+          id: string
+          updated_at: string
+          video_id: string
+          video_song: string | null
+          video_title_edited: string | null
+        }
+        Insert: {
+          channel_id: string
+          channel_type: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          updated_at?: string
+          video_id: string
+          video_song?: string | null
+          video_title_edited?: string | null
+        }
+        Update: {
+          channel_id?: string
+          channel_type?: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          updated_at?: string
+          video_id?: string
+          video_song?: string | null
+          video_title_edited?: string | null
+        }
+        Relationships: []
+      }
+      ld_youtube: {
+        Row: {
+          channel_artwork: string
+          channel_customurl: string | null
+          channel_decription: string
+          channel_id: string
+          channel_title: string
+          channel_type: string
+          created_at: string
+          deleted: boolean | null
+          id: string
+          updated_at: string
+          video_artwork: string
+          video_commentcount: number
+          video_description: string | null
+          video_duration: string
+          video_id: string
+          video_likecount: number
+          video_publishedat: string
+          video_song: string | null
+          video_title: string
+          video_title_original: string
+          video_viewcount: number
+        }
+        Insert: {
+          channel_artwork: string
+          channel_customurl?: string | null
+          channel_decription: string
+          channel_id: string
+          channel_title: string
+          channel_type: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          updated_at?: string
+          video_artwork: string
+          video_commentcount: number
+          video_description?: string | null
+          video_duration: string
+          video_id: string
+          video_likecount: number
+          video_publishedat: string
+          video_song?: string | null
+          video_title: string
+          video_title_original: string
+          video_viewcount: number
+        }
+        Update: {
+          channel_artwork?: string
+          channel_customurl?: string | null
+          channel_decription?: string
+          channel_id?: string
+          channel_title?: string
+          channel_type?: string
+          created_at?: string
+          deleted?: boolean | null
+          id?: string
+          updated_at?: string
+          video_artwork?: string
+          video_commentcount?: number
+          video_description?: string | null
+          video_duration?: string
+          video_id?: string
+          video_likecount?: number
+          video_publishedat?: string
+          video_song?: string | null
+          video_title?: string
+          video_title_original?: string
+          video_viewcount?: number
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      ld_video_channels: {
+        Row: {
+          channel_id: string | null
+          deleted: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       delete_user: { Args: never; Returns: undefined }
@@ -577,6 +1015,7 @@ export type Database = {
         | 'OCEA'
         | 'MEAF'
       user_role: 'user' | 'admin' | 'moderator'
+      version_target: 'ios' | 'android' | 'web'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -592,12 +1031,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -619,13 +1058,12 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -644,13 +1082,12 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema['Tables']
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+    keyof DefaultSchema['Tables'] | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -669,13 +1106,12 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema['Enums']
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    keyof DefaultSchema['Enums'] | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -688,11 +1124,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -720,6 +1156,7 @@ export const Constants = {
         'MEAF',
       ],
       user_role: ['user', 'admin', 'moderator'],
+      version_target: ['ios', 'android', 'web'],
     },
   },
 } as const
