@@ -16,7 +16,6 @@ CREATE TYPE public.user_region AS enum (
     'SEAS',
     'OCEA',
     'MEAF'
-
     );
 
 CREATE TABLE
