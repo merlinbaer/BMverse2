@@ -28,6 +28,51 @@ export function connectAnonDB(): SupabaseClient {
   }
 }
 
+// Update gl_sync
+export async function triggerSync(
+    connect: SupabaseClient,
+): Promise<number> {
+  try {
+    const { data, error } = await connect
+        .from('gl_sync')
+        .update({updater: 'batch' })
+        .eq('deleted', false)
+        .eq('sync_id', 1)
+        .select('*')
+
+    if (error) throw error
+    return data.length
+  } catch (err) {
+    console.log(
+        'Fatal Error: Update gl_sync: ' +
+        JSON.stringify(err, null, 2),
+    )
+    throw err
+  }
+}
+
+// Insert news message into bm_news
+export async function insertNews(
+    inputData: string,
+    connect: SupabaseClient,
+) {
+  try {
+    const { data, error } = await connect
+        .from('bm_news')
+        .insert({news_info: inputData, news_updater: 'postgres'})
+        .select('*')
+    if (error) throw error
+    return data.length
+  } catch (err) {
+    console.log(
+        'Fatal Error: Inserting message in table bm_news' +
+        ': ' +
+        JSON.stringify(err, null, 2),
+    )
+    throw err
+  }
+}
+
 // Insert data into a table. Array of objects has to fit the table structure (keys = column names)!
 export async function insertUntypedData(
   // deno-lint-ignore no-explicit-any

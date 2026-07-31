@@ -1,5 +1,5 @@
-import {insertUntypedData, selectAllRows, updateUntypedData} from "../_shared/global.ts";
-import Job from '../_shared/joblib.ts';
+import {insertNews, triggerSync, insertUntypedData, selectAllRows, updateUntypedData} from "shared/global.ts";
+import Job from "shared/joblib.ts";
 
 // -- Sync BABYMETAL videos from ld tables into bm tables --
 
@@ -46,6 +46,10 @@ Deno.serve(async (req: Request) => {
         job.log('Missing videos in bm: ' + missingVideos.length)
         if (missingVideos.length > 0) {
             insertedVideos = await insertUntypedData(missingVideos, 'bm_videos', job.db)
+            const insertNewsMessage = insertedVideos === 1
+                ? `New video available. ${missingVideos[0].video_title}`
+                : `${insertedVideos} new videos available.`
+            void await insertNews(insertNewsMessage, job.db)
         }
     } catch (err) {
         job.error(`Error: Videos insert failed: ${JSON.stringify(err, null, 2)} `);
@@ -62,6 +66,7 @@ Deno.serve(async (req: Request) => {
                 const updatedRow = await updateUntypedData('bm_videos', row, 'video_id', job.db)
                 deletedVideos = deletedVideos + updatedRow;
             }
+            void await triggerSync(job.db)
         }
     } catch (err) {
         job.error(`Error: Only ${deletedVideos} videos soft deleted: ${JSON.stringify(err, null, 2)} `);
@@ -77,6 +82,7 @@ Deno.serve(async (req: Request) => {
                 const updatedRow = await updateUntypedData('bm_videos', row, 'video_id', job.db);
                 updatedVideos = updatedVideos + updatedRow;
             }
+            void await triggerSync(job.db)
         }
     } catch (err) {
         job.error(`Error: Only ${updatedVideos} videos updated: ${JSON.stringify(err, null, 2)}`);

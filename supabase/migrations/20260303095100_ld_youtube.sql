@@ -36,6 +36,8 @@ FROM ld_video_selection
 WHERE deleted is false
 GROUP by deleted, channel_id;
 
+GRANT SELECT ON TABLE public.ld_video_channels TO service_role;
+
 CREATE TABLE
   public.ld_youtube (
     id uuid not null default gen_random_uuid (),

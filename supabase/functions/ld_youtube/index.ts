@@ -1,5 +1,5 @@
-import {delay, deleteAllRows, insertUntypedData, selectAllRows} from "../_shared/global.ts";
-import Job from '../_shared/joblib.ts'
+import {delay, deleteAllRows, insertUntypedData, selectAllRows} from "shared/global.ts";
+import Job from "shared/joblib.ts"
 
 // -- Load YouTube BABYMETAL video data --
 
