@@ -60,7 +60,7 @@ https://supabase.com/docs/guides/functions/quickstart
   Scriptkürzel für "yarn supabase functions serve --no-verify-jwt"  
   Stellt alle functions im functions folder für Aufrufe zur Verfügung.
 
-- yarn depl --no-verify-jwt
+- yarn supabase functions deploy --no-verify-jwt
 
   Scriptkürzel fürr "yarn supabase functions deploy".
   Deployed alle functions nach production

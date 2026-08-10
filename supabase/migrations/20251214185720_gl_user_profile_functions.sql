@@ -26,16 +26,22 @@ CREATE TRIGGER on_auth_user_created
     FOR each ROW
 execute procedure public.handle_new_user();
 
-CREATE OR REPLACE FUNCTION public.delete_user()
-    RETURNS void
-    LANGUAGE plpgsql
-    SECURITY DEFINER
-    SET search_path = public, auth
-AS
+create or replace function public.delete_user()
+    returns void
+    language plpgsql
+    security invoker
+    set search_path = ''
+as
 $$
-BEGIN
-    DELETE FROM auth.users WHERE id = auth.uid();
-END;
+begin
+    -- fail closed if called without a session
+    if auth.uid() is null then
+        raise exception 'Not authenticated';
+    end if;
+    delete
+    from auth.users
+    where id = auth.uid();
+end;
 $$;
 
 CREATE OR REPLACE FUNCTION public.update_last_seen()
