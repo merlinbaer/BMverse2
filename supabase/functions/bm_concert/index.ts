@@ -1,5 +1,5 @@
-import {insertUntypedData, selectAllRows, selectRows, updateUntypedData} from "../_shared/global.ts";
-import Job from '../_shared/joblib.ts';
+import {insertNews,insertUntypedData, selectAllRows, triggerSync, updateUntypedData} from "shared/global.ts";
+import Job from "shared/joblib.ts";
 
 // -- Sync BABYMETAL concerts, performed songs and year statistics from ld tables & view into bm tables --
 
@@ -19,27 +19,20 @@ Deno.serve(async (req: Request) => {
     let insertedConcerts = 0;
     let insertedUpcomingConcerts = 0;
     let insertedSongs = 0;
-    let insertedYears = 0;
     let updatedConcerts = 0;
     let updatedOldSongs = 0;
     let updatedNewSongs = 0;
-    let updatedYears = 0;
     let deletedConcerts = 0;
     let deletedUpcomingConcerts = 0;
     let deletedSongs = 0;
-    let deletedYears = 0;
     // deno-lint-ignore no-explicit-any
     let setlist: any[] =[];
     // deno-lint-ignore no-explicit-any
     let setlistSongs: any[] =[];
     // deno-lint-ignore no-explicit-any
-    let setlistYears: any[] =[];
-    // deno-lint-ignore no-explicit-any
     let concert: any[] =[];
     // deno-lint-ignore no-explicit-any
     let concertSongs: any[] =[];
-    // deno-lint-ignore no-explicit-any
-    let concertYears: any[] =[];
 
     // load concerts and performed songs from ld and bm tables
     try {
@@ -155,66 +148,6 @@ Deno.serve(async (req: Request) => {
         return new Response("Error in JOB:" + job.name + " - Insert updated songs failed", { status: 500 });
     }
 
-    // load ld year view and bm year table
-    try {
-        setlistYears = await selectAllRows('ld_setlist_years_view', '*', job.db)
-        concertYears = await selectAllRows('bm_event_concert_years', '*', job.db)
-        job.log(`#bm_event_concert_years: ${concertYears.length}; #ld_setlist_years: ${setlistYears.length};`);
-    } catch (err) {
-        job.error(`Error: Reading year data failed: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Year loading failed" , { status: 500 });
-    }
-
-    // Insert missing years from ld view into bm table 
-    try {
-        const missingYears = missingByYear(setlistYears, concertYears)
-        job.log('Missing years in bm: ' + missingYears.length)
-        if (missingYears.length > 0) {
-            for (const obj of missingYears) {
-                obj.display_year = String(obj.year)
-            }
-            insertedYears = await insertUntypedData(missingYears, 'bm_event_concert_years', job.db)
-        }
-    } catch (err) {
-        job.error(`Error: Year insert failed: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Insert year failed", { status: 500 });
-    }
-
-    // Soft delete from bm year table, when data is missing in ld year view 
-    try {
-        const missingYears = missingByYear(concertYears, setlistYears)
-        job.log('Missing years in ld: ' + missingYears.length)
-        if (missingYears.length > 0) {
-            for (const row of missingYears) {
-                if ( row.year !== 9999 ) {  // do not soft delete upcoming concerts
-                    row.deleted = true
-                    const updatedRow = await updateUntypedData('bm_event_concert_years', row, 'year', job.db)
-                    deletedYears = deletedYears + updatedRow;
-                } else {
-                    job.log('Year 9999 in bm table not soft deleted.')
-                }
-            }
-        }
-    } catch (err) {
-        job.error(`Error: Only ${deletedYears} years soft deleted: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Delete year failed", { status: 500 });
-    }
-
-    // Updating years in bm table
-    try {
-        const changedSetlistYears = changedYear(setlistYears, concertYears)
-        job.log('Changed years: ' + changedSetlistYears.length)
-        if (changedSetlistYears.length > 0) {
-            for (const row of changedSetlistYears) {
-                const updatedRow = await updateUntypedData('bm_event_concert_years', row, 'year', job.db)
-                updatedYears = updatedYears + updatedRow;
-            }
-        }
-    } catch (err) {
-        job.error(`Error: Only ${updatedYears} years updated: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Year update failed" , { status: 500 });
-    }
-
     setlist =[];
     concert = [];
     // Sync upcoming concert and year table
@@ -238,6 +171,7 @@ Deno.serve(async (req: Request) => {
         job.log('Missing upcoming concerts in bm: ' + missingSetlist.length)
         if (missingSetlist.length > 0) {
             insertedUpcomingConcerts = await insertUntypedData(missingSetlist, 'bm_event_concert_upcoming', job.db)
+            void await insertNews('New tour data in upcoming concerts', job.db)
         }
     } catch (err) {
         job.error(`Error: Upcoming concerts insert failed: ${JSON.stringify(err, null, 2)} `);
@@ -257,51 +191,22 @@ Deno.serve(async (req: Request) => {
     } catch (err) {
         job.error(`Error: Only ${deletedUpcomingConcerts} upcoming concerts soft deleted: ${JSON.stringify(err, null, 2)} `);
         return new Response("Error in JOB:" + job.name + " - Delete upcoming concerts failed.", { status: 500 });
-    } 
-    try {
-        // reload upcoming concerts in ld and bm tables
-        setlist = await selectAllRows('ld_setlist_upcoming', '*', job.db);
-        concert = await selectAllRows('bm_event_concert_upcoming', '*', job.db);
-        job.log(`#bm_event_concert_upcoming: ${concert.length}; #ld_setlist_upcoming: ${setlist.length};`);
-    } catch (err) {
-        job.error(`Error: Reading upcoming concerts data failed: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Upcoming concerts loading failed" , { status: 500 });
     }
-    try {
-        // Update bm year table and handle upcoming concerts at year=9999
-        const year9999 = await selectRows('bm_event_concert_years', '*', 'year', 9999, job.db);
-        job.log(`#Rows with year=9999 in bm_event_concert_years: ${String(year9999.length)};`);
-        if (concert.length > 0) { // There are upcoming events
-            const row = { 
-                year : 9999,
-                display_year : 'ahead',
-                total_concerts: concert.length
-            }
-            if ( year9999.length > 0 ) {  // row year=9999 exists -> Update when total_records is changing
-                if (year9999[0].total_concerts !== concert.length) { // Should only one active row (with deleted=false) for year=9999
-                    await updateUntypedData('bm_event_concert_years', row, 'year', job.db)
-                    job.log(`Row year=9999 in bm_event_concert_years updated to new value: ${String(concert.length)};`)
-                }
-            } else {                      // row year=9999 does not exist -> Insert row with year=9999
-                await insertUntypedData([row], 'bm_event_concert_years', job.db)
-                job.log(`Row year=9999 in bm_event_concert_years inserted with value: ${String(concert.length)};`)
-            }
-        } else {                  // There are no upcoming events
-            if ( year9999.length > 0) {   // row year=9999 exists -> soft delete row with year=9999
-                const row = { 
-                    year : 9999,
-                    deleted: true,
-                }
-                await updateUntypedData('bm_event_concert_years', row, 'year', job.db)
-                job.log(`Row year=9999 in bm_event_concert_years soft deleted.`)
-            }                    // There are no upcoming events, and row year=9999 does not exist -> Do nothing
-        }
-    } catch (err) {
-        job.error(`Error: Syncing year 9999: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Upcoming concert year sync failed.", { status: 500 });
-    } 
+    if (
+        insertedConcerts > 0 ||
+        insertedUpcomingConcerts > 0 ||
+        insertedSongs > 0 ||
+        updatedConcerts > 0 ||
+        updatedOldSongs > 0 ||
+        updatedNewSongs > 0 ||
+        deletedConcerts > 0 ||
+        deletedUpcomingConcerts > 0 ||
+        deletedSongs > 0
+    ) {
+        void await triggerSync(job.db);
+    }
 
-    await job.end(`Concerts inserted: ${insertedConcerts}; Songs inserted: ${insertedSongs}; Years inserted: ${insertedYears}; Updated concerts: ${updatedConcerts}; Updated old songs(deleted): ${updatedOldSongs}; Updated new songs(inserted): ${updatedNewSongs}; Years updated: ${updatedYears}; Concerts deleted: ${deletedConcerts}; Songs deleted: ${deletedSongs}; Years deleted: ${deletedYears}; Upcoming concerts inserted: ${insertedUpcomingConcerts}; Upcoming concerts deleted: ${deletedUpcomingConcerts};`)
+    await job.end(`Concerts inserted: ${insertedConcerts}; Songs inserted: ${insertedSongs}; Updated concerts: ${updatedConcerts}; Updated old songs(deleted): ${updatedOldSongs}; Updated new songs(inserted): ${updatedNewSongs}; Concerts deleted: ${deletedConcerts}; Songs deleted: ${deletedSongs}; Upcoming concerts inserted: ${insertedUpcomingConcerts}; Upcoming concerts deleted: ${deletedUpcomingConcerts};`)
     return new Response(`Job-${job.name}: OK`, { status: 200 });
 })
 
@@ -313,13 +218,6 @@ function missingBySetlistId(aData: any[], bData: any[]) {
     const bIds = bData.map(row => row.setlist_id)
       // Find rows in a that don't exist in b by setlist_id
     return aData.filter(row => !bIds.includes(row.setlist_id))
-  }
-
-// deno-lint-ignore no-explicit-any
-function missingByYear(aData: any[], bData: any[]) {
-    const bYears = bData.map(row => row.year)
-      // Find rows in a that don't exist in b by year
-    return aData.filter(row => !bYears.includes(row.year))
   }
 
 // deno-lint-ignore no-explicit-any
@@ -336,20 +234,3 @@ function changedVersion(tableAData: any[], tableBData: any[]) {
     }
     return differences
 }
-
-// deno-lint-ignore no-explicit-any
-function changedYear(viewAData: any[], tableBData: any[]) {
-    const differences = []
-    // Check if the total_concerts of a certain year has changed
-    for (const rowA of viewAData) {
-        const rowB = tableBData.find(row => row.year === rowA.year)
-        if (rowB) {
-            if (rowA.total_concerts !== rowB.total_concerts) {
-                rowA.display_year = String(rowA.year)
-                differences.push(rowA);
-            }
-        }
-    }
-    return differences
-}
-
