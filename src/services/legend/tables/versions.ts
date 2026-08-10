@@ -3,6 +3,7 @@ import { computed, Observable } from '@legendapp/state'
 import { VersionsType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
+import { Platform } from 'react-native'
 
 // Define supabase observable
 const { store$, sync, clearCache } = createTableStore<VersionsType>({
@@ -24,10 +25,10 @@ export const latestVersion$ = computed(() => {
   if (items.length === 0) return null
 
   const latestRow = items
-    .filter(v => v && !v.deleted)
+    .filter(v => v && !v.deleted && v.version_target === Platform.OS)
     .reduce((prev, current) => {
       return prev.version_id > current.version_id ? prev : current
     })
 
-  return latestRow?.version ?? null
+  return `${latestRow.version}-${latestRow.version_target}`
 }) as unknown as Observable<string | null>

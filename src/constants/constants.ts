@@ -1,8 +1,9 @@
 import { DarkTheme } from 'expo-router/react-navigation'
 
 import appJson from '../../app.json'
+import { Platform } from 'react-native'
 
-export const APP_VERSION = appJson.expo.version
+export const APP_VERSION = `${appJson.expo.version}-${Platform.OS}`
 
 export const COLORS = {
   PRIMARY: '#db1b1a',

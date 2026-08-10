@@ -187,6 +187,7 @@ export type Database = {
           setlist_id: string
           setlist_info: string | null
           setlist_lastupdated: string | null
+          setlist_tickets: string | null
           setlist_tour_name: string | null
           setlist_url: string | null
           setlist_venue_city_coords_lat: number | null
@@ -217,6 +218,7 @@ export type Database = {
           setlist_id: string
           setlist_info?: string | null
           setlist_lastupdated?: string | null
+          setlist_tickets?: string | null
           setlist_tour_name?: string | null
           setlist_url?: string | null
           setlist_venue_city_coords_lat?: number | null
@@ -247,6 +249,7 @@ export type Database = {
           setlist_id?: string
           setlist_info?: string | null
           setlist_lastupdated?: string | null
+          setlist_tickets?: string | null
           setlist_tour_name?: string | null
           setlist_url?: string | null
           setlist_venue_city_coords_lat?: number | null

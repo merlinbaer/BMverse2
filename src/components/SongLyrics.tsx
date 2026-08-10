@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   tabInactive: {
-    borderBottomColor: COLORS.BG_GREY,
+    borderBottomColor: COLORS.MAXIMUM_TRACK_TINT_COLOR,
   },
   tabItem: {
     alignItems: 'center',
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   tabText: {
-    color: COLORS.BG_GREY,
+    color: COLORS.MAXIMUM_TRACK_TINT_COLOR,
     fontWeight: 'bold',
     textAlign: 'center',
   },
