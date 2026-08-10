@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourcePerFileMappings">
+    <file url="file://$PROJECT_DIR$/../migrations/20260202095300_bm_concerts.sql" value="1426327a-289c-4cad-af27-ba41a46b63cb" />
+  </component>
+</project>
