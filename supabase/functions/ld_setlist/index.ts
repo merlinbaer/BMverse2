@@ -30,7 +30,7 @@ Deno.serve(async (req: Request) => {
     // load mapping tables
     try {
         songsMapping = await selectAllRows('ld_song_mapping', 'song_name_original, song_title', job.db)
-        songsArray = await selectAllRows('bm_songs', 'song_title, song_artwork_small', job.db)
+        songsArray = await selectAllRows('bm_songs', 'song_title, song_preview_artwork', job.db)
     } catch (err) {
         job.error(`Error reading mapping tables: ${JSON.stringify(err, null, 2)} `);
         return new Response("Error in JOB:" + job.name + " - Data mapping" , { status: 500 });
@@ -137,7 +137,7 @@ function transformToSongs(fetchedArray: any [], songsMapping : any [], songsArra
                     const mappedSongObject = songsMapping.find(obj => obj['song_name_original'] === song.name)
                     const mappedSongName = mappedSongObject ? mappedSongObject.song_title : song.name
                     const songObject = songsArray.find(obj => obj['song_title'] === mappedSongName)
-                    const songArtwork = songObject ? songObject.song_artwork_small : "unknown"
+                    const songArtwork = songObject ? songObject.song_preview_artwork : "unknown"
                     songsPageArray.push({
                         'setlist_id': obj.id,
                         'setlist_versionid': obj.versionId,

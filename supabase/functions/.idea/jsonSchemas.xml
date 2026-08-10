@@ -14,6 +14,21 @@
                   <Item>
                     <option name="path" value="deno.json" />
                   </Item>
+                  <Item>
+                    <option name="path" value="bm_concert/deno.json" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="token/deno.json" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="ld_youtube/deno.json" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="demo_job/deno.json" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="_shared/deno.json" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>
@@ -29,6 +44,9 @@
                 <list>
                   <Item>
                     <option name="path" value="import_map.json" />
+                  </Item>
+                  <Item>
+                    <option name="path" value="_shared/import_map.json" />
                   </Item>
                 </list>
               </option>

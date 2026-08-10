@@ -36,8 +36,8 @@ Deno.serve(async (req: Request) => {
         setlistUpcoming = await selectAllRows('ld_upcoming_concerts', '*', job.db)
         job.log("# upcoming event: " + setlistUpcoming.length)
     } catch (err) {
-        job.error(`Error reading mapping tables: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Data mapping" , { status: 500 });
+        job.error(`Error reading driver table: ${JSON.stringify(err, null, 2)} `);
+        return new Response("Error in JOB:" + job.name + " - Data load upcoming failed." , { status: 500 });
     }
 
     // Soft delete old upcoming concerts
@@ -60,8 +60,8 @@ Deno.serve(async (req: Request) => {
         setlistUpcoming = await selectAllRows('ld_upcoming_concerts', '*', job.db)
         job.log("# upcoming event: " + setlistUpcoming.length)
     } catch (err) {
-        job.error(`Error reading mapping tables: ${JSON.stringify(err, null, 2)} `);
-        return new Response("Error in JOB:" + job.name + " - Data mapping" , { status: 500 });
+        job.error(`Error reading driver tables: ${JSON.stringify(err, null, 2)} `);
+        return new Response("Error in JOB:" + job.name + " - Data load upcoming failed." , { status: 500 });
     }
 
     // load ld table
@@ -70,6 +70,14 @@ Deno.serve(async (req: Request) => {
         const fetchedData = await fetchUpcomingSetlists(setlistUpcoming)
         job.log("Fetched data from upcoming event: " + fetchedData.length)
         setlistArray = transformToSetlist(fetchedData);
+
+        // Copy setlist_tickets from source table data (setlistUpcoming) to the transformed array
+        for (const item of setlistArray) {
+            const sourceRow = setlistUpcoming.find(row => row.setlist_id === item.setlist_id);
+            if (sourceRow) {
+                item.setlist_tickets = sourceRow.setlist_tickets;
+            }
+        }
 
         // insert API data
         const deletedRows = await deleteAllRows('ld_setlist_upcoming', job.db)

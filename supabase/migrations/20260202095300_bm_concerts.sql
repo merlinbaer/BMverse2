@@ -121,6 +121,7 @@ create table
     setlist_venue_url               text                     null,
     setlist_tour_name               text                     null,
     setlist_artwork                 text                     not null,
+    setlist_tickets                 text                     null,
     constraint bm_event_concert_upcoming_pkey primary key (id)
 ) tablespace pg_default;
 
