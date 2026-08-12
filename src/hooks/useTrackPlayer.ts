@@ -48,7 +48,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
 
   const lastStatusPlaying = useRef(status?.playing)
   const lastProxyPlaying = useRef(proxyStatus.playing)
-  const lastSyncedIndex = useRef(activeIndex)
+  const lastSyncedIndex = useRef(-1)
 
   const [resolvedArtworkUrl, setResolvedArtworkUrl] = useState<
     string | undefined
@@ -165,18 +165,17 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   // Synchronize external index -> Playlist index (Manual selection from lists)
   useEffect(() => {
     if (activeIndex !== lastSyncedIndex.current) {
+      if (!status) return
+
       lastSyncedIndex.current = activeIndex
-      if (
-        status &&
-        status.currentIndex !== activeIndex &&
-        activeIndex >= 0 &&
-        activeIndex < files.length
-      ) {
-        playlist.skipTo(activeIndex)
+      if (playlist && activeIndex >= 0 && activeIndex < files.length) {
+        if (status.currentIndex !== activeIndex) {
+          playlist.skipTo(activeIndex)
+        }
         playlist.play()
       }
     }
-  }, [activeIndex, playlist, files.length])
+  }, [activeIndex, playlist, files.length, status?.currentIndex])
 
   // Synchronize playlist index -> External index (Native auto-advance or native skip)
   useEffect(() => {
