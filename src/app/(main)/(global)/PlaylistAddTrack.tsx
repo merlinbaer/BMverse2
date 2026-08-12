@@ -32,6 +32,7 @@ const PlaylistAddTrack = () => {
       title="Add Track"
       data={pickerTracks}
       onSelect={handleSelectTrack}
+      isFullWidth={true}
     />
   )
 }

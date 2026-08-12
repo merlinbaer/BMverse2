@@ -34,6 +34,7 @@ const MusicFileDelete = () => {
       title="Delete Music File"
       data={data}
       onSelect={handleDelete}
+      isFullWidth={true}
     />
   )
 }

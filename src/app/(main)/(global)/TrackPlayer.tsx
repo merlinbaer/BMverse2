@@ -31,7 +31,7 @@ export default function TrackPlayerScreen() {
   }, [dominantColor])
 
   return (
-    <AppModalScreen gradientColors={gradientColors}>
+    <AppModalScreen gradientColors={gradientColors} isFullWidth={true}>
       {dismiss => <TrackContent dismiss={dismiss} />}
     </AppModalScreen>
   )

@@ -14,15 +14,17 @@ interface MusicFileListSelectorProps {
   title: string
   data: ListItemType[]
   onSelect: (item: ListItemType, dismiss: () => void) => void
+  isFullWidth?: boolean
 }
 
 export const MusicFileListSelector = ({
   title,
   data,
   onSelect,
+  isFullWidth,
 }: MusicFileListSelectorProps) => {
   return (
-    <AppModalScreen>
+    <AppModalScreen isFullWidth={isFullWidth}>
       {dismiss => (
         <View style={styles.container}>
           <AppText style={styles.title}>{title}</AppText>

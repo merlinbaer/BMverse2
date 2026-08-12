@@ -22,11 +22,13 @@ import { COLORS } from '@/constants/constants'
 interface AppModalScreenProps {
   children: (dismiss: () => void) => ReactNode
   gradientColors?: readonly [ColorValue, ColorValue, ...ColorValue[]]
+  isFullWidth?: boolean
 }
 
 export function AppModalScreen({
   children,
   gradientColors: propGradientColors,
+  isFullWidth = false,
 }: AppModalScreenProps) {
   const router = useRouter()
   const { top } = useSafeAreaInsets()
@@ -90,6 +92,7 @@ export function AppModalScreen({
           style={[
             styles.modalCard,
             { marginTop: top + 60 },
+            isFullWidth && { width: '100%' },
             animatedStyle,
             gradientColors ? { backgroundColor: COLORS.TRANSPARENT } : {},
           ]}
