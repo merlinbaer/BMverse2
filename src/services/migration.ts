@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
 import { Paths } from 'expo-file-system'
+import { Platform } from 'react-native'
 
 import { localStore$ } from '@/services/legend'
 
@@ -32,36 +33,38 @@ export const performVersionMigration = async () => {
     }
 
     // 3. Clear the Documents folder (where version 1 might have stored files)
-    try {
-      const docs = Paths.document
-      if (docs.exists) {
-        const items = docs.list()
-        for (const item of items) {
-          try {
-            const name = item.name.toLowerCase()
-            // Skip SQLite related files and directories to avoid "readonly database" errors
-            // as version 2 might have already initialized its database in the same location.
-            if (
-              name === 'sqlite' ||
-              name === 'exponent-sqlite' ||
-              name.endsWith('.db') ||
-              name.endsWith('.db-journal') ||
-              name.endsWith('.db-shm') ||
-              name.endsWith('.db-wal')
-            ) {
-              console.log(`Migration: Skipping protected item: ${item.name}`)
-              continue
+    if (Platform.OS !== 'web') {
+      try {
+        const docs = Paths.document
+        if (docs.exists) {
+          const items = docs.list()
+          for (const item of items) {
+            try {
+              const name = item.name.toLowerCase()
+              // Skip SQLite related files and directories to avoid "readonly database" errors
+              // as version 2 might have already initialized its database in the same location.
+              if (
+                name === 'sqlite' ||
+                name === 'exponent-sqlite' ||
+                name.endsWith('.db') ||
+                name.endsWith('.db-journal') ||
+                name.endsWith('.db-shm') ||
+                name.endsWith('.db-wal')
+              ) {
+                console.log(`Migration: Skipping protected item: ${item.name}`)
+                continue
+              }
+              item.delete()
+              console.log(`Migration: Deleted ${item.name}`)
+            } catch (itemError) {
+              console.error(`Migration: Failed to delete ${item.name}`, itemError)
             }
-            item.delete()
-            console.log(`Migration: Deleted ${item.name}`)
-          } catch (itemError) {
-            console.error(`Migration: Failed to delete ${item.name}`, itemError)
           }
+          console.log('Migration: Documents folder cleared')
         }
-        console.log('Migration: Documents folder cleared')
+      } catch (e) {
+        console.error('Migration: Failed to clear Documents folder', e)
       }
-    } catch (e) {
-      console.error('Migration: Failed to clear Documents folder', e)
     }
 
     // 4. Update the lastStartedVersion to prevent repeated migration
