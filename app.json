@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "bmverse2",
+    "name": "BMverse2",
     "slug": "bmverse2",
     "version": "2.0.0",
     "orientation": "portrait",
@@ -10,7 +10,7 @@
     "platforms": ["ios", "android", "web"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "eu.bruu.bmverse2",
+      "bundleIdentifier": "eu.bruu.bmverse",
       "backgroundColor": "#000000",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,

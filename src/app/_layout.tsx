@@ -5,7 +5,7 @@ import { Stack, useRouter, useSegments } from 'expo-router'
 import Head from 'expo-router/head'
 import { ThemeProvider } from 'expo-router/react-navigation'
 import * as SplashScreen from 'expo-splash-screen'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Platform } from 'react-native'
 
 import { AppTheme } from '@/constants/constants'
@@ -23,6 +23,7 @@ import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
 import { refreshLocalCoverList } from '@/services/player/cover'
 import { refreshLocalMusicList } from '@/services/player/files'
 import { isPWA, registerServiceWorker } from '@/services/pwa'
+import { performVersionMigration } from '@/services/migration'
 
 SplashScreen.setOptions({
   duration: 500,
@@ -34,6 +35,7 @@ export default function RootLayout() {
   const router = useRouter()
   const segments = useSegments() as string[]
   const isDismissed = useValue(isInstallDismissed$)
+  const hasInitialized = useRef(false)
 
   // 1. Monitor hydration status for the local store
   const localSyncStatus = useValue(syncState(localStore$))
@@ -45,6 +47,7 @@ export default function RootLayout() {
   // 3. Once hydrated, get the actual value from the disk
   const isOnboarding = useValue(localStore$.isOnboarding)
   const [loaded, error] = useFonts(bmFonts)
+
 
   // 4. Show Install Screen when Web and no PWA
   useEffect(() => {
@@ -59,16 +62,23 @@ export default function RootLayout() {
 
   // 5. One time tasks, this runs once
   useEffect(() => {
-    initAuth()
-    initializeStores() // Starting warming up table stores
-    void initAssets()
-    startSyncCoordinator()
-    void refreshLocalMusicList()
-    void refreshLocalCoverList()
-    void registerServiceWorker()
-    initAudioMode()
-    initPlayerStats()
-  }, [])
+    if (!isHydrated || hasInitialized.current) return
+    hasInitialized.current = true
+
+    const init = async () => {
+      await performVersionMigration()
+      initAuth()
+      initializeStores() // Starting warming up table stores
+      void initAssets()
+      startSyncCoordinator()
+      void refreshLocalMusicList()
+      void refreshLocalCoverList()
+      void registerServiceWorker()
+      initAudioMode()
+      initPlayerStats()
+    }
+    void init()
+  }, [isHydrated])
 
   // 6. Can run several times
   useEffect(() => {

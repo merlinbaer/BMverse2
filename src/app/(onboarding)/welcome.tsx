@@ -1,3 +1,4 @@
+import { useValue } from '@legendapp/state/react'
 import { router } from 'expo-router'
 import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
@@ -11,6 +12,7 @@ import { isPWA } from '@/services/pwa'
 
 export default function WelcomePage() {
   const { height } = useWindowDimensions()
+  const isVersion1Upgrade = useValue(localStore$.isVersion1Upgrade)
 
   // Calculate available height: screen height - top padding - other elements - gaps
   const textAreaHeight =
@@ -24,6 +26,7 @@ export default function WelcomePage() {
 
   const onAcceptPress = () => {
     localStore$.isOnboarding.set(false)
+    localStore$.isVersion1Upgrade.set(false)
     router.replace(`/(main)/(tabs)/news/News`)
   }
   return (
@@ -63,6 +66,12 @@ export default function WelcomePage() {
           color={COLORS.TEXT_MUTED}
           size={FONT.SIZE.SM}
         />
+        {isVersion1Upgrade && (
+          <AppText fontSize={FONT.SIZE.SM} style={styles.UpgradeMessageStyle}>
+            Important: Version 2.0 is a complete rebuild. Previous added files
+            and settings are not compatible and have been cleared.
+          </AppText>
+        )}
       </View>
       <AppButton title="Accept" onPress={onAcceptPress} />
     </KeyboardAwareScrollView>
@@ -88,5 +97,9 @@ const styles = StyleSheet.create({
   keyboardAwareScrollView: {
     backgroundColor: COLORS.BACKGROUND,
     flex: 1,
+  },
+  UpgradeMessageStyle: {
+    color: COLORS.PRIMARY,
+    paddingTop: 24,
   },
 })

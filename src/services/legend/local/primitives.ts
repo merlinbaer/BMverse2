@@ -7,6 +7,8 @@ import { persistLargeStore } from '@/services/legend/config'
 export const localStore$ = observable({
   lastSyncTime: null as string | null,
   isOnboarding: true,
+  lastStartedVersion: null as string | null,
+  isVersion1Upgrade: false,
 })
 
 // Use the same 'persistLargeStore' (IndexedDB/SQLite) as your tables
