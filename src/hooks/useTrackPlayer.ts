@@ -9,6 +9,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image } from 'react-native'
 import { File } from 'expo-file-system'
+import { IMAGES } from '@/constants/images'
 
 import {
   activeTrackIndex$,
@@ -83,12 +84,16 @@ export const useTrackPlayer = (onFinished?: () => void) => {
         url = Image.resolveAssetSource(rawUri).uri
       }
 
+      if (!url) {
+        url = Image.resolveAssetSource(IMAGES.cover200.notFound).uri
+      }
+
       if (!isCancelled) {
         setResolvedArtworkUrl(url)
       }
     }
 
-    loadArtwork()
+    void loadArtwork()
     return () => {
       isCancelled = true
     }
