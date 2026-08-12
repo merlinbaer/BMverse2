@@ -1,8 +1,14 @@
 import { useValue } from '@legendapp/state/react'
-import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
-import Constants, { ExecutionEnvironment } from 'expo-constants'
-import { useCallback, useEffect, useRef } from 'react'
-import { Image, Platform } from 'react-native'
+
+import {
+  useAudioPlayer,
+  useAudioPlayerStatus,
+  useAudioPlaylist,
+  useAudioPlaylistStatus,
+} from 'expo-audio'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Image } from 'react-native'
+import { File } from 'expo-file-system'
 
 import {
   activeTrackIndex$,
@@ -15,102 +21,197 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   const allFiles = useValue(musicFiles$)
   const activeIndex = useValue(activeTrackIndex$)
 
-  const files = activeTracks.length > 0 ? activeTracks : allFiles
+  const files = useMemo(
+    () => (activeTracks.length > 0 ? activeTracks : allFiles),
+    [activeTracks, allFiles],
+  )
   const currentTrack = files[activeIndex]
 
-  // useAudioPlayer(null) gives a stable player instance that unmounts with the component.
-  const player = useAudioPlayer()
-  const status = useAudioPlayerStatus(player)
+  const sources = useMemo(
+    () =>
+      files.map(f => ({
+        uri: f.audioUri,
+        name: f.title || f.origTitle || undefined,
+      })),
+    [files],
+  )
 
-  // Use a ref to track the last loaded URI to avoid redundant replaces
-  const lastLoadedUriRef = useRef<string | null>(null)
+  const playlist = useAudioPlaylist({
+    sources,
+    loop: 'none',
+  })
+  const status = useAudioPlaylistStatus(playlist)
 
-  // Track change handling
+  // Proxy player for lock screen metadata (since AudioPlaylist currently lacks it in expo-audio)
+  const proxyPlayer = useAudioPlayer(null)
+  const proxyStatus = useAudioPlayerStatus(proxyPlayer)
+
+  const lastStatusPlaying = useRef(status?.playing)
+  const lastProxyPlaying = useRef(proxyStatus.playing)
+  const lastSyncedIndex = useRef(activeIndex)
+
+  const [resolvedArtworkUrl, setResolvedArtworkUrl] = useState<
+    string | undefined
+  >(undefined)
+
+  // Resolve artwork to data URI for lock screen if it's a local file
+  useEffect(() => {
+    let isCancelled = false
+    const loadArtwork = async () => {
+      if (!currentTrack) {
+        setResolvedArtworkUrl(undefined)
+        return
+      }
+
+      let url: string | undefined = undefined
+      const rawUri = currentTrack.appCoverUri
+
+      if (typeof rawUri === 'string') {
+        url = rawUri
+        if (url.startsWith('file://')) {
+          try {
+            const file = new File(url)
+            const base64 = await file.base64()
+            const extension = url.split('.').pop()?.toLowerCase() || 'jpeg'
+            const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
+            url = `data:${mime};base64,${base64}`
+          } catch (e) {
+            console.warn('BMverse: Failed to read artwork for lock screen', e)
+          }
+        }
+      } else if (typeof rawUri === 'number') {
+        url = Image.resolveAssetSource(rawUri).uri
+      }
+
+      if (!isCancelled) {
+        setResolvedArtworkUrl(url)
+      }
+    }
+
+    loadArtwork()
+    return () => {
+      isCancelled = true
+    }
+  }, [currentTrack])
+
+  // Synchronize current track metadata to lock screen via proxy player
+  useEffect(() => {
+    if (!currentTrack || !proxyPlayer) return
+
+    // Load source into proxy player (muted) so it can be active for lock screen
+    proxyPlayer.replace(currentTrack.audioUri)
+    proxyPlayer.volume = 0
+
+    // We only set the metadata.
+    // Note: Play/Pause on the lock screen will control this proxy player.
+    // We relay those states back to the playlist in the next effect.
+    proxyPlayer.setActiveForLockScreen(true, {
+      title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
+      artist:
+        currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
+      albumTitle:
+        currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
+      artworkUrl: resolvedArtworkUrl,
+    })
+
+    // Sync playing state to proxy after replacement if needed
+    if (status?.playing) {
+      proxyPlayer.play()
+      lastStatusPlaying.current = true
+      lastProxyPlaying.current = true
+    } else {
+      proxyPlayer.pause()
+      lastStatusPlaying.current = false
+      lastProxyPlaying.current = false
+    }
+  }, [currentTrack, proxyPlayer, resolvedArtworkUrl])
+
+  // Synchronize playback state between real playlist and proxy player (lock screen)
+  useEffect(() => {
+    if (!proxyPlayer || !status) return
+
+    const isPlaying = status.playing
+    const isProxyPlaying = proxyStatus.playing
+
+    if (isPlaying !== lastStatusPlaying.current) {
+      // In-app change
+      if (isPlaying) {
+        proxyPlayer.play()
+      } else {
+        proxyPlayer.pause()
+      }
+      lastStatusPlaying.current = isPlaying
+      lastProxyPlaying.current = isPlaying
+    } else if (isProxyPlaying !== lastProxyPlaying.current) {
+      // Lock screen change
+      if (isProxyPlaying) {
+        playlist.play()
+      } else {
+        playlist.pause()
+      }
+      lastProxyPlaying.current = isProxyPlaying
+      lastStatusPlaying.current = isProxyPlaying
+    }
+  }, [status?.playing, proxyStatus.playing, proxyPlayer, playlist])
+
+  // Synchronize external index -> Playlist index (Manual selection from lists)
+  useEffect(() => {
+    if (activeIndex !== lastSyncedIndex.current) {
+      lastSyncedIndex.current = activeIndex
+      if (
+        status &&
+        status.currentIndex !== activeIndex &&
+        activeIndex >= 0 &&
+        activeIndex < files.length
+      ) {
+        playlist.skipTo(activeIndex)
+        playlist.play()
+      }
+    }
+  }, [activeIndex, playlist, files.length])
+
+  // Synchronize playlist index -> External index (Native auto-advance or native skip)
   useEffect(() => {
     if (
-      currentTrack?.audioUri &&
-      currentTrack.audioUri !== lastLoadedUriRef.current
+      status &&
+      status.currentIndex !== activeIndex &&
+      status.currentIndex !== -1 &&
+      status.currentIndex !== lastSyncedIndex.current
     ) {
-      player.replace(currentTrack.audioUri)
-      lastLoadedUriRef.current = currentTrack.audioUri
-      player.play()
+      lastSyncedIndex.current = status.currentIndex
+      activeTrackIndex$.set(status.currentIndex)
     }
-  }, [currentTrack?.audioUri, player])
-
-  // Lockscreen handling
-  useEffect(() => {
-    if (!currentTrack || !player) return
-
-    let artworkUrl: string | undefined = undefined
-    if (typeof currentTrack.appCoverUri === 'string') {
-      artworkUrl = currentTrack.appCoverUri
-    } else if (typeof currentTrack.appCoverUri === 'number') {
-      artworkUrl = Image.resolveAssetSource(currentTrack.appCoverUri).uri
-    }
-
-    const isExpoGo =
-      Constants.executionEnvironment === ExecutionEnvironment.StoreClient
-
-    const shouldSetLockScreen =
-      Platform.OS === 'web' ||
-      Platform.OS === 'ios' ||
-      (Platform.OS === 'android' && !isExpoGo)
-
-    if (shouldSetLockScreen) {
-      try {
-        player.setActiveForLockScreen(true, {
-          title: currentTrack.title || 'Unknown Title',
-          artist: currentTrack.artist || 'Unknown Artist',
-          albumTitle: currentTrack.album || 'Unknown Album',
-          artworkUrl,
-        })
-      } catch (e) {
-        console.log('useTrackPlayer: setActiveForLockScreen failed', e)
-      }
-    }
-  }, [currentTrack, player])
+  }, [status?.currentIndex, activeIndex])
 
   const next = useCallback(() => {
-    if (files.length === 0) return
-    const nextIndex = (activeIndex + 1) % files.length
-    activeTrackIndex$.set(nextIndex)
-  }, [activeIndex, files.length])
+    playlist.next()
+  }, [playlist])
 
   const previous = useCallback(() => {
-    if (files.length === 0) return
-    const prevIndex = (activeIndex - 1 + files.length) % files.length
-    activeTrackIndex$.set(prevIndex)
-  }, [activeIndex, files.length])
+    playlist.previous()
+  }, [playlist])
 
   // Auto-advance
-  const autoAdvanceHandledRef = useRef(false)
   useEffect(() => {
     if (status?.didJustFinish) {
-      if (!autoAdvanceHandledRef.current) {
-        autoAdvanceHandledRef.current = true
-        if (activeIndex < files.length - 1) {
-          next()
-        } else {
-          onFinished?.()
-        }
+      if (status.currentIndex === files.length - 1) {
+        onFinished?.()
       }
-    } else {
-      autoAdvanceHandledRef.current = false
     }
-  }, [status?.didJustFinish, activeIndex, files.length, next, onFinished])
+  }, [status?.didJustFinish, status?.currentIndex, files.length, onFinished])
 
   const handlePlayPause = () => {
     if (status?.playing) {
-      player.pause()
+      playlist.pause()
     } else {
-      player.play()
+      playlist.play()
     }
   }
 
-  const seek = (time: number) => player.seekTo(time)
+  const seek = (time: number) => playlist.seekTo(time)
 
   return {
-    player,
+    player: playlist,
     status,
     currentTrack,
     handlePlayPause,

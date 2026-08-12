@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer'
 
 import * as DocumentPicker from 'expo-document-picker'
-import * as FileSystem from 'expo-file-system/legacy'
+import { File, FileMode, Paths } from 'expo-file-system'
 import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
@@ -26,61 +26,56 @@ const getFileMetadata = async (uri: string, fileName?: string) => {
 
     let buffer: Buffer
 
-    if (isMp3) {
-      // Read first 10 bytes to check for ID3 tag size
-      const headBase64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-        length: 10,
-      })
-      const headBuffer = Buffer.from(headBase64, 'base64')
+    const file = new File(uri)
+    if (!file.exists) return null
 
-      if (
-        headBuffer.toString('ascii', 0, 3) === 'ID3' &&
-        headBuffer.length >= 10
-      ) {
-        const sizeBytes = [
-          headBuffer.readUInt8(6),
-          headBuffer.readUInt8(7),
-          headBuffer.readUInt8(8),
-          headBuffer.readUInt8(9),
-        ]
-        // ID3v2 size is 4 bytes, each with 7 bits.
-        // We shift according to the spec to get the full tag size.
-        const tagSize =
-          (sizeBytes[0] << 21) |
-          (sizeBytes[1] << 14) |
-          (sizeBytes[2] << 7) |
-          sizeBytes[3]
+    const handle = file.open(FileMode.ReadOnly)
+    try {
+      if (isMp3) {
+        // Read first 10 bytes to check for ID3 tag size
+        const headBytes = handle.readBytes(10)
+        const headBuffer = Buffer.from(headBytes)
 
-        // Read the tag + header (10 bytes header + tagSize)
-        const base64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-          length: tagSize + 10,
-        })
-        buffer = Buffer.from(base64, 'base64')
+        if (
+          headBuffer.toString('ascii', 0, 3) === 'ID3' &&
+          headBuffer.length >= 10
+        ) {
+          const sizeBytes = [
+            headBuffer.readUInt8(6),
+            headBuffer.readUInt8(7),
+            headBuffer.readUInt8(8),
+            headBuffer.readUInt8(9),
+          ]
+          // ID3v2 size is 4 bytes, each with 7 bits.
+          // We shift according to the spec to get the full tag size.
+          const tagSize =
+            (sizeBytes[0] << 21) |
+            (sizeBytes[1] << 14) |
+            (sizeBytes[2] << 7) |
+            sizeBytes[3]
+
+          // Read the tag + header (10 bytes header + tagSize)
+          handle.offset = 0 // Reset to start
+          const fullBytes = handle.readBytes(tagSize + 10)
+          buffer = Buffer.from(fullBytes)
+        } else {
+          // No ID3v2 tag at start, read a small chunk for ID3v1 or other info
+          handle.offset = 0
+          const smallBytes = handle.readBytes(4096)
+          buffer = Buffer.from(smallBytes)
+        }
+      } else if (isM4a) {
+        // M4A atoms can be scattered, but 'moov' is typically at the start or end.
+        // Reading the whole file is slow, so we try the first 1 MB, which covers most cases.
+        const bytes = handle.readBytes(1024 * 1024)
+        buffer = Buffer.from(bytes)
       } else {
-        // No ID3v2 tag at start, read a small chunk for ID3v1 or other info
-        const base64 = await FileSystem.readAsStringAsync(uri, {
-          encoding: FileSystem.EncodingType.Base64,
-          length: 4096,
-        })
-        buffer = Buffer.from(base64, 'base64')
+        // Unknown type, read a reasonable chunk
+        const bytes = handle.readBytes(1024 * 1024)
+        buffer = Buffer.from(bytes)
       }
-    } else if (isM4a) {
-      // M4A atoms can be scattered, but 'moov' is typically at the start or end.
-      // Reading the whole file is slow, so we try the first 1 MB, which covers most cases.
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-        length: 1024 * 1024, // 1MB
-      })
-      buffer = Buffer.from(base64, 'base64')
-    } else {
-      // Unknown type, read a reasonable chunk
-      const base64 = await FileSystem.readAsStringAsync(uri, {
-        encoding: FileSystem.EncodingType.Base64,
-        length: 1024 * 1024, // 1MB
-      })
-      buffer = Buffer.from(base64, 'base64')
+    } finally {
+      handle.close()
     }
 
     if (isM4a) {
@@ -134,7 +129,7 @@ export const pickAndSaveMusicFiles = async () => {
     return { count: 0, playlistCreated: false }
   }
 
-  const docDir = FileSystem.documentDirectory
+  const docDir = Paths.document.uri
   if (!docDir) {
     throw new Error('Document directory not available')
   }
@@ -161,23 +156,21 @@ export const pickAndSaveMusicFiles = async () => {
       const newFileName = `${uuid}_${timestamp}_${safeName}`
 
       // Copy the file to the persistent document area
-      const destinationUri = `${docDir}${newFileName}`
+      const destinationFile = new File(Paths.document, newFileName)
+      const destinationUri = destinationFile.uri
       try {
-        await FileSystem.copyAsync({
-          from: asset.uri,
-          to: destinationUri,
-        })
+        const sourceFile = new File(asset.uri)
+        await sourceFile.copy(destinationFile)
       } catch (copyError) {
         console.error(
           `BMverse: copyAsync failed for ${asset.uri}, trying read/write fallback:`,
           copyError,
         )
         // Fallback: Read as Base64 and write to destination
-        const base64 = await FileSystem.readAsStringAsync(asset.uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        })
-        await FileSystem.writeAsStringAsync(destinationUri, base64, {
-          encoding: FileSystem.EncodingType.Base64,
+        const sourceFile = new File(asset.uri)
+        const base64 = await sourceFile.base64()
+        destinationFile.write(base64, {
+          encoding: 'base64',
         })
       }
 
@@ -251,10 +244,11 @@ export const pickAndSaveMusicFiles = async () => {
 export const refreshLocalMusicList = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = FileSystem.documentDirectory
+    const docDir = Paths.document.uri
     if (!docDir) return
 
-    const contents = await FileSystem.readDirectoryAsync(docDir)
+    const items = Paths.document.list()
+    const contents = items.map(item => item.name)
     const currentStore = musicFiles$.peek() || []
 
     const musicFiles: MusicFile[] = []
@@ -325,15 +319,19 @@ export const refreshLocalMusicList = async () => {
 export const deleteAllMusicFiles = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = FileSystem.documentDirectory
+    const docDir = Paths.document.uri
     if (!docDir) return
 
-    const contents = await FileSystem.readDirectoryAsync(docDir)
+    const items = Paths.document.list()
+    const contents = items.map(item => item.name)
 
     const filesToDelete = contents.filter(name => /^[0-9a-f-]{36}/.test(name))
 
     for (const name of filesToDelete) {
-      await FileSystem.deleteAsync(`${docDir}${name}`, { idempotent: true })
+      const file = new File(Paths.document, name)
+      if (file.exists) {
+        file.delete()
+      }
     }
 
     musicFiles$.set([])
@@ -351,7 +349,10 @@ export const deleteSingleMusicFile = async (fileId: string) => {
     if (!fileToDelete) return
 
     // 1. Delete a physical file
-    await FileSystem.deleteAsync(fileToDelete.audioUri, { idempotent: true })
+    const file = new File(fileToDelete.audioUri)
+    if (file.exists) {
+      file.delete()
+    }
 
     // 2. Remove from musicFiles store
     const fileIndex = musicFiles$.get().findIndex(f => f.id === fileId)

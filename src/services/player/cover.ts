@@ -1,5 +1,5 @@
 import * as DocumentPicker from 'expo-document-picker'
-import * as FileSystem from 'expo-file-system/legacy'
+import { File, Paths } from 'expo-file-system'
 import React from 'react'
 import { Platform } from 'react-native'
 import Canvas, { Image as CanvasImage } from 'react-native-canvas'
@@ -63,9 +63,8 @@ export const processImage = (
     const run = async () => {
       try {
         if (!imageUri.startsWith('data:')) {
-          const base64 = await FileSystem.readAsStringAsync(imageUri, {
-            encoding: FileSystem.EncodingType.Base64,
-          })
+          const file = new File(imageUri)
+          const base64 = await file.base64()
           const extension = imageUri.split('.').pop()?.toLowerCase() || 'jpeg'
           const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
           imageUri = `data:${mime};base64,${base64}`
@@ -111,7 +110,7 @@ export const pickAndSaveCoverFiles = async (
 ) => {
   if (Platform.OS === 'web') return { count: 0 }
 
-  const docDir = FileSystem.documentDirectory
+  const docDir = Paths.document.uri
   if (!docDir) {
     throw new Error('Document directory not available')
   }
@@ -137,23 +136,21 @@ export const pickAndSaveCoverFiles = async (
       const safeName = asset.name.replace(/[^a-zA-Z0-9. _-]/g, '')
       const newFileName = `cover_${uuid}_${timestamp}_${safeName}`
 
-      const destinationUri = `${docDir}${newFileName}`
+      const destinationFile = new File(Paths.document, newFileName)
+      const destinationUri = destinationFile.uri
       try {
-        await FileSystem.copyAsync({
-          from: asset.uri,
-          to: destinationUri,
-        })
+        const sourceFile = new File(asset.uri)
+        await sourceFile.copy(destinationFile)
       } catch (copyError) {
         console.error(
           `BMverse: cover copyAsync failed for ${asset.uri}, trying read/write fallback:`,
           copyError,
         )
         // Fallback: Read as Base64 and write to destination
-        const base64 = await FileSystem.readAsStringAsync(asset.uri, {
-          encoding: FileSystem.EncodingType.Base64,
-        })
-        await FileSystem.writeAsStringAsync(destinationUri, base64, {
-          encoding: FileSystem.EncodingType.Base64,
+        const sourceFile = new File(asset.uri)
+        const base64 = await sourceFile.base64()
+        destinationFile.write(base64, {
+          encoding: 'base64',
         })
       }
 
@@ -195,10 +192,11 @@ export const pickAndSaveCoverFiles = async (
 export const refreshLocalCoverList = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = FileSystem.documentDirectory
+    const docDir = Paths.document.uri
     if (!docDir) return
 
-    const contents = await FileSystem.readDirectoryAsync(docDir)
+    const items = Paths.document.list()
+    const contents = items.map(item => item.name)
     const currentStore = coverFiles$.peek() || []
 
     // 1. Process App Assets
@@ -265,16 +263,20 @@ export const refreshLocalCoverList = async () => {
 export const deleteAllCoverFiles = async () => {
   if (Platform.OS === 'web') return
   try {
-    const docDir = FileSystem.documentDirectory
+    const docDir = Paths.document.uri
     if (!docDir) return
 
-    const contents = await FileSystem.readDirectoryAsync(docDir)
+    const items = Paths.document.list()
+    const contents = items.map(item => item.name)
 
     // 1. Delete physical files from the disk
     const filesToDelete = contents.filter(name => name.startsWith('cover_'))
 
     for (const name of filesToDelete) {
-      await FileSystem.deleteAsync(`${docDir}${name}`, { idempotent: true })
+      const file = new File(Paths.document, name)
+      if (file.exists) {
+        file.delete()
+      }
     }
 
     // 2. Filter store to keep only assets
@@ -297,9 +299,10 @@ export const deleteSingleCoverFile = async (coverId: string) => {
     if (!coverToDelete || coverToDelete.fileFormat === 'asset') return
 
     // 1. Delete a physical file
-    await FileSystem.deleteAsync(coverToDelete.coverUri as string, {
-      idempotent: true,
-    })
+    const file = new File(coverToDelete.coverUri as string)
+    if (file.exists) {
+      file.delete()
+    }
 
     // 2. Remove from store
     const index = coverFiles$.get().findIndex(c => c.id === coverId)
