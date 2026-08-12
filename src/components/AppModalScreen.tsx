@@ -92,7 +92,7 @@ export function AppModalScreen({
           style={[
             styles.modalCard,
             { marginTop: top + 60 },
-            isFullWidth && { width: '100%' },
+            isFullWidth && { width: '95%' },
             animatedStyle,
             gradientColors ? { backgroundColor: COLORS.TRANSPARENT } : {},
           ]}

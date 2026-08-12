@@ -16,6 +16,10 @@ npx eas-cli build -p ios --profile production
 
 npx eas-cli submit -p ios --profile production
 
+### 4. Build and submit an expo go version to TestFlight
+
+npx eas-cli go
+
 ## Commands
 
 Generate supabase types:

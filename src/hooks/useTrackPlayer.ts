@@ -1,7 +1,7 @@
 import { useValue } from '@legendapp/state/react'
 import { useAudioPlayer, useAudioPlayerStatus } from 'expo-audio'
 import Constants, { ExecutionEnvironment } from 'expo-constants'
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Image, Platform } from 'react-native'
 
 import {
@@ -70,27 +70,34 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     }
   }, [currentTrack, player])
 
-  // Auto-advance
-  useEffect(() => {
-    if (status?.didJustFinish) {
-      if (onFinished) {
-        onFinished()
-      }
-      next()
-    }
-  }, [status?.didJustFinish])
-
-  const next = () => {
+  const next = useCallback(() => {
     if (files.length === 0) return
     const nextIndex = (activeIndex + 1) % files.length
     activeTrackIndex$.set(nextIndex)
-  }
+  }, [activeIndex, files.length])
 
-  const previous = () => {
+  const previous = useCallback(() => {
     if (files.length === 0) return
     const prevIndex = (activeIndex - 1 + files.length) % files.length
     activeTrackIndex$.set(prevIndex)
-  }
+  }, [activeIndex, files.length])
+
+  // Auto-advance
+  const autoAdvanceHandledRef = useRef(false)
+  useEffect(() => {
+    if (status?.didJustFinish) {
+      if (!autoAdvanceHandledRef.current) {
+        autoAdvanceHandledRef.current = true
+        if (activeIndex < files.length - 1) {
+          next()
+        } else {
+          onFinished?.()
+        }
+      }
+    } else {
+      autoAdvanceHandledRef.current = false
+    }
+  }, [status?.didJustFinish, activeIndex, files.length, next, onFinished])
 
   const handlePlayPause = () => {
     if (status?.playing) {
