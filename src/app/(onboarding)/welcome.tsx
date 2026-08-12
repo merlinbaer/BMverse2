@@ -68,8 +68,8 @@ export default function WelcomePage() {
         />
         {isVersion1Upgrade && (
           <AppText fontSize={FONT.SIZE.SM} style={styles.UpgradeMessageStyle}>
-            Important: Version 2.0 is a complete rebuild. Previous added files
-            and settings are not compatible and have been cleared.
+            Important: This version is not compatible to previous versions.
+            Previous added files and settings have been cleared.
           </AppText>
         )}
       </View>
