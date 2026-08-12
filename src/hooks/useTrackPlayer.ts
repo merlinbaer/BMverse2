@@ -105,14 +105,22 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     // We only set the metadata.
     // Note: Play/Pause on the lock screen will control this proxy player.
     // We relay those states back to the playlist in the next effect.
-    proxyPlayer.setActiveForLockScreen(true, {
-      title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
-      artist:
-        currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
-      albumTitle:
-        currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
-      artworkUrl: resolvedArtworkUrl,
-    })
+    proxyPlayer.setActiveForLockScreen(
+      true,
+      {
+        title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
+        artist:
+          currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
+        albumTitle:
+          currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
+        artworkUrl: resolvedArtworkUrl,
+      },
+      {
+        isLiveStream: true,
+        showSeekBackward: false,
+        showSeekForward: false,
+      },
+    )
 
     // Sync playing state to proxy after replacement if needed
     if (status?.playing) {
