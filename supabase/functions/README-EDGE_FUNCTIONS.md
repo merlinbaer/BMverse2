@@ -1,12 +1,12 @@
 
 ## Install development (Mac)
-- brew install deno (nur einmal)
-- yarn supabase init (nur beim erstenmal)
-- yarn supabase login (wenn repo neu aufgesetzt wird)
-- yarn supabase link (wenn repo neu aufgesetzt wird)
-- yarn supabase start (nur beim erstenmal, oder wenn docker runtergefahren wurde)
-  (dauert beim erstenmal. Einfach in der Docker GUI verfolgen was passiert)
-- .env.sample nach supabase/functions als .env kopieren und ggf. benötigte API Keys eintragen.
+- brew install deno (only once)
+- yarn supabase init (only the first time)
+- yarn supabase login (when repo is set up new)
+- yarn supabase link (when repo is set up new)
+- yarn supabase start (only the first time, or if docker was shut down)
+  (takes a while the first time. Just follow what happens in the Docker GUI)
+- Copy .env.sample to supabase/functions as .env and enter any required API keys if necessary.
 
 
 ## Clean install @supabase
@@ -54,37 +54,37 @@ https://supabase.com/docs/guides/functions/quickstart
 ## Needed Jetbrains plugins
 - Deno
 
-## Kommandos
+## Commands
 - yarn serv  
 
-  Scriptkürzel für "yarn supabase functions serve --no-verify-jwt"  
-  Stellt alle functions im functions folder für Aufrufe zur Verfügung.
+  Script shortcut for "yarn supabase functions serve --no-verify-jwt"  
+  Makes all functions in the functions folder available for calls.
 
 - yarn supabase functions deploy --no-verify-jwt
 
-  Scriptkürzel fürr "yarn supabase functions deploy".
-  Deployed alle functions nach production
+  Script shortcut for "yarn supabase functions deploy".
+  Deploys all functions to production
 
 - yarn supabase secrets list
 
-  Zeigt welche env variablen im Projekt zur Verfügung stehen. Mann kann die Variablen einzeln auch im Dashboard in "Project Settings" -> " Edge Functions" setzen. Oder auf einen Schlag mit dem Befehl: 
+  Shows which env variables are available in the project. You can also set the variables individually in the dashboard under "Project Settings" -> "Edge Functions". Or all at once with the command: 
 
-- yarn supabase secrets set --env-file <z.B. filename: .env im project hauptverzeichnis>
+- yarn supabase secrets set --env-file <e.g. filename: .env in project root directory>
 
 - deno check index.ts 
-  Damit können zusätzliche Checks durchgeführt werden . Im Verzeichnis der Function aufrufen.
+  This allows additional checks to be carried out. Run in the function directory.
 
-## Edge Function Aufrufe
-Beispielaufrufe:
-- GET Aufruf im Browser in development-env
+## Edge Function Calls
+Example calls:
+- GET call in the browser in development-env
   http://localhost:54321/functions/v1/hello?name=demo_job
 
-- GET Aufruf im Browser in development-env
+- GET call in the browser in development-env
   http://<supabase_url>/functions/v1/hello?name=demo_job
 
-- Für die Testumgebung gibt es test scripte im script folder welche den Aufruf mit curl starten (besseres Vorgehen als im Browser)
+- For the test environment, there are test scripts in the script folder that start the call with curl (better approach than in the browser)
 
-Im supabase project dashboard gibt e nach einem deploy mehr Infos und die functions können auch dort gelöscht werden und die logs (von console.log) können dort eingesehen werden:
+In the supabase project dashboard, there is more info after a deploy and the functions can also be deleted there and the logs (from console.log) can be viewed there:
 
 
 ## Known Issues

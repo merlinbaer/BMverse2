@@ -52,7 +52,7 @@ yarn supabase migration new <name_migration>
 
 ## Edit migration file for creating DDL
 
-Das leere Migration Scriptfile editieren mit create statements aus schema
+Edit the empty migration script file with create statements from schema
 
 ## Execute in local DB
 
@@ -60,8 +60,7 @@ yarn supabase migration up
 
 ## Edit migration file for changing Schame Objects with alter DDL Statements
 
-Das leere Migration Scriptfile editieren mit Alter statements. Danach in den schema files die schema Objekte in der
-endgültigen Form beschreiben.
+Edit the empty migration script file with Alter statements. Then describe the schema objects in their final form in the schema files.
 
 ## Check status of migration files in local and remote
 
@@ -81,7 +80,7 @@ yarn supabase migration up --linked
 
 ## To reset local database
 
-- Es wird alles zurückgesetzt und alle Migrations Files in der Reihenfolge und danach alle Seed Files werden ausgeführt.
+- Everything will be reset and all migration files will be executed in order, followed by all seed files.
 - yarn supabase db reset
 
 ## Where the Migrations info is stored in the db

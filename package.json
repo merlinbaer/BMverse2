@@ -7,15 +7,12 @@
     "start": "expo start --go --clear --host lan",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "web": "expo start --web",
     "iphone": "expo run:ios --device",
     "fix": "expo install --fix",
     "doctor": "npx expo-doctor",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "pretty": "prettier --write .",
-    "build": "eas build --platform ios",
-    "deploy": "eas submit --platform ios"
+    "pretty": "prettier --write ."
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",

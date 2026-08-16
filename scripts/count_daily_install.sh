@@ -1,5 +1,6 @@
 #!/bin/bash
 # Script runs at webserver for creating a file with ios installations and web calls to workbox
+# runs on a daily base with cron
 
 # Konfiguration
 LOG_FILES="/readonly/touchpi/logs/access_log /readonly/touchpi/logs/access_log.1"
