@@ -11,6 +11,7 @@
       <excludeFolder url="file://$MODULE_DIR$/supabase/.temp" />
       <excludeFolder url="file://$MODULE_DIR$/supabase/snippets" />
       <excludeFolder url="file://$MODULE_DIR$/supabase/functions" />
+      <excludeFolder url="file://$MODULE_DIR$/deploy" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

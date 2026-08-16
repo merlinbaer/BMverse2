@@ -50,8 +50,8 @@ eas build -p ios --local
 Submit to Appstore or Testflight:
 eas submit --platform ios
 
-Build web. Go to web dashboard and change alias "run" to newest build yarn expo export --platform web --clear && npx
-eas-cli deploy
+Build web. Go to web dashboard and change alias "run" to newest build   
+yarn expo export --platform web --clear && npx eas-cli deploy
 
 ## Get started
 
