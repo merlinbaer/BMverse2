@@ -12,6 +12,7 @@ import { AppText } from '@/components/AppText'
 import { COLORS, FONT, MAP_HEIGHT } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
 import { upcomingItem$ } from '@/services/legend'
+import { getDomainFromUrl } from '@/services/urlHelper'
 
 export default function UpComingDetailScreen() {
   const { id } = useLocalSearchParams<{
@@ -74,6 +75,16 @@ export default function UpComingDetailScreen() {
           />
         </Pressable>
       </AppBox>
+      {!!detail?.setlist_tickets && (
+        <AppBox>
+          <AppText fontSize={FONT.SIZE.LG}>{'Tickets:'}</AppText>
+          <AppHyperlink
+            description={getDomainFromUrl(detail.setlist_tickets)}
+            hyperlink={detail.setlist_tickets}
+            type={'extern'}
+          />
+        </AppBox>
+      )}
       {showTourInfo && (
         <AppBox>
           {!!detail?.setlist_tour_name && (
@@ -87,11 +98,7 @@ export default function UpComingDetailScreen() {
     </AppScreen>
   )
 }
-/*
-      <AppBox>
-        <AppText fontSize={FONT.SIZE.LG}>{'Tickets:'}</AppText>
-      </AppBox>
- */
+
 const styles = StyleSheet.create({
   mapContainer: {
     alignItems: 'center',
