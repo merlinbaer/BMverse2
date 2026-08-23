@@ -36,18 +36,16 @@ export const upcomingList$ = () =>
           new Date(a.setlist_eventdate).getTime() -
           new Date(b.setlist_eventdate).getTime(),
       )
-      .map(
-        (item): ListItemType => ({
-          id: item.id,
-          line1:
-            item.setlist_venue_city_name +
-            (item.setlist_venue_name ? ' - ' + item.setlist_venue_name : ''),
-          line2: item.setlist_eventdate,
-          icon: item.setlist_artwork,
-          route: {
-            pathname: '/(main)/(tabs)/fox/concerts/UpcomingDetail',
-            params: { id: item.id },
-          } as Href,
-        }),
-      )
+      .map((item): ListItemType => ({
+        id: item.id,
+        line1:
+          item.setlist_venue_city_name +
+          (item.setlist_venue_name ? ' - ' + item.setlist_venue_name : ''),
+        line2: item.setlist_eventdate,
+        icon: item.setlist_artwork,
+        route: {
+          pathname: '/(main)/(tabs)/fox/concerts/UpcomingDetail',
+          params: { id: item.id },
+        } as Href,
+      }))
   })

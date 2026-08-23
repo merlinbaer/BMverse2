@@ -29,13 +29,11 @@ export const setlistsList$ = (setlistId?: string) =>
         return item.setlist_id === setlistId
       })
       .sort((a, b) => a.song_nr - b.song_nr)
-      .map(
-        (item): ListItemType => ({
-          id: item.song_name ?? '',
-          line1: item.song_name ?? '',
-          line2: item.song_info ?? '',
-          icon: (item.song_nr + 1).toString(), // Ensure icon matches string | number
-          route: null,
-        }),
-      )
+      .map((item): ListItemType => ({
+        id: item.song_name ?? '',
+        line1: item.song_name ?? '',
+        line2: item.song_info ?? '',
+        icon: (item.song_nr + 1).toString(), // Ensure icon matches string | number
+        route: null,
+      }))
   })

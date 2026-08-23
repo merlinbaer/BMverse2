@@ -1,9 +1,9 @@
 import { computed, Observable } from '@legendapp/state'
+import { Platform } from 'react-native'
 
 import { VersionsType } from '@/types/tables'
 
 import { createTableStore } from '../factory'
-import { Platform } from 'react-native'
 
 // Define supabase observable
 const { store$, sync, clearCache } = createTableStore<VersionsType>({

@@ -43,24 +43,22 @@ export const videoList$ = (sortType?: VideoListType) =>
             )
         }
       })
-      .map(
-        (item): ListItemType => ({
-          id: item.id,
-          line1: item.video_title,
-          line2:
-            sortType === 'Views'
-              ? `${Number(item.video_viewcount).toLocaleString()} views`
-              : sortType === 'Title'
-                ? (item.video_song ?? '')
-                : (item.video_publishedat?.replace('T', ' ').substring(0, 16) ??
-                  ''),
-          icon: item.channel_artwork,
-          route: {
-            pathname: '/(main)/(tabs)/fox/videos/VideoDetail',
-            params: { id: item.id },
-          } as Href,
-        }),
-      )
+      .map((item): ListItemType => ({
+        id: item.id,
+        line1: item.video_title,
+        line2:
+          sortType === 'Views'
+            ? `${Number(item.video_viewcount).toLocaleString()} views`
+            : sortType === 'Title'
+              ? (item.video_song ?? '')
+              : (item.video_publishedat?.replace('T', ' ').substring(0, 16) ??
+                ''),
+        icon: item.channel_artwork,
+        route: {
+          pathname: '/(main)/(tabs)/fox/videos/VideoDetail',
+          params: { id: item.id },
+        } as Href,
+      }))
   })
 
 export const videosBySong$ = (songTitle: string) =>
@@ -73,18 +71,16 @@ export const videosBySong$ = (songTitle: string) =>
         return !(!item || item.deleted) && item.video_song === songTitle
       })
       .sort((a, b) => (b.video_viewcount ?? 0) - (a.video_viewcount ?? 0))
-      .map(
-        (item): ListItemType => ({
-          id: item.id,
-          line1: item.channel_type,
-          line2: item.video_duration,
-          icon: item.video_artwork,
-          route: {
-            pathname: '/(main)/(tabs)/fox/videos/VideoDetail',
-            params: { id: item.id },
-          } as Href,
-        }),
-      )
+      .map((item): ListItemType => ({
+        id: item.id,
+        line1: item.channel_type,
+        line2: item.video_duration,
+        icon: item.video_artwork,
+        route: {
+          pathname: '/(main)/(tabs)/fox/videos/VideoDetail',
+          params: { id: item.id },
+        } as Href,
+      }))
   })
 
 export const videosCount$ = computed(() => {

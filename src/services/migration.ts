@@ -57,7 +57,10 @@ export const performVersionMigration = async () => {
               item.delete()
               console.log(`Migration: Deleted ${item.name}`)
             } catch (itemError) {
-              console.error(`Migration: Failed to delete ${item.name}`, itemError)
+              console.error(
+                `Migration: Failed to delete ${item.name}`,
+                itemError,
+              )
             }
           }
           console.log('Migration: Documents folder cleared')

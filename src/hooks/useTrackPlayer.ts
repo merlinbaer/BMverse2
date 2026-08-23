@@ -1,16 +1,15 @@
 import { useValue } from '@legendapp/state/react'
-
 import {
   useAudioPlayer,
   useAudioPlayerStatus,
   useAudioPlaylist,
   useAudioPlaylistStatus,
 } from 'expo-audio'
+import { File } from 'expo-file-system'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image } from 'react-native'
-import { File } from 'expo-file-system'
-import { IMAGES } from '@/constants/images'
 
+import { IMAGES } from '@/constants/images'
 import {
   activeTrackIndex$,
   activeTrackList$,

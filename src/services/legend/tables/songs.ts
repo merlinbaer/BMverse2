@@ -73,21 +73,19 @@ export const songList$ = (sortType?: SongListType) =>
             return a.song_id.localeCompare(b.song_id)
         }
       })
-      .map(
-        (item): ListItemType => ({
-          id: item.id,
-          line1: item.song_title,
-          line2:
-            sortType === 'Appearance'
-              ? item.song_first_appearance
-              : item.song_artist,
-          icon: getSongCover(item.song_default_cover),
-          route: {
-            pathname: '/(main)/(tabs)/fox/songs/SongDetail',
-            params: { id: item.id },
-          } as Href,
-        }),
-      )
+      .map((item): ListItemType => ({
+        id: item.id,
+        line1: item.song_title,
+        line2:
+          sortType === 'Appearance'
+            ? item.song_first_appearance
+            : item.song_artist,
+        icon: getSongCover(item.song_default_cover),
+        route: {
+          pathname: '/(main)/(tabs)/fox/songs/SongDetail',
+          params: { id: item.id },
+        } as Href,
+      }))
   })
 
 export const songsCount$ = computed(() => {

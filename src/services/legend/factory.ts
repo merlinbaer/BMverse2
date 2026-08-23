@@ -85,13 +85,12 @@ export function createTableStore<T extends BaseRow>(config: TableConfig<T>) {
   // Add row
   const add = (defaults?: Partial<T>) => {
     const id = generateId()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     ;(store$ as any)[id].assign({ id, ...defaults } as Partial<T>)
     return id
   }
   // Delete row (does only flag deleted in supabase)
   const remove = (id: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(store$ as any)[id].delete()
   }
   // Sync from supabase

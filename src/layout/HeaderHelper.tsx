@@ -116,7 +116,6 @@ export const PlayerListDetailButton = ({
 )
 
 export const headerStyles = StyleSheet.create({
-  // eslint-disable-next-line react-native/no-unused-styles
   backButton: {
     paddingBottom: 6,
     paddingLeft: Platform.select({
@@ -129,7 +128,7 @@ export const headerStyles = StyleSheet.create({
       default: 8,
     }),
   },
-  // eslint-disable-next-line react-native/no-unused-styles
+
   sortButton: {
     paddingBottom: 2,
     paddingRight: Platform.select({

@@ -20,10 +20,10 @@ import {
   localStore$,
 } from '@/services/legend'
 import { initializeStores, startSyncCoordinator } from '@/services/legend/lib'
+import { performVersionMigration } from '@/services/migration'
 import { refreshLocalCoverList } from '@/services/player/cover'
 import { refreshLocalMusicList } from '@/services/player/files'
 import { isPWA, registerServiceWorker } from '@/services/pwa'
-import { performVersionMigration } from '@/services/migration'
 
 SplashScreen.setOptions({
   duration: 500,
@@ -47,7 +47,6 @@ export default function RootLayout() {
   // 3. Once hydrated, get the actual value from the disk
   const isOnboarding = useValue(localStore$.isOnboarding)
   const [loaded, error] = useFonts(bmFonts)
-
 
   // 4. Show Install Screen when Web and no PWA
   useEffect(() => {

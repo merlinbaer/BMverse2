@@ -15,11 +15,7 @@ export function connectAnonDB(): SupabaseClient {
     global: { headers: { Authorization: `Bearer ${supabaseKey}` } },
   }
   try {
-    return createClient(
-        supabaseUrl!,
-        supabaseKey!,
-        supabaseConnectOption,
-    )
+    return createClient(supabaseUrl!, supabaseKey!, supabaseConnectOption)
   } catch (err) {
     console.log(
       'Fatal Error: DB connection refused: ' + JSON.stringify(err, null, 2),
@@ -29,43 +25,35 @@ export function connectAnonDB(): SupabaseClient {
 }
 
 // Update gl_sync
-export async function triggerSync(
-    connect: SupabaseClient,
-): Promise<number> {
+export async function triggerSync(connect: SupabaseClient): Promise<number> {
   try {
     const { data, error } = await connect
-        .from('gl_sync')
-        .update({updater: 'batch' })
-        .eq('deleted', false)
-        .eq('sync_id', 1)
-        .select('*')
+      .from('gl_sync')
+      .update({ updater: 'batch' })
+      .eq('deleted', false)
+      .eq('sync_id', 1)
+      .select('*')
 
     if (error) throw error
     return data.length
   } catch (err) {
-    console.log(
-        'Fatal Error: Update gl_sync: ' +
-        JSON.stringify(err, null, 2),
-    )
+    console.log('Fatal Error: Update gl_sync: ' + JSON.stringify(err, null, 2))
     throw err
   }
 }
 
 // Insert news message into bm_news
-export async function insertNews(
-    inputData: string,
-    connect: SupabaseClient,
-) {
+export async function insertNews(inputData: string, connect: SupabaseClient) {
   try {
     const { data, error } = await connect
-        .from('bm_news')
-        .insert({news_info: inputData, news_updater: 'postgres'})
-        .select('*')
+      .from('bm_news')
+      .insert({ news_info: inputData, news_updater: 'postgres' })
+      .select('*')
     if (error) throw error
     return data.length
   } catch (err) {
     console.log(
-        'Fatal Error: Inserting message in table bm_news' +
+      'Fatal Error: Inserting message in table bm_news' +
         ': ' +
         JSON.stringify(err, null, 2),
     )
@@ -129,7 +117,7 @@ export async function selectAllRows(
   tableName: string,
   columns: string,
   connect: SupabaseClient,
-// deno-lint-ignore no-explicit-any
+  // deno-lint-ignore no-explicit-any
 ): Promise<any[]> {
   try {
     const { data, error } = await connect
@@ -170,7 +158,7 @@ export async function selectRows(
   // deno-lint-ignore no-explicit-any
   eqValue: any,
   connect: SupabaseClient,
-// deno-lint-ignore no-explicit-any
+  // deno-lint-ignore no-explicit-any
 ): Promise<any[]> {
   try {
     const { data, error } = await connect

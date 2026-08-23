@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-globals */
-
 // Core cache for the HTML shell, Asset cache for JS/Images/Fonts
 const CORE_CACHE = 'bmverse-core-v2'
 const ASSET_CACHE = 'bmverse-assets-v2'
@@ -73,7 +71,6 @@ self.addEventListener('fetch', event => {
 
             const responseToCache = networkResponse.clone()
             caches.open(ASSET_CACHE).then(cache => {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call
               cache.put(request, responseToCache)
             })
             return networkResponse
