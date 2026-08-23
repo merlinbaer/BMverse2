@@ -5,7 +5,6 @@ import {
   useAudioPlaylist,
   useAudioPlaylistStatus,
 } from 'expo-audio'
-import { File } from 'expo-file-system'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Image } from 'react-native'
 
@@ -46,6 +45,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   const proxyPlayer = useAudioPlayer(null)
   const proxyStatus = useAudioPlayerStatus(proxyPlayer)
 
+  const isReplacing = useRef(false)
   const lastStatusPlaying = useRef(status?.playing)
   const lastProxyPlaying = useRef(proxyStatus.playing)
   const lastSyncedIndex = useRef(-1)
@@ -54,7 +54,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     string | undefined
   >(undefined)
 
-  // Resolve artwork to data URI for lock screen if it's a local file
+  // Resolve artwork URL for lock screen metadata
   useEffect(() => {
     let isCancelled = false
     const loadArtwork = async () => {
@@ -68,17 +68,6 @@ export const useTrackPlayer = (onFinished?: () => void) => {
 
       if (typeof rawUri === 'string') {
         url = rawUri
-        if (url.startsWith('file://')) {
-          try {
-            const file = new File(url)
-            const base64 = await file.base64()
-            const extension = url.split('.').pop()?.toLowerCase() || 'jpeg'
-            const mime = extension === 'png' ? 'image/png' : 'image/jpeg'
-            url = `data:${mime};base64,${base64}`
-          } catch (e) {
-            console.warn('BMverse: Failed to read artwork for lock screen', e)
-          }
-        }
       } else if (typeof rawUri === 'number') {
         url = Image.resolveAssetSource(rawUri).uri
       }
@@ -102,9 +91,14 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   useEffect(() => {
     if (!currentTrack || !proxyPlayer) return
 
+    isReplacing.current = true
+
     // Load source into proxy player (muted) so it can be active for lock screen
     proxyPlayer.replace(currentTrack.audioUri)
     proxyPlayer.volume = 0
+
+    // Resolve artwork URL for lock screen
+    const artworkUrl = resolvedArtworkUrl
 
     // We only set the metadata.
     // Note: Play/Pause on the lock screen will control this proxy player.
@@ -117,7 +111,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
           currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
         albumTitle:
           currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
-        artworkUrl: resolvedArtworkUrl,
+        artworkUrl,
       },
       {
         isLiveStream: true,
@@ -126,16 +120,22 @@ export const useTrackPlayer = (onFinished?: () => void) => {
       },
     )
 
-    // Sync playing state to proxy after replacement if needed
+    // Initial sync of playing state after replacement
     if (status?.playing) {
       proxyPlayer.play()
-      lastStatusPlaying.current = true
-      lastProxyPlaying.current = true
     } else {
       proxyPlayer.pause()
-      lastStatusPlaying.current = false
-      lastProxyPlaying.current = false
     }
+    lastStatusPlaying.current = status?.playing
+    lastProxyPlaying.current = proxyStatus.playing
+
+    // Reset isReplacing after a short delay to allow status to stabilize
+    const timer = setTimeout(() => {
+      isReplacing.current = false
+    }, 500)
+
+    return () => clearTimeout(timer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTrack, proxyPlayer, resolvedArtworkUrl])
 
   // Synchronize playback state between real playlist and proxy player (lock screen)
@@ -146,24 +146,32 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     const isProxyPlaying = proxyStatus.playing
 
     if (isPlaying !== lastStatusPlaying.current) {
-      // In-app change
+      // In-app change: Sync TO proxy
       if (isPlaying) {
         proxyPlayer.play()
       } else {
         proxyPlayer.pause()
       }
       lastStatusPlaying.current = isPlaying
-      lastProxyPlaying.current = isPlaying
+      // We don't update lastProxyPlaying here to avoid the race condition loop.
+      // It will be updated in the next cycles when isProxyPlaying matches isPlaying.
     } else if (isProxyPlaying !== lastProxyPlaying.current) {
-      // Lock screen change
-      if (isProxyPlaying) {
-        playlist.play()
-      } else {
-        playlist.pause()
+      // Proxy state changed (lock screen interaction or sync finishing)
+
+      // CRITICAL: We only sync back to the playlist if we are NOT in the middle of a track change.
+      // A track change causes the proxy player to be replaced, which momentarily reports playing: false.
+      if (isProxyPlaying !== isPlaying && !isReplacing.current) {
+        // This is a real change from the lock screen controls
+        if (isProxyPlaying) {
+          playlist.play()
+        } else {
+          playlist.pause()
+        }
+        lastStatusPlaying.current = isProxyPlaying
       }
       lastProxyPlaying.current = isProxyPlaying
-      lastStatusPlaying.current = isProxyPlaying
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status?.playing, proxyStatus.playing, proxyPlayer, playlist])
 
   // Synchronize external index -> Playlist index (Manual selection from lists)
@@ -179,6 +187,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
         playlist.play()
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeIndex, playlist, files.length, status?.currentIndex])
 
   // Synchronize playlist index -> External index (Native auto-advance or native skip)
@@ -192,6 +201,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
       lastSyncedIndex.current = status.currentIndex
       activeTrackIndex$.set(status.currentIndex)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status?.currentIndex, activeIndex])
 
   const next = useCallback(() => {

@@ -5,9 +5,8 @@
   "license": "MIT",
   "scripts": {
     "start": "expo start --go --clear --host lan",
-    "android": "expo run:android",
-    "ios": "expo run:ios",
-    "iphone": "expo run:ios --device",
+    "ios": "expo run:ios --device",
+    "android": "expo run:android --device",
     "fix": "expo install --fix",
     "doctor": "npx expo-doctor",
     "lint": "eslint .",
