@@ -70,7 +70,15 @@ npx eas-cli submit -p ios --profile production
 
 yarn expo export --platform web --clear
 
-### 4. Build and submit an expo go version to TestFlight (not the same as in simulator)
+### 4. Build iOS for TestFlight
+
+npx eas-cli build -p android --profile production
+
+### 4. Build Android for Test in GooglePlay
+
+npx eas-cli submit -p android --profile production
+
+### 6. Build and submit an expo go version to TestFlight (not the same as in simulator)
 
 npx eas-cli go
 
