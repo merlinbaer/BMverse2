@@ -58,7 +58,7 @@ You need a separate IDE in /supabase/functions. Setup is determined with deno.js
 
 eas will be called now locally (no global install/always newest version): "npx eas-cli ..." instead of "eas ..."
 
-### 1. Build iOS for TestFlight
+### 1. Build EAS IOS
 
 npx eas-cli build -p ios --profile production
 
@@ -70,11 +70,11 @@ npx eas-cli submit -p ios --profile production
 
 yarn expo export --platform web --clear
 
-### 4. Build iOS for TestFlight
+### 4. Build EAS android
 
 npx eas-cli build -p android --profile production
 
-### 4. Build Android for Test in GooglePlay
+### 5. Submit android for Test in GooglePlay
 
 npx eas-cli submit -p android --profile production
 
@@ -88,17 +88,17 @@ npx eas-cli go
 
 /scripts/update_db_types.sh
 
-### Build a development build and run on default (Simulator)
-
-yarn ios
-
 ### Just start the development server
 
 yarn start
 
-### Create a development build and upload it to a connected iPhone
+### Build an IOS development build and run on selected device
 
-yarn iphone
+yarn ios
+
+### Build an android development build and run on selected device
+
+yarn android
 
 ### Managing environment variables with cli (better use the dashboard):
 
@@ -116,18 +116,25 @@ npx eas-cli build --platform ios
 
 npx eas-cli build -p ios --local
 
+### Log Android production build
+
+adb logcat -c  
+connect cable to device for debugging  
+adb logcat -v time > crash.log  
+run app  
+^C quit logging
+
 ## Upgrades
 
 - check installation with: yarn outdated
 - control installed packages with: yarn list --depth=0
-- Do very carfully upgrades with: yarn upgrade <package_name>
-- Do downgrades to compatibilty with: yarn fix
+- Do very carefully upgrades with: yarn upgrade <package_name>
+- Expo compatible with: yarn fix
 
 ## Deploy
 
-### IOS
+### IOS (Altstore)
 
-- Check compatibility with: yarn doctor
 - Save ipa file from expo as backup.
 - run ./get_download_url.sh in the terminal
 - Download ADP folder with files in Safari Browser into Download folder with Download URL.
@@ -138,7 +145,7 @@ npx eas-cli build -p ios --local
 - Sync the folder deploy with Remote Web Server
 - Commit and push last commit of this release (with new index.html)
 
-### Web
+### Web (Uberspace)
 
 - yarn expo export --platform web --clear
 - Sync /dist folder with Remote Web Server

@@ -1,4 +1,5 @@
 import { useValue } from '@legendapp/state/react'
+import { Asset } from 'expo-asset'
 import {
   useAudioPlayer,
   useAudioPlayerStatus,
@@ -6,7 +7,6 @@ import {
   useAudioPlaylistStatus,
 } from 'expo-audio'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Image } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
 import {
@@ -14,8 +14,12 @@ import {
   activeTrackList$,
   musicFiles$,
 } from '@/services/legend'
+import { isValidUrl } from '@/services/urlHelper'
 
 export const useTrackPlayer = (onFinished?: () => void) => {
+  useEffect(() => {
+    console.log('BMverse: Build 2026-08-24 20:56 - Asset Fix Applied')
+  }, [])
   const activeTracks = useValue(activeTrackList$)
   const allFiles = useValue(musicFiles$)
   const activeIndex = useValue(activeTrackIndex$)
@@ -53,27 +57,54 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   const [resolvedArtworkUrl, setResolvedArtworkUrl] = useState<
     string | undefined
   >(undefined)
+  const [lastTrackUri, setLastTrackUri] = useState<string | undefined>(
+    currentTrack?.audioUri ?? undefined,
+  )
+
+  const currentUri = currentTrack?.audioUri ?? undefined
+  if (currentUri !== lastTrackUri) {
+    setLastTrackUri(currentUri)
+    setResolvedArtworkUrl(undefined)
+  }
 
   // Resolve artwork URL for lock screen metadata
   useEffect(() => {
     let isCancelled = false
     const loadArtwork = async () => {
       if (!currentTrack) {
-        setResolvedArtworkUrl(undefined)
         return
       }
 
       let url: string | undefined = undefined
       const rawUri = currentTrack.appCoverUri
 
-      if (typeof rawUri === 'string') {
-        url = rawUri
-      } else if (typeof rawUri === 'number') {
-        url = Image.resolveAssetSource(rawUri).uri
-      }
+      try {
+        if (typeof rawUri === 'string' && isValidUrl(rawUri)) {
+          url = rawUri
+        } else if (
+          typeof rawUri === 'number' ||
+          (typeof rawUri === 'string' && rawUri.length > 0)
+        ) {
+          const asset = Asset.fromModule(rawUri)
+          await asset.downloadAsync()
+          url = isValidUrl(asset.localUri)
+            ? (asset.localUri as string)
+            : isValidUrl(asset.uri)
+              ? (asset.uri as string)
+              : undefined
+        }
 
-      if (!url) {
-        url = Image.resolveAssetSource(IMAGES.cover200.notFound).uri
+        if (!url) {
+          const asset = Asset.fromModule(IMAGES.cover200.notFound)
+          await asset.downloadAsync()
+          url = isValidUrl(asset.localUri)
+            ? (asset.localUri as string)
+            : isValidUrl(asset.uri)
+              ? (asset.uri as string)
+              : undefined
+        }
+      } catch (e) {
+        console.warn('useTrackPlayer: loadArtwork failed', e)
       }
 
       if (!isCancelled) {
@@ -98,27 +129,26 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     proxyPlayer.volume = 0
 
     // Resolve artwork URL for lock screen
-    const artworkUrl = resolvedArtworkUrl
-
     // We only set the metadata.
     // Note: Play/Pause on the lock screen will control this proxy player.
     // We relay those states back to the playlist in the next effect.
-    proxyPlayer.setActiveForLockScreen(
-      true,
-      {
+    const artworkUrl =
+      typeof resolvedArtworkUrl === 'string' && isValidUrl(resolvedArtworkUrl)
+        ? resolvedArtworkUrl
+        : undefined
+
+    try {
+      proxyPlayer.setActiveForLockScreen(true, {
         title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
         artist:
           currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
         albumTitle:
           currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
-        artworkUrl,
-      },
-      {
-        isLiveStream: true,
-        showSeekBackward: false,
-        showSeekForward: false,
-      },
-    )
+        artworkUrl: artworkUrl,
+      })
+    } catch (e) {
+      console.warn('useTrackPlayer: setActiveForLockScreen failed', e)
+    }
 
     // Initial sync of playing state after replacement
     if (status?.playing) {
