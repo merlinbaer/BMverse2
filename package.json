@@ -9,6 +9,7 @@
     "android": "expo run:android --device",
     "fix": "expo install --fix",
     "doctor": "npx expo-doctor",
+    "serv": "yarn supabase functions serve --no-verify-jwt",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "pretty": "prettier --write ."

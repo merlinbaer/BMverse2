@@ -1,9 +1,14 @@
 # Setup
 
-- yarn supabase init
-- yarn supabase login
-- yarn add supabase
+- yarn add supabase (install package)
+- yarn supabase init (create project structure and config.toml)
+
+- yarn supabase login (login in cloud environment, needed for linking)
 - yarn supabase link --project-ref <your-project-ref>
+- After starting the first time, migrations and seeds run automatically.   
+  Add to .env EXPO_PUBLIC_SUPABASE_URL=http://<local_ip>:54321  
+  Add to .env EXPO_PUBLIC_SUPABASE_KEY=
+- max row changed from 1000 to 10.000 in production (in dashboard) and local (in config.toml)
 
 ## Edit Config.toml
 
@@ -14,9 +19,7 @@
 
 ## Start Database first time, should run migrations and seeds
 
-yarn supabase start
-or
-yarn supabase start
+yarn supabase start or yarn supabase start
 
 ## Check Supabase Setup with
 
@@ -25,16 +28,16 @@ yarn supabase status
 ## Current Setup
 
 🔧 Development Tools                 
-Studio │ http://127.0.0.1:54333     
-Mailpit │ http://127.0.0.1:54334     
-MCP │ http://127.0.0.1:54331/mcp  
+Studio │ http://127.0.0.1:54323     
+Mailpit │ http://127.0.0.1:54324     
+MCP │ http://127.0.0.1:54321/mcp  
 🌐 APIs                                              
-Project URL │ http://127.0.0.1:54331              
-REST │ http://127.0.0.1:54331/rest/v1      
-GraphQL │ http://127.0.0.1:54331/graphql/v1   
-Edge Functions │ http://127.0.0.1:54331/functions/v1  
+Project URL │ http://127.0.0.1:54321              
+REST │ http://127.0.0.1:54321/rest/v1      
+GraphQL │ http://127.0.0.1:54321/graphql/v1   
+Edge Functions │ http://127.0.0.1:54321/functions/v1  
 ⛁ Database                                                    
-URL │ postgresql://postgres:postgres@127.0.0.1:54332/postgres
+URL │ postgresql://postgres:postgres@127.0.0.1:54322/postgres
 
 # Workflow
 
@@ -58,11 +61,12 @@ Edit the empty migration script file with create statements from schema
 
 yarn supabase migration up
 
-## Edit migration file for changing Schame Objects with alter DDL Statements
+## Edit the migration file for changing Schame Objects with alter DDL Statements
 
-Edit the empty migration script file with Alter statements. Then describe the schema objects in their final form in the schema files.
+Edit the empty migration script file with Alter statements. Then describe the schema objects in their final form in the
+schema files.
 
-## Check status of migration files in local and remote
+## Check the status of migration files in local and remote
 
 yarn supabase migration list
 
@@ -70,7 +74,7 @@ yarn supabase migration list
 
 yarn supabase db diff
 
-## Create migration file from difference
+## Create a migration file from a difference
 
 - yarn supabase db diff -f <your-migration-name-here>
 
@@ -78,9 +82,9 @@ yarn supabase db diff
 
 yarn supabase migration up --linked
 
-## To reset local database
+## To reset the local database
 
-- Everything will be reset and all migration files will be executed in order, followed by all seed files.
+- Everything will be reset, and all migration files will be executed in order, followed by all seed files.
 - yarn supabase db reset
 
 ## Where the Migrations info is stored in the db
@@ -92,7 +96,7 @@ SELECT * FROM supabase_migrations.schema_migrations;
 - Check Backups first
 - yarn supabase db reset --linked
 
-## Authentication / Emails / Confirm sign up || Magic link or OTP || Reauthentication
+## Authentication / Emails / Confirm signup || Magic link or OTP || Reauthentication
 
 <h2>Confirm your signup</h2>
 

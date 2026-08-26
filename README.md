@@ -120,7 +120,7 @@ npx eas-cli build -p ios --local
 
 adb logcat -c  
 connect cable to device for debugging  
-adb logcat -v time > crash.log  
+adb logcat -v time > device.log  
 run app  
 ^C quit logging
 
