@@ -16,6 +16,7 @@ export const isValidUrl = (url: any): boolean => {
     lowerUrl.startsWith('http://') ||
     lowerUrl.startsWith('https://') ||
     lowerUrl.startsWith('file://') ||
-    lowerUrl.startsWith('content://')
+    lowerUrl.startsWith('content://') ||
+    lowerUrl.startsWith('data:')
   )
 }

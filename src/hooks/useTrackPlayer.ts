@@ -6,9 +6,10 @@ import {
   useAudioPlaylist,
   useAudioPlaylistStatus,
 } from 'expo-audio'
+import Constants from 'expo-constants'
 import * as FileSystemLegacy from 'expo-file-system/legacy'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Platform } from 'react-native'
+import { Image, Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
 import {
@@ -19,11 +20,39 @@ import {
 import { isValidUrl } from '@/services/urlHelper'
 
 export const useTrackPlayer = (onFinished?: () => void) => {
+  const TRANSPARENT_PIXEL_PATH = `${FileSystemLegacy.cacheDirectory}transparent_pixel.png`
+
   useEffect(() => {
     console.log(
-      'BMverse: Build 2026-08-26 17:25 - SDK 57 Asset & FileSystem Fix Applied',
+      'BMverse: Build 2026-08-30 14:00 - SDK 57 Asset & FileSystem Fix & Lint Applied',
     )
-  }, [])
+
+    // Ensure transparent pixel exists for clearing artwork
+    const ensurePixel = async () => {
+      try {
+        const info = await FileSystemLegacy.getInfoAsync(TRANSPARENT_PIXEL_PATH)
+        if (!info.exists) {
+          const base64 =
+            'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
+          await FileSystemLegacy.writeAsStringAsync(
+            TRANSPARENT_PIXEL_PATH,
+            base64,
+            { encoding: 'base64' },
+          )
+          console.log(
+            'BMverse: useTrackPlayer: Created transparent pixel at',
+            TRANSPARENT_PIXEL_PATH,
+          )
+        }
+      } catch (e) {
+        console.warn(
+          'BMverse: useTrackPlayer: Failed to create transparent pixel',
+          e,
+        )
+      }
+    }
+    ensurePixel()
+  }, [TRANSPARENT_PIXEL_PATH])
   const activeTracks = useValue(activeTrackList$)
   const allFiles = useValue(musicFiles$)
   const activeIndex = useValue(activeTrackIndex$)
@@ -83,6 +112,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
       const rawUri = currentTrack.appCoverUri
 
       try {
+        console.log('BMverse: useTrackPlayer: loadArtwork rawUri:', rawUri)
         if (typeof rawUri === 'string' && isValidUrl(rawUri)) {
           url = rawUri
         } else if (
@@ -90,9 +120,34 @@ export const useTrackPlayer = (onFinished?: () => void) => {
           (typeof rawUri === 'string' && rawUri.length > 0)
         ) {
           const asset = Asset.fromModule(rawUri)
+          console.log('BMverse: useTrackPlayer: asset before download:', asset)
           await asset.downloadAsync()
+          console.log('BMverse: useTrackPlayer: asset after download:', asset)
 
           let candidate = asset.localUri || asset.uri
+
+          // Fallback to Image.resolveAssetSource if candidate is not a valid URL
+          if (!isValidUrl(candidate) && !candidate?.startsWith('/')) {
+            try {
+              const resolved = Image.resolveAssetSource(
+                typeof rawUri === 'number' ? rawUri : { uri: rawUri },
+              )
+              console.log(
+                'BMverse: useTrackPlayer: Image.resolveAssetSource:',
+                resolved,
+              )
+              if (resolved && resolved.uri) {
+                candidate = resolved.uri
+              }
+            } catch (e) {
+              console.warn(
+                'BMverse: useTrackPlayer: Image.resolveAssetSource failed',
+                e,
+              )
+            }
+          }
+
+          console.log('BMverse: useTrackPlayer: candidate:', candidate)
           if (candidate) {
             if (candidate.startsWith('/') && !candidate.startsWith('file://')) {
               candidate = `file://${candidate}`
@@ -104,29 +159,104 @@ export const useTrackPlayer = (onFinished?: () => void) => {
                 candidate.startsWith('res://') ||
                 candidate.startsWith('android.resource://') ||
                 candidate.startsWith('file:///android_res/') ||
-                candidate.startsWith('file:///android_asset/'))
+                candidate.startsWith('file:///android_asset/') ||
+                (!candidate.includes('://') && !candidate.startsWith('/')))
+
+            console.log(
+              'BMverse: useTrackPlayer: isBundledAndroid:',
+              isBundledAndroid,
+            )
 
             if (isValidUrl(candidate) && !isBundledAndroid) {
               url = candidate
             } else if (isBundledAndroid) {
               try {
-                const cachePath = `${FileSystemLegacy.cacheDirectory}artwork_${asset.hash || 'unknown'}`
-                await FileSystemLegacy.copyAsync({
-                  from: candidate,
-                  to: cachePath,
-                })
-                url = cachePath
+                const extension = asset.type ? `.${asset.type}` : '.png'
+                const cachePath = `${FileSystemLegacy.cacheDirectory}artwork_${asset.hash || 'unknown'}${extension}`
+                console.log(
+                  'BMverse: useTrackPlayer: Attempting to copy bundled asset:',
+                  candidate,
+                  'to',
+                  cachePath,
+                )
+
+                // In production, we might need different URI formats to copy from resources
+                const appPkg =
+                  Constants.expoConfig?.android?.package || 'eu.bruu.bmverse2'
+                const nameOnly = candidate.split('/').pop() || candidate
+                const possibleUris = [
+                  candidate,
+                  `res:///drawable/${nameOnly}`,
+                  `res:///${nameOnly}`,
+                  `android.resource://${appPkg}/drawable/${nameOnly}`,
+                  `android.resource://${appPkg}/${nameOnly}`,
+                ]
+
+                let success = false
+                for (const fromUri of possibleUris) {
+                  try {
+                    console.log(
+                      'BMverse: useTrackPlayer: Trying copy from',
+                      fromUri,
+                    )
+                    await FileSystemLegacy.copyAsync({
+                      from: fromUri,
+                      to: cachePath,
+                    })
+                    success = true
+                    console.log(
+                      'BMverse: useTrackPlayer: Copy successful from',
+                      fromUri,
+                    )
+                    break
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  } catch (err) {
+                    // try next
+                  }
+                }
+
+                if (success) {
+                  url = cachePath
+                } else {
+                  console.warn(
+                    'BMverse: useTrackPlayer: All copy attempts failed for',
+                    candidate,
+                  )
+                }
               } catch (e) {
-                console.warn('useTrackPlayer: Failed to copy bundled asset', e)
+                console.warn(
+                  'useTrackPlayer: Failed to process bundled asset',
+                  e,
+                )
               }
             }
           }
         }
 
+        console.log('BMverse: useTrackPlayer: final url before fallback:', url)
+
         if (!url) {
           const asset = Asset.fromModule(IMAGES.cover200.notFound)
           await asset.downloadAsync()
           let candidate = asset.localUri || asset.uri
+
+          // Fallback to Image.resolveAssetSource if candidate is not a valid URL
+          if (!isValidUrl(candidate) && !candidate?.startsWith('/')) {
+            try {
+              const resolved = Image.resolveAssetSource(
+                typeof IMAGES.cover200.notFound === 'number'
+                  ? IMAGES.cover200.notFound
+                  : { uri: IMAGES.cover200.notFound },
+              )
+              if (resolved && resolved.uri) {
+                candidate = resolved.uri
+              }
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (e) {
+              // ignore
+            }
+          }
+
           if (candidate) {
             if (candidate.startsWith('/') && !candidate.startsWith('file://')) {
               candidate = `file://${candidate}`
@@ -137,18 +267,38 @@ export const useTrackPlayer = (onFinished?: () => void) => {
                 candidate.startsWith('res://') ||
                 candidate.startsWith('android.resource://') ||
                 candidate.startsWith('file:///android_res/') ||
-                candidate.startsWith('file:///android_asset/'))
+                candidate.startsWith('file:///android_asset/') ||
+                (!candidate.includes('://') && !candidate.startsWith('/')))
 
             if (isValidUrl(candidate) && !isBundledAndroid) {
               url = candidate
             } else if (isBundledAndroid) {
               try {
-                const cachePath = `${FileSystemLegacy.cacheDirectory}artwork_fallback_${asset.hash || 'unknown'}`
-                await FileSystemLegacy.copyAsync({
-                  from: candidate,
-                  to: cachePath,
-                })
-                url = cachePath
+                const extension = asset.type ? `.${asset.type}` : '.png'
+                const cachePath = `${FileSystemLegacy.cacheDirectory}artwork_fallback_${asset.hash || 'unknown'}${extension}`
+
+                const appPkg =
+                  Constants.expoConfig?.android?.package || 'eu.bruu.bmverse2'
+                const nameOnly = candidate.split('/').pop() || candidate
+                const possibleUris = [
+                  candidate,
+                  `res:///drawable/${nameOnly}`,
+                  `android.resource://${appPkg}/drawable/${nameOnly}`,
+                ]
+
+                for (const fromUri of possibleUris) {
+                  try {
+                    await FileSystemLegacy.copyAsync({
+                      from: fromUri,
+                      to: cachePath,
+                    })
+                    url = cachePath
+                    break
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  } catch (err) {
+                    // try next
+                  }
+                }
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
               } catch (e) {
                 // ignore
@@ -156,6 +306,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
             }
           }
         }
+        console.log('BMverse: useTrackPlayer: final resolved url:', url)
       } catch (e) {
         console.warn('useTrackPlayer: loadArtwork failed', e)
       }
@@ -185,11 +336,18 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     // We only set the metadata.
     // Note: Play/Pause on the lock screen will control this proxy player.
     // We relay those states back to the playlist in the next effect.
+    // If resolvedArtworkUrl is undefined, we use a transparent pixel to clear the previous artwork on Android
     const artworkUrl =
-      typeof resolvedArtworkUrl === 'string' && isValidUrl(resolvedArtworkUrl)
+      typeof resolvedArtworkUrl === 'string' &&
+      isValidUrl(resolvedArtworkUrl) &&
+      !resolvedArtworkUrl.startsWith('data:')
         ? resolvedArtworkUrl
-        : undefined
+        : TRANSPARENT_PIXEL_PATH
 
+    console.log(
+      'BMverse: useTrackPlayer: setting metadata artworkUrl:',
+      artworkUrl,
+    )
     try {
       proxyPlayer.setActiveForLockScreen(true, {
         title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
