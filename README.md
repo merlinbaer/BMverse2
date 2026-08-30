@@ -118,11 +118,12 @@ npx eas-cli build -p ios --local
 
 ### Log Android production build
 
-adb logcat -c  
-connect cable to device for debugging  
-adb logcat -v time > device.log  
-run app  
-^C quit logging
+connect cable to device for debugging
+
+- adb logcat -c
+- adb logcat -v time > device.log
+- run app
+- ^C quit logging
 
 ## Upgrades
 

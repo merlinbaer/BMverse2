@@ -6,7 +6,9 @@ import {
   useAudioPlaylist,
   useAudioPlaylistStatus,
 } from 'expo-audio'
+import * as FileSystemLegacy from 'expo-file-system/legacy'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
 import {
@@ -18,7 +20,9 @@ import { isValidUrl } from '@/services/urlHelper'
 
 export const useTrackPlayer = (onFinished?: () => void) => {
   useEffect(() => {
-    console.log('BMverse: Build 2026-08-24 20:56 - Asset Fix Applied')
+    console.log(
+      'BMverse: Build 2026-08-26 17:25 - SDK 57 Asset & FileSystem Fix Applied',
+    )
   }, [])
   const activeTracks = useValue(activeTrackList$)
   const allFiles = useValue(musicFiles$)
@@ -87,21 +91,70 @@ export const useTrackPlayer = (onFinished?: () => void) => {
         ) {
           const asset = Asset.fromModule(rawUri)
           await asset.downloadAsync()
-          url = isValidUrl(asset.localUri)
-            ? (asset.localUri as string)
-            : isValidUrl(asset.uri)
-              ? (asset.uri as string)
-              : undefined
+
+          let candidate = asset.localUri || asset.uri
+          if (candidate) {
+            if (candidate.startsWith('/') && !candidate.startsWith('file://')) {
+              candidate = `file://${candidate}`
+            }
+
+            const isBundledAndroid =
+              Platform.OS === 'android' &&
+              (candidate.startsWith('asset://') ||
+                candidate.startsWith('res://') ||
+                candidate.startsWith('android.resource://') ||
+                candidate.startsWith('file:///android_res/') ||
+                candidate.startsWith('file:///android_asset/'))
+
+            if (isValidUrl(candidate) && !isBundledAndroid) {
+              url = candidate
+            } else if (isBundledAndroid) {
+              try {
+                const cachePath = `${FileSystemLegacy.cacheDirectory}artwork_${asset.hash || 'unknown'}`
+                await FileSystemLegacy.copyAsync({
+                  from: candidate,
+                  to: cachePath,
+                })
+                url = cachePath
+              } catch (e) {
+                console.warn('useTrackPlayer: Failed to copy bundled asset', e)
+              }
+            }
+          }
         }
 
         if (!url) {
           const asset = Asset.fromModule(IMAGES.cover200.notFound)
           await asset.downloadAsync()
-          url = isValidUrl(asset.localUri)
-            ? (asset.localUri as string)
-            : isValidUrl(asset.uri)
-              ? (asset.uri as string)
-              : undefined
+          let candidate = asset.localUri || asset.uri
+          if (candidate) {
+            if (candidate.startsWith('/') && !candidate.startsWith('file://')) {
+              candidate = `file://${candidate}`
+            }
+            const isBundledAndroid =
+              Platform.OS === 'android' &&
+              (candidate.startsWith('asset://') ||
+                candidate.startsWith('res://') ||
+                candidate.startsWith('android.resource://') ||
+                candidate.startsWith('file:///android_res/') ||
+                candidate.startsWith('file:///android_asset/'))
+
+            if (isValidUrl(candidate) && !isBundledAndroid) {
+              url = candidate
+            } else if (isBundledAndroid) {
+              try {
+                const cachePath = `${FileSystemLegacy.cacheDirectory}artwork_fallback_${asset.hash || 'unknown'}`
+                await FileSystemLegacy.copyAsync({
+                  from: candidate,
+                  to: cachePath,
+                })
+                url = cachePath
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              } catch (e) {
+                // ignore
+              }
+            }
+          }
         }
       } catch (e) {
         console.warn('useTrackPlayer: loadArtwork failed', e)
