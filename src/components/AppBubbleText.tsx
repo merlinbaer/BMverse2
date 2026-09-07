@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, View, ViewStyle } from 'react-native'
+import { Platform, StyleSheet, View, ViewStyle } from 'react-native'
 
 import { AppMarkdown } from '@/components/AppMarkdown'
 import { AppText } from '@/components/AppText'
@@ -57,9 +57,16 @@ const styles = StyleSheet.create({
     maxWidth: '100%',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    shadowColor: COLORS.BACKGROUND,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 1,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 1px 1px rgba(0, 0, 0, 0.2)',
+      },
+      default: {
+        shadowColor: COLORS.BACKGROUND,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.2,
+        shadowRadius: 1,
+      },
+    }),
   },
 })

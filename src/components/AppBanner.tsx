@@ -1,6 +1,6 @@
 import { LinearGradient } from 'expo-linear-gradient'
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 
 import { COLORS } from '@/constants/constants'
 
@@ -34,13 +34,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 12,
 
-    shadowColor: COLORS.BACKGROUND,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 6,
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.4)',
+      },
+      default: {
+        shadowColor: COLORS.BACKGROUND,
+        shadowOffset: {
+          width: 0,
+          height: 4,
+        },
+        shadowOpacity: 0.4,
+        shadowRadius: 6,
+      },
+    }),
     transform: [{ rotate: '-4deg' }],
   },
   text: {

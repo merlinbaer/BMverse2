@@ -43,11 +43,18 @@ const styles = StyleSheet.create({
     minWidth: 220, // Minimum width
     paddingHorizontal: 10,
     paddingVertical: 10,
-    shadowColor: COLORS.BACKGROUND, // For iOS shadow
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
     userSelect: 'none', // Web
+    ...Platform.select({
+      web: {
+        boxShadow: '0px 5px 10px rgba(0, 0, 0, 0.1)',
+      },
+      default: {
+        shadowColor: COLORS.BACKGROUND, // For iOS shadow
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+      },
+    }),
   },
   disabled: {
     opacity: 0.5,
