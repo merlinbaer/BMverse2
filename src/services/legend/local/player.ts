@@ -88,6 +88,18 @@ export const musicFileUpdate = (
   }
 }
 
+export const albumCoverUpdate = (
+  albumName: string,
+  imageUri: string | number,
+) => {
+  const currentMusicFiles = musicFiles$.peek()
+  currentMusicFiles.forEach((file, index) => {
+    if ((file.album || file.origAlbum) === albumName) {
+      musicFiles$[index].appCoverUri.set(imageUri as string | number)
+    }
+  })
+}
+
 export const musicFilesList$ = (
   playlistId?: string,
   enableRoute = false,
