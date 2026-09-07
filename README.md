@@ -64,7 +64,7 @@ npx eas-cli build -p ios --profile production
 
 ### 2. Submit to TestFlight
 
-npx eas-cli submit -p ios --profile production
+npx eas-cli submit -p ios --profile production --clear-cache
 
 ### 3. Build web
 
@@ -72,7 +72,7 @@ yarn expo export --platform web --clear
 
 ### 4. Build EAS android
 
-npx eas-cli build -p android --profile production
+npx eas-cli build -p android --profile production --clear-cache
 
 ### 5. Submit android for Test in GooglePlay
 
