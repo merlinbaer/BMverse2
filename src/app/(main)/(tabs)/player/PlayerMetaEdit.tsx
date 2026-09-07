@@ -170,9 +170,7 @@ export default function PlayerMetaEditScreen() {
             activeOpacity={0.7}
           >
             <Image
-              source={
-                file.appCoverUri || file.coverUri || IMAGES.cover200.notFound
-              }
+              source={file.appCoverUri || IMAGES.cover200.notFound}
               contentFit="cover"
               style={styles.headerImage}
             />
