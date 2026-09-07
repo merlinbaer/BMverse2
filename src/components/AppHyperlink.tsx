@@ -31,8 +31,8 @@ export const AppHyperlink = ({
     }
   }
 
-  return (
-    <View style={styles.container}>
+  const content = (
+    <>
       <Text
         numberOfLines={1}
         style={{
@@ -44,11 +44,7 @@ export const AppHyperlink = ({
         {description}
       </Text>
       {hyperlink ? (
-        <TouchableOpacity
-          style={styles.iconContainer}
-          activeOpacity={0.85}
-          onPress={() => handleOnPress(hyperlink)}
-        >
+        <View style={styles.iconContainer}>
           {type === 'intern' ? (
             <IMAGES.vector.MaterialIcons
               name={'open-in-browser'}
@@ -62,12 +58,26 @@ export const AppHyperlink = ({
               color={color}
             />
           )}
-        </TouchableOpacity>
+        </View>
       ) : (
         <></>
       )}
-    </View>
+    </>
   )
+
+  if (hyperlink) {
+    return (
+      <TouchableOpacity
+        style={styles.container}
+        activeOpacity={0.85}
+        onPress={() => handleOnPress(hyperlink)}
+      >
+        {content}
+      </TouchableOpacity>
+    )
+  }
+
+  return <View style={styles.container}>{content}</View>
 }
 
 const styles = StyleSheet.create({

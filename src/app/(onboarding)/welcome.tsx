@@ -1,28 +1,16 @@
 import { useValue } from '@legendapp/state/react'
 import { router } from 'expo-router'
-import { Platform, StyleSheet, useWindowDimensions, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { StyleSheet, View } from 'react-native'
 
 import { AppButton } from '@/components/AppButton'
 import { AppHyperlink } from '@/components/AppHyperlink'
+import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
 import { localStore$ } from '@/services/legend/local/primitives'
-import { isPWA } from '@/services/pwa'
 
 export default function WelcomePage() {
-  const { height } = useWindowDimensions()
   const isVersion1Upgrade = useValue(localStore$.isVersion1Upgrade)
-
-  // Calculate available height: screen height - top padding - other elements - gaps
-  const textAreaHeight =
-    height -
-    Platform.select({
-      ios: 160,
-      android: 105,
-      default: isPWA() ? 70 + 20 : 70, // PWA Bigger Header => Smaller TextArea
-    }) -
-    210
 
   const onAcceptPress = () => {
     localStore$.isOnboarding.set(false)
@@ -30,17 +18,11 @@ export default function WelcomePage() {
     router.replace(`/(main)/(tabs)/news/News`)
   }
   return (
-    <KeyboardAwareScrollView
-      style={styles.keyboardAwareScrollView}
-      contentContainerStyle={styles.keyboardAwareContentContainer}
-      keyboardShouldPersistTaps="handled"
-      enableOnAndroid={true}
-      extraScrollHeight={100}
-    >
-      <AppText fontSize={FONT.SIZE.BASE}>
-        Please read the Terms and Conditions:
-      </AppText>
-      <View style={[styles.WelcomeContentStyle, { height: textAreaHeight }]}>
+    <AppScreen contentContainerStyle={styles.contentContainer}>
+      <View style={styles.WelcomeContentStyle}>
+        <AppText fontSize={FONT.SIZE.BASE}>
+          Please read the Terms and Conditions:
+        </AppText>
         <AppText fontSize={FONT.SIZE.SM}>
           BMverse has no affiliation, association, endorsement, or any
           connection to BABYMETAL, or any of its subsidiaries or affiliates.
@@ -74,29 +56,18 @@ export default function WelcomePage() {
         )}
       </View>
       <AppButton title="Accept" onPress={onAcceptPress} />
-    </KeyboardAwareScrollView>
+    </AppScreen>
   )
 }
 
 const styles = StyleSheet.create({
+  contentContainer: {
+    gap: LAYOUT.gap,
+  },
   WelcomeContentStyle: {
     gap: 12,
     paddingBottom: 24,
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-  },
-  keyboardAwareContentContainer: {
-    gap: LAYOUT.gap,
-    paddingBottom: 24,
-    paddingHorizontal: LAYOUT.paddingHorizontal,
-    paddingTop: Platform.select({
-      ios: 170,
-      android: 20,
-      default: 10,
-    }),
-  },
-  keyboardAwareScrollView: {
-    backgroundColor: COLORS.BACKGROUND,
-    flex: 1,
+    paddingTop: 12,
   },
   UpgradeMessageStyle: {
     color: COLORS.PRIMARY,
