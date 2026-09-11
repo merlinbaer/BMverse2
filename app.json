@@ -60,10 +60,16 @@
         {
           "image": "./assets/splash-icon.png",
           "backgroundColor": "#000000",
-          "resizeMode": "cover",
-          "dark": {
+          "ios": {
             "image": "./assets/splash-icon.png",
-            "backgroundColor": "#000000"
+            "backgroundColor": "#000000",
+            "enableFullScreenImage_legacy": true,
+            "resizeMode": "cover"
+          },
+          "android": {
+            "image": "./assets/adaptive-icon.png",
+            "backgroundColor": "#000000",
+            "resizeMode": "contain"
           }
         }
       ],

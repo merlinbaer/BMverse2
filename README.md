@@ -60,11 +60,11 @@ eas will be called now locally (no global install/always newest version): "npx e
 
 ### 1. Build EAS IOS
 
-npx eas-cli build -p ios --profile production
+npx eas-cli build -p ios --profile production --clear-cache
 
 ### 2. Submit to TestFlight
 
-npx eas-cli submit -p ios --profile production --clear-cache
+npx eas-cli submit -p ios --profile production
 
 ### 3. Build web
 
