@@ -80,7 +80,12 @@ export const musicFile$ = (id: string) =>
 
 export const musicFileUpdate = (
   id: string,
-  data: Partial<Pick<MusicFile, 'title' | 'artist' | 'album' | 'appCoverUri'>>,
+  data: Partial<
+    Pick<
+      MusicFile,
+      'title' | 'artist' | 'album' | 'disc' | 'track' | 'appCoverUri'
+    >
+  >,
 ) => {
   const file$ = musicFiles$.find(f => f.id.get() === id)
   if (file$) {
@@ -125,8 +130,8 @@ export const musicFilesList$ = (
           (a.album || a.origAlbum || '').localeCompare(
             b.album || b.origAlbum || '',
           ) ||
-          (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
-          (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+          (a.disc ?? a.origDisc ?? 0) - (b.disc ?? b.origDisc ?? 0) ||
+          (a.track ?? a.origTrack ?? 0) - (b.track ?? b.origTrack ?? 0) ||
           a.title.localeCompare(b.title)
         )
       })
@@ -138,8 +143,10 @@ export const musicFilesList$ = (
         const line1 = albumName.includes(playlistTimestamp)
           ? albumName
           : `${albumName} - ${playlistTimestamp}`
-        const discPart = file.origDisc ? `D/${file.origDisc}` : ''
-        const trackPart = file.origTrack ? `T/${file.origTrack}` : ''
+        const discVal = file.disc ?? file.origDisc
+        const trackVal = file.track ?? file.origTrack
+        const discPart = discVal ? `D/${discVal}` : ''
+        const trackPart = trackVal ? `T/${trackVal}` : ''
         const metaPrefix = [discPart, trackPart].filter(Boolean).join(' - ')
 
         return {
@@ -275,8 +282,8 @@ export const albumTracksList$ = (albumName: string) =>
       .slice()
       .sort((a, b) => {
         return (
-          (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
-          (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+          (a.disc ?? a.origDisc ?? 0) - (b.disc ?? b.origDisc ?? 0) ||
+          (a.track ?? a.origTrack ?? 0) - (b.track ?? b.origTrack ?? 0) ||
           (a.title || a.origTitle || '').localeCompare(
             b.title || b.origTitle || '',
           )
@@ -323,8 +330,8 @@ export const playAlbum = (albumName: string) => {
     .filter(file => (file.album || file.origAlbum) === albumName)
     .sort((a, b) => {
       return (
-        (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
-        (a.origTrack ?? 0) - (b.origTrack ?? 0) ||
+        (a.disc ?? a.origDisc ?? 0) - (b.disc ?? b.origDisc ?? 0) ||
+        (a.track ?? a.origTrack ?? 0) - (b.track ?? b.origTrack ?? 0) ||
         (a.title || a.origTitle || '').localeCompare(
           b.title || b.origTitle || '',
         )

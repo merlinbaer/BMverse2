@@ -11,6 +11,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from 'react-native'
 
 import { AppBubbleText } from '@/components/AppBubbleText'
@@ -22,13 +23,18 @@ import { IMAGES } from '@/constants/images'
 import { musicFile$, musicFileUpdate } from '@/services/legend'
 import { MusicFile } from '@/types/player'
 
+type MetaFieldKey = 'title' | 'artist' | 'album' | 'disc' | 'track'
+
 interface MetaFieldProps {
   label: string
-  field: 'title' | 'artist' | 'album'
+  field: MetaFieldKey
   observable$: Observable<string>
   musicFileId: string
-  handleUpdate: (field: 'title' | 'artist' | 'album') => void
-  handleRevert: (field: 'title' | 'artist' | 'album') => void
+  handleUpdate: (field: MetaFieldKey) => void
+  handleRevert: (field: MetaFieldKey) => void
+  keyboardType?: 'default' | 'number-pad' | 'numeric'
+  isNumeric?: boolean
+  style?: ViewStyle
 }
 
 const MetaField = ({
@@ -38,21 +44,39 @@ const MetaField = ({
   musicFileId,
   handleUpdate,
   handleRevert,
+  keyboardType = 'default',
+  isNumeric = false,
+  style,
 }: MetaFieldProps) => {
   const value = useValue(observable$)
   const file = useValue(musicFile$(musicFileId))
 
   if (!file) return null
 
-  const origField =
-    `orig${field.charAt(0).toUpperCase()}${field.slice(1)}` as keyof MusicFile
+  const origFieldMap: Record<MetaFieldKey, keyof MusicFile> = {
+    title: 'origTitle',
+    artist: 'origArtist',
+    album: 'origAlbum',
+    disc: 'origDisc',
+    track: 'origTrack',
+  }
+
+  const origField = origFieldMap[field]
   const origValue = file[origField]
   const currentValue = file[field]
   const hasChanged =
     origValue !== null && origValue !== undefined && currentValue !== origValue
 
+  const handleChangeText = (val: string) => {
+    if (isNumeric) {
+      observable$.set(val.replace(/[^0-9]/g, ''))
+    } else {
+      observable$.set(val)
+    }
+  }
+
   return (
-    <View style={styles.fieldSection}>
+    <View style={[styles.fieldSection, style]}>
       <View style={styles.labelRow}>
         <AppText style={styles.label}>{label}</AppText>
         {hasChanged && (
@@ -76,9 +100,10 @@ const MetaField = ({
           placeholder={`Enter ${label.toLowerCase()}`}
           placeholderTextColor={COLORS.TEXT_MUTED}
           value={value}
-          onChangeText={val => observable$.set(val)}
+          onChangeText={handleChangeText}
           onBlur={() => handleUpdate(field)}
           onSubmitEditing={() => handleUpdate(field)}
+          keyboardType={keyboardType}
         />
         <IMAGES.vector.Octicons
           name="pencil"
@@ -97,6 +122,12 @@ export default function PlayerMetaEditScreen() {
   const draftTitle$ = useObservable(file?.title ?? '')
   const draftArtist$ = useObservable(file?.artist ?? '')
   const draftAlbum$ = useObservable(file?.album ?? '')
+  const draftDisc$ = useObservable(
+    file?.disc !== null && file?.disc !== undefined ? String(file.disc) : '',
+  )
+  const draftTrack$ = useObservable(
+    file?.track !== null && file?.track !== undefined ? String(file.track) : '',
+  )
 
   const hintText =
     '**Hint:**\n' +
@@ -108,8 +139,16 @@ export default function PlayerMetaEditScreen() {
       draftTitle$.set(file.title)
       draftArtist$.set(file.artist ?? '')
       draftAlbum$.set(file.album ?? '')
+      draftDisc$.set(
+        file.disc !== null && file.disc !== undefined ? String(file.disc) : '',
+      )
+      draftTrack$.set(
+        file.track !== null && file.track !== undefined
+          ? String(file.track)
+          : '',
+      )
     }
-  }, [file, draftTitle$, draftArtist$, draftAlbum$])
+  }, [file, draftTitle$, draftArtist$, draftAlbum$, draftDisc$, draftTrack$])
 
   if (!file) {
     return (
@@ -127,26 +166,44 @@ export default function PlayerMetaEditScreen() {
     })
   }
 
-  const handleUpdate = (field: 'title' | 'artist' | 'album') => {
-    let value = ''
-    if (field === 'title') value = draftTitle$.get().trim()
-    if (field === 'artist') value = draftArtist$.get().trim()
-    if (field === 'album') value = draftAlbum$.get().trim()
+  const handleUpdate = (field: MetaFieldKey) => {
+    if (field === 'disc' || field === 'track') {
+      const rawVal = (field === 'disc' ? draftDisc$ : draftTrack$).get().trim()
+      const numVal = rawVal !== '' ? parseInt(rawVal, 10) : null
+      const finalVal = numVal !== null && !isNaN(numVal) ? numVal : null
 
-    if (value !== file[field]) {
-      musicFileUpdate(id ?? '', { [field]: value })
+      if (finalVal !== file[field]) {
+        musicFileUpdate(id ?? '', { [field]: finalVal })
+      }
+    } else {
+      let value = ''
+      if (field === 'title') value = draftTitle$.get().trim()
+      if (field === 'artist') value = draftArtist$.get().trim()
+      if (field === 'album') value = draftAlbum$.get().trim()
+
+      if (value !== file[field]) {
+        musicFileUpdate(id ?? '', { [field]: value })
+      }
     }
   }
 
-  const handleRevert = (field: 'title' | 'artist' | 'album') => {
-    const origField =
-      `orig${field.charAt(0).toUpperCase()}${field.slice(1)}` as keyof MusicFile
-    const origValue = file[origField] as string | null
+  const handleRevert = (field: MetaFieldKey) => {
+    const origFieldMap: Record<MetaFieldKey, keyof MusicFile> = {
+      title: 'origTitle',
+      artist: 'origArtist',
+      album: 'origAlbum',
+      disc: 'origDisc',
+      track: 'origTrack',
+    }
+    const origField = origFieldMap[field]
+    const origValue = file[origField]
 
     if (origValue !== null && origValue !== undefined) {
-      if (field === 'title') draftTitle$.set(origValue)
-      if (field === 'artist') draftArtist$.set(origValue)
-      if (field === 'album') draftAlbum$.set(origValue)
+      if (field === 'title') draftTitle$.set(origValue as string)
+      if (field === 'artist') draftArtist$.set(origValue as string)
+      if (field === 'album') draftAlbum$.set(origValue as string)
+      if (field === 'disc') draftDisc$.set(String(origValue))
+      if (field === 'track') draftTrack$.set(String(origValue))
 
       musicFileUpdate(id ?? '', { [field]: origValue })
     }
@@ -208,6 +265,30 @@ export default function PlayerMetaEditScreen() {
               handleUpdate={handleUpdate}
               handleRevert={handleRevert}
             />
+            <View style={styles.rowContainer}>
+              <MetaField
+                label="Disc"
+                field="disc"
+                observable$={draftDisc$}
+                musicFileId={id ?? ''}
+                handleUpdate={handleUpdate}
+                handleRevert={handleRevert}
+                keyboardType="number-pad"
+                isNumeric={true}
+                style={styles.halfField}
+              />
+              <MetaField
+                label="Track"
+                field="track"
+                observable$={draftTrack$}
+                musicFileId={id ?? ''}
+                handleUpdate={handleUpdate}
+                handleRevert={handleRevert}
+                keyboardType="number-pad"
+                isNumeric={true}
+                style={styles.halfField}
+              />
+            </View>
           </View>
           <AppBubbleText markup={hintText} orientation={'center'} />
         </ScrollView>
@@ -224,6 +305,9 @@ const styles = StyleSheet.create({
     gap: 20,
     paddingBottom: 40,
     paddingHorizontal: LAYOUT.paddingHorizontal,
+  },
+  halfField: {
+    flex: 1,
   },
   headerImage: {
     borderRadius: 12,
@@ -286,6 +370,10 @@ const styles = StyleSheet.create({
     color: COLORS.PRIMARY,
     fontSize: FONT.SIZE.XS,
     fontWeight: '600',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    gap: 16,
   },
   scrollContainer: {
     paddingBottom: 40,

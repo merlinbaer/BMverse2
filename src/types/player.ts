@@ -39,6 +39,8 @@ export interface MusicFile {
   title: string
   artist: string | null
   album: string | null
+  track: number | null
+  disc: number | null
   lyrics: string | null
   appCoverUri: string | number | null
 }

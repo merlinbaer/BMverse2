@@ -197,6 +197,8 @@ export const pickAndSaveMusicFiles = async () => {
         title: common?.title ?? asset.name,
         artist: common?.artist ?? null,
         album: common?.album ?? null,
+        track: common?.track.no ?? null,
+        disc: common?.disk.no ?? null,
         lyrics: common?.lyrics?.[0].text ?? null,
         appCoverUri: null,
       }
@@ -215,8 +217,8 @@ export const pickAndSaveMusicFiles = async () => {
         const albumB = b.album || b.origAlbum || ''
         return (
           albumA.localeCompare(albumB) ||
-          (a.origDisc ?? 0) - (b.origDisc ?? 0) ||
-          (a.origTrack ?? 0) - (b.origTrack ?? 0)
+          (a.disc ?? a.origDisc ?? 0) - (b.disc ?? b.origDisc ?? 0) ||
+          (a.track ?? a.origTrack ?? 0) - (b.track ?? b.origTrack ?? 0)
         )
       })
 
@@ -273,6 +275,14 @@ export const refreshLocalMusicList = async () => {
       if (existing && existing.fileFormat) {
         musicFiles.push({
           ...existing,
+          track:
+            existing.track === undefined
+              ? (existing.origTrack ?? null)
+              : existing.track,
+          disc:
+            existing.disc === undefined
+              ? (existing.origDisc ?? null)
+              : existing.disc,
           audioUri: fileUri, // Always update URI in case docDir path changed
           origFilename: filename,
           importedAt,
@@ -301,6 +311,14 @@ export const refreshLocalMusicList = async () => {
         title: existing?.title ?? common?.title ?? filename,
         artist: existing?.artist ?? common?.artist ?? null,
         album: existing?.album ?? common?.album ?? null,
+        track:
+          existing?.track === undefined
+            ? (common?.track.no ?? null)
+            : existing.track,
+        disc:
+          existing?.disc === undefined
+            ? (common?.disk.no ?? null)
+            : existing.disc,
         lyrics: existing?.lyrics ?? common?.lyrics?.[0].text ?? null,
         appCoverUri: existing?.appCoverUri ?? null,
       } as MusicFile)
