@@ -29,6 +29,15 @@
       ],
       "versions": [
         {
+          "downloadURL": "https://app.bmverse.bruu.eu/releases/145c0a44-2489-45c4-8464-de46783c6628",
+          "size": 38300000,
+          "version": "2.0.1",
+          "buildVersion": "28",
+          "date": "2026-09-12T07:25:00+02:00",
+          "localizedDescription": "- Tickets in upcoming concerts \n- edit disk and track metadata \n- bulk update album cover",
+          "minOSVersion": "16.4"
+        },
+        {
           "downloadURL": "https://app.bmverse.bruu.eu/releases/881a6c48-51a9-4585-93d2-e637aeddae51",
           "size": 38500000,
           "version": "2.0.0",
