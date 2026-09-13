@@ -9,7 +9,7 @@ export const getDomainFromUrl = (url: string | null | undefined): string => {
 /**
  * Checks if a value is a valid URL string with a protocol
  */
-export const isValidUrl = (url: any): boolean => {
+export const isValidUrl = (url: string | null | undefined): boolean => {
   if (typeof url !== 'string') return false
   const lowerUrl = url.toLowerCase()
   return (
