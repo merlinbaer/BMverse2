@@ -10,6 +10,8 @@ import {
   cleanupMusicFileCovers,
   cleanupPlaylistImages,
   coverFiles$,
+  musicFiles$,
+  playlists$,
 } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
 import { CoverFile } from '@/types/player'
@@ -103,7 +105,12 @@ export const processImage = (
 }
 
 /**
- * Picks image files (PNG/JPG) and saves them to the app's document directory.
+ * Cover File Life Cycle:
+ * 1. Assets from IMAGES.cover600 are seeded with string IDs (e.g., 'a_babymetal').
+ * 2. User covers are picked, stored in Paths.document as 'cover_<uuid>_<timestamp>_<name>',
+ *    and tracked in coverFiles$ with unique IDs.
+ * Note: On iOS, Paths.document container UUID changes on app updates. Dynamic reconciliation
+ * or relative/ID-based referencing must be used to prevent stale URI mapping.
  */
 export const pickAndSaveCoverFiles = async (
   canvasRef?: React.RefObject<Canvas | null>,
@@ -249,6 +256,52 @@ export const refreshLocalCoverList = async () => {
       })
 
     coverFiles$.set([...assetList, ...loadedFiles])
+
+    // 3. Reconcile sandbox container URIs and prune dangling references for music files & playlists
+    const existingFilenames = new Set(contents)
+    const normalizedDocDir = docDir.endsWith('/') ? docDir : `${docDir}/`
+
+    const currentMusic = musicFiles$.peek() || []
+    currentMusic.forEach((file, idx) => {
+      if (
+        typeof file.appCoverUri === 'string' &&
+        file.appCoverUri.startsWith('file://')
+      ) {
+        const filename = decodeURIComponent(
+          file.appCoverUri.split('?')[0].split('/').pop() || '',
+        )
+        if (filename && existingFilenames.has(filename)) {
+          const activeUri = `${normalizedDocDir}${filename}`
+          if (file.appCoverUri !== activeUri) {
+            musicFiles$[idx].appCoverUri.set(activeUri)
+          }
+        } else {
+          // File no longer exists in Paths.document; prune dangling reference
+          musicFiles$[idx].appCoverUri.set(null)
+        }
+      }
+    })
+
+    const currentPlaylists = playlists$.peek() || []
+    currentPlaylists.forEach((playlist, idx) => {
+      if (
+        typeof playlist.imageUri === 'string' &&
+        playlist.imageUri.startsWith('file://')
+      ) {
+        const filename = decodeURIComponent(
+          playlist.imageUri.split('?')[0].split('/').pop() || '',
+        )
+        if (filename && existingFilenames.has(filename)) {
+          const activeUri = `${normalizedDocDir}${filename}`
+          if (playlist.imageUri !== activeUri) {
+            playlists$[idx].imageUri.set(activeUri)
+          }
+        } else {
+          // File no longer exists in Paths.document; prune dangling reference
+          playlists$[idx].imageUri.set(null)
+        }
+      }
+    })
   } catch (error) {
     console.error('refreshLocalCoverList error:', error)
   }

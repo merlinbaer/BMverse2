@@ -420,41 +420,58 @@ export const playlistImageUpdate = (
 }
 
 /**
- * Centralized helper to remove references to a specific image URI (or all local files) from playlists.
- * If deletedUri is provided, only that specific URI is nulled.
- * If deletedUri is omitted, all local file references (file://) are nulled.
+ * Helper to test if a stored URI refers to the target deleted cover.
+ * Matches by filename or exact URI to handle iOS sandbox UUID changes.
+ */
+const isMatchingCoverUri = (
+  targetUri: string,
+  deletedUri?: string,
+): boolean => {
+  if (!deletedUri) {
+    return targetUri.startsWith('file://')
+  }
+  if (targetUri === deletedUri) return true
+
+  // Compare file names (e.g. cover_<uuid>_<timestamp>_<name>)
+  const targetFilename = decodeURIComponent(
+    targetUri.split('?')[0].split('/').pop() || '',
+  )
+  const deletedFilename = decodeURIComponent(
+    deletedUri.split('?')[0].split('/').pop() || '',
+  )
+  return Boolean(
+    targetFilename && deletedFilename && targetFilename === deletedFilename,
+  )
+}
+
+/**
+ * Cleans up references to a deleted cover image across playlists.
+ * Matches by filename rather than exact URI to tolerate iOS sandbox container path changes.
  */
 export const cleanupPlaylistImages = (deletedUri?: string) => {
   const currentPlaylists = playlists$.peek()
   currentPlaylists.forEach((playlist, index) => {
-    if (typeof playlist.imageUri === 'string') {
-      const shouldNull = deletedUri
-        ? playlist.imageUri === deletedUri
-        : playlist.imageUri.startsWith('file://')
-
-      if (shouldNull) {
-        playlists$[index].imageUri.set(null)
-      }
+    if (
+      typeof playlist.imageUri === 'string' &&
+      isMatchingCoverUri(playlist.imageUri, deletedUri)
+    ) {
+      playlists$[index].imageUri.set(null)
     }
   })
 }
 
 /**
- * Centralized helper to remove references to a specific image URI (or all local files) from music files.
- * If deletedUri is provided, only that specific URI is nulled.
- * If deletedUri is omitted, all local file references (file://) are nulled.
+ * Cleans up references to a deleted cover image across music files.
+ * Matches by filename rather than exact URI to tolerate iOS sandbox container path changes.
  */
 export const cleanupMusicFileCovers = (deletedUri?: string) => {
   const currentMusicFiles = musicFiles$.peek()
   currentMusicFiles.forEach((file, index) => {
-    if (typeof file.appCoverUri === 'string') {
-      const shouldNull = deletedUri
-        ? file.appCoverUri === deletedUri
-        : file.appCoverUri.startsWith('file://')
-
-      if (shouldNull) {
-        musicFiles$[index].appCoverUri.set(null)
-      }
+    if (
+      typeof file.appCoverUri === 'string' &&
+      isMatchingCoverUri(file.appCoverUri, deletedUri)
+    ) {
+      musicFiles$[index].appCoverUri.set(null)
     }
   })
 }
