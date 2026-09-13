@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PublishConfigData" remoteFilesAllowedToDisappearOnAutoupload="false">
+    <serverData>
+      <paths name="web_uberspace">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/app.bmverse.bruu.eu/releases" local="$PROJECT_DIR$/deploy/releases" web="/" />
+            <mapping local="" />
+          </mappings>
+        </serverdata>
+      </paths>
+    </serverData>
+  </component>
+</project>

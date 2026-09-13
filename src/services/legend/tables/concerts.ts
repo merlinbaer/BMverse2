@@ -3,6 +3,7 @@ import { Href } from 'expo-router'
 
 import concertBoxTour from '@/../assets/images/concert_box_tour.png'
 import concertBoxYear from '@/../assets/images/concert_box_year.png'
+import { formatDateOnly } from '@/services/dateTimeHelper'
 import { ConcertListType, ListItemType } from '@/types/list'
 import { ConcertsType, SetlistType } from '@/types/tables'
 
@@ -205,19 +206,11 @@ export const songPerformanceStats$ = (songTitle: string) =>
     const firstConcert = sortedConcerts[0]
     const lastConcert = sortedConcerts[sortedConcerts.length - 1]
 
-    const formatDate = (dateStr: string) => {
-      if (!dateStr) return 'N/A'
-      if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr
-      const d = new Date(dateStr)
-      if (isNaN(d.getTime())) return 'N/A'
-      return d.toISOString().split('T')[0]
-    }
-
     return {
       totalLivePlays: String(matchingConcerts.length),
-      firstPerformed: formatDate(firstConcert.setlist_eventdate),
+      firstPerformed: formatDateOnly(firstConcert.setlist_eventdate),
       firstPerformedIn: firstConcert.setlist_venue_city_country_name,
-      lastPerformed: formatDate(lastConcert.setlist_eventdate),
+      lastPerformed: formatDateOnly(lastConcert.setlist_eventdate),
       lastPerformedIn: lastConcert.setlist_venue_city_country_name,
     }
   })

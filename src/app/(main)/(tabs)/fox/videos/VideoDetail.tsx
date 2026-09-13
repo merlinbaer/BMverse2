@@ -11,6 +11,7 @@ import { AppLoadScreen } from '@/components/AppLoadScreen'
 import { AppScreen } from '@/components/AppScreen'
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT } from '@/constants/constants'
+import { formatDateTime } from '@/services/dateTimeHelper'
 import { videoItem$ } from '@/services/legend'
 
 export default function VideoDetailScreen() {
@@ -30,13 +31,6 @@ export default function VideoDetailScreen() {
       </AppScreen>
     )
   }
-
-  const formattedDate = detail?.video_publishedat
-    ? new Date(detail.video_publishedat)
-        .toISOString()
-        .replace('T', ' ')
-        .substring(0, 16)
-    : ''
 
   // Workaround for onFullScreenChange ios problem. But does not work
   const injectedJavaScript = `
@@ -114,7 +108,10 @@ export default function VideoDetailScreen() {
         </AppText>
       </AppBox>
       <AppBox>
-        <AppInfoRow label="PUBLISHED at:" value={formattedDate} />
+        <AppInfoRow
+          label="PUBLISHED at:"
+          value={formatDateTime(detail?.video_publishedat)}
+        />
         <AppInfoRow
           label="VIEW count:"
           value={Number(detail?.video_viewcount).toLocaleString()}

@@ -5,18 +5,13 @@ import { FlatList, Platform, StyleSheet } from 'react-native'
 
 import { AppBubbleText } from '@/components/AppBubbleText'
 import { COLORS, LAYOUT } from '@/constants/constants'
+import { formatShortDate } from '@/services/dateTimeHelper'
 import { newsItem$, newsList$ } from '@/services/legend'
 
 function NewsItem({ id }: { id: string }) {
   const item = useValue(newsItem$(id))
   if (!item) return null
-  const footerText = item.news_update
-    ? new Date(item.news_update).toLocaleDateString([], {
-        day: '2-digit',
-        month: '2-digit',
-        year: '2-digit',
-      })
-    : ''
+  const footerText = formatShortDate(item.news_update)
   return (
     <AppBubbleText
       markup={item.news_info}

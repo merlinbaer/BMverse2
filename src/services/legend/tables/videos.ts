@@ -1,6 +1,7 @@
 import { computed } from '@legendapp/state'
 import { Href } from 'expo-router'
 
+import { formatDateTime } from '@/services/dateTimeHelper'
 import { ListItemType, VideoListType } from '@/types/list'
 import { VideoType } from '@/types/tables'
 
@@ -51,8 +52,7 @@ export const videoList$ = (sortType?: VideoListType) =>
             ? `${Number(item.video_viewcount).toLocaleString()} views`
             : sortType === 'Title'
               ? (item.video_song ?? '')
-              : (item.video_publishedat?.replace('T', ' ').substring(0, 16) ??
-                ''),
+              : formatDateTime(item.video_publishedat),
         icon: item.channel_artwork,
         route: {
           pathname: '/(main)/(tabs)/fox/videos/VideoDetail',
