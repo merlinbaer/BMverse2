@@ -153,5 +153,6 @@ connect cable to device for debugging
 
 ## Release
 
+- Run npx eas-cli
 - Run ./create_release_ios.sh
 - Run ./create_release_web.sh
