@@ -58,23 +58,39 @@ You need a separate IDE in /supabase/functions. Setup is determined with deno.js
 
 eas will be called now locally (no global install/always newest version): "npx eas-cli ..." instead of "eas ..."
 
-### 1. Build EAS IOS
+### 1. Production Build - EAS IOS
 
-npx eas-cli build -p ios --profile production --clear-cache
+Für AltStore, Android und Web (app.json):
 
-### 2. Submit to TestFlight
+- "slug": "bmverse2", # Expo Project readable name
+- "bundleIdentifier": "eu.bruu.bmverse", # IOS Build identifier
+- "projectId": "777dff8d-b5cb-401c-8fe8-045f75656806" # Expo Project id
 
+Für Apple Store:
+
+- "slug": "BMverse",
+- "bundleIdentifier": "eu.bruu.bmverse2",
+- "projectId": "0a7070ee-efe5-4511-a358-2c25eb910808"
+
+./scripts/build_special_ios.sh
+
+### 2. Submit to Apple TestFlight
+
+Für AltStore (eu.bmverse.bmverse):  
 npx eas-cli submit -p ios --profile production
+
+Für Apple Store (eu.bmverse.bmverse2):  
+is included in the build_special_ios.sh script
 
 ### 3. Build web
 
 yarn expo export --platform web --clear
 
-### 4. Build EAS android
+### 4. Production Build - EAS android
 
 npx eas-cli build -p android --profile production --clear-cache
 
-### 5. Submit android for Test in GooglePlay
+### 5. Submit android for Test in Google Play Store
 
 npx eas-cli submit -p android --profile production
 
