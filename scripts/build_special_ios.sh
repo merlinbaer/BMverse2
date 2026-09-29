@@ -162,7 +162,7 @@ else
 fi
 
 set +e
-npx --yes eas-cli build -p ios --profile production --clear-cache "$@"
+npx --yes eas-cli build -p ios --profile bmverse2 --clear-cache "$@"
 SUBMIT_EXIT_CODE=$?
 set -e
 

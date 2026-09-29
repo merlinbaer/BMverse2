@@ -122,7 +122,7 @@ npx eas-cli env:list, eas env:create, eas env:update, eas env:delete and eas env
 
 ### Upload environment variables as secrets to the project (depreceated):
 
-npx eas-cli secret:push --scope project --env-file .env
+npx eas-cli secret:push --scope project --env-file .env.production
 
 ### Build in eas cloud for preparation uploading to Appstore or Testflight:
 
