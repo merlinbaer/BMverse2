@@ -12,7 +12,7 @@ import Markdown from 'react-native-markdown-display'
 import { AppButton } from '@/components/AppButton'
 import { AppText } from '@/components/AppText'
 import { COLORS, LAYOUT } from '@/constants/constants'
-import privacyText from '@/constants/privacy'
+import { privacyText } from '@/constants/privacy'
 import { localStore$ } from '@/services/legend/local/primitives'
 
 export default function LoginPage() {

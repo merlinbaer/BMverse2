@@ -266,4 +266,3 @@ The following summary reflects the information required for Apple’s App Store 
 
 For questions or concerns regarding this Privacy Policy or data protection, please contact us via the contact information provided at: [Contacts](https://bmverse.bruu.eu/contact)
 `
-export default privacyText

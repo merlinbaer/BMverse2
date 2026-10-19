@@ -122,4 +122,3 @@ These Terms are governed by the laws of Germany.
 
 By using BMverse, you acknowledge that you have read, understood, and agree to these Terms, the Privacy Policy, and any other applicable policies published by BMverse [https://bmverse.bruu.eu/](https://bmverse.bruu.eu/).
 `
-export default termsText
