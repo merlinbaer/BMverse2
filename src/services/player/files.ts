@@ -33,7 +33,7 @@ const getFileMetadata = async (uri: string, fileName?: string) => {
     try {
       if (isMp3) {
         // Read first 10 bytes to check for ID3 tag size
-        const headBytes = handle.readBytes(10)
+        const headBytes = await handle.readBytes(10)
         const headBuffer = Buffer.from(headBytes)
 
         if (
@@ -56,22 +56,22 @@ const getFileMetadata = async (uri: string, fileName?: string) => {
 
           // Read the tag + header (10 bytes header + tagSize)
           handle.offset = 0 // Reset to start
-          const fullBytes = handle.readBytes(tagSize + 10)
+          const fullBytes = await handle.readBytes(tagSize + 10)
           buffer = Buffer.from(fullBytes)
         } else {
           // No ID3v2 tag at start, read a small chunk for ID3v1 or other info
           handle.offset = 0
-          const smallBytes = handle.readBytes(4096)
+          const smallBytes = await handle.readBytes(4096)
           buffer = Buffer.from(smallBytes)
         }
       } else if (isM4a) {
         // M4A atoms can be scattered, but 'moov' is typically at the start or end.
         // Reading the whole file is slow, so we try the first 1 MB, which covers most cases.
-        const bytes = handle.readBytes(1024 * 1024)
+        const bytes = await handle.readBytes(1024 * 1024)
         buffer = Buffer.from(bytes)
       } else {
         // Unknown type, read a reasonable chunk
-        const bytes = handle.readBytes(1024 * 1024)
+        const bytes = await handle.readBytes(1024 * 1024)
         buffer = Buffer.from(bytes)
       }
     } finally {
@@ -169,7 +169,7 @@ export const pickAndSaveMusicFiles = async () => {
         // Fallback: Read as Base64 and write to destination
         const sourceFile = new File(asset.uri)
         const base64 = await sourceFile.base64()
-        destinationFile.write(base64, {
+        await destinationFile.write(base64, {
           encoding: 'base64',
         })
       }

@@ -1,6 +1,6 @@
-import { Image } from 'expo-image'
+import { Image, ImageSource } from 'expo-image'
 import React from 'react'
-import { ImageSourcePropType, StyleSheet, View, ViewStyle } from 'react-native'
+import { StyleSheet, View, ViewStyle } from 'react-native'
 
 import { AppBubbleText } from '@/components/AppBubbleText'
 import { IMAGES } from '@/constants/images'
@@ -13,7 +13,7 @@ interface CharacterSpeaksProps {
 }
 
 interface BaseProps extends CharacterSpeaksProps {
-  imageSource: ImageSourcePropType
+  imageSource: ImageSource
 }
 
 function CharacterSpeaks({

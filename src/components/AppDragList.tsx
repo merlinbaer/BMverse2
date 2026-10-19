@@ -12,7 +12,7 @@ interface AppDragListProps {
   data: ListItemType[]
   onReorder: (newData: ListItemType[]) => void
   onDeleteItem?: (item: ListItemType) => void
-  ListHeaderComponent?: React.ReactElement | null
+  ListHeaderComponent?: React.ReactElement
 }
 
 function Item({ info }: { info: DragListRenderItemInfo<ListItemType> }) {

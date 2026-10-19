@@ -156,7 +156,7 @@ export const pickAndSaveCoverFiles = async (
         // Fallback: Read as Base64 and write to destination
         const sourceFile = new File(asset.uri)
         const base64 = await sourceFile.base64()
-        destinationFile.write(base64, {
+        await destinationFile.write(base64, {
           encoding: 'base64',
         })
       }

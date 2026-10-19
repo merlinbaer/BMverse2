@@ -26,7 +26,7 @@ const CAROUSEL_WIDTH = SCREEN_WIDTH - 68
 
 export function AppPictureCarousel({ data }: AppPictureCarouselProps) {
   const router = useRouter()
-  const scrollViewRef = useRef<ScrollView>(null)
+  const scrollViewRef = useRef<React.ElementRef<typeof ScrollView>>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
   if (!data || data.length === 0) return null
