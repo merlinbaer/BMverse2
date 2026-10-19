@@ -4,9 +4,9 @@ import { LayoutScreenHeader } from '@/layout/HeaderHelper'
 
 export default function PublicLayout() {
   return (
-    <Stack initialRouteName="welcome">
+    <Stack>
       <Stack.Screen
-        name="welcome"
+        name="index"
         options={{ ...LayoutScreenHeader, headerTitle: 'Welcome' }}
       />
       <Stack.Screen

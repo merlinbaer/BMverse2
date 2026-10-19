@@ -15,7 +15,7 @@ export default function Layout() {
       }}
     >
       <Stack.Screen
-        name="Videos"
+        name="index"
         options={{
           title: 'Videos',
           headerRight: () => (

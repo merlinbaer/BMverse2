@@ -29,7 +29,7 @@ export default function TermsPage() {
 
   const onPress = () => {
     localStore$.isOnboarding.set(false)
-    router.replace(`/(onboarding)/welcome`)
+    router.replace(`/(onboarding)`)
   }
 
   return (

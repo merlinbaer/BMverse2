@@ -54,7 +54,7 @@ export default function FoxScreen() {
           <View style={styles.suAreaContainer}>
             <Pressable
               onPress={() =>
-                handlePressCharacter('Su-', '/(main)/(tabs)/fox/songs/Songs')
+                handlePressCharacter('Su-', '/(main)/(tabs)/fox/songs')
               }
               style={styles.suImageTouchTarget}
             >
@@ -68,9 +68,7 @@ export default function FoxScreen() {
             {visibleCharacter === 'Su-' && (
               <Pressable
                 style={[styles.itemContainer, styles.suBubbleAbsolute]}
-                onPress={() =>
-                  handlePressTextbox('/(main)/(tabs)/fox/songs/Songs')
-                }
+                onPress={() => handlePressTextbox('/(main)/(tabs)/fox/songs')}
               >
                 <AppBubbleText markup={suMessage} orientation={'center'} />
               </Pressable>
@@ -82,10 +80,7 @@ export default function FoxScreen() {
             <View style={[styles.sideCharacterWrapper, styles.momoWrapper]}>
               <Pressable
                 onPress={() =>
-                  handlePressCharacter(
-                    'Momo',
-                    '/(main)/(tabs)/fox/concerts/Concerts',
-                  )
+                  handlePressCharacter('Momo', '/(main)/(tabs)/fox/concerts')
                 }
               >
                 <Image
@@ -98,7 +93,7 @@ export default function FoxScreen() {
                 <Pressable
                   style={[styles.itemContainer, styles.momoBubble]}
                   onPress={() =>
-                    handlePressTextbox('/(main)/(tabs)/fox/concerts/Concerts')
+                    handlePressTextbox('/(main)/(tabs)/fox/concerts')
                   }
                 >
                   <AppBubbleText markup={momoMessage} orientation={'left'} />
@@ -109,10 +104,7 @@ export default function FoxScreen() {
             <View style={[styles.sideCharacterWrapper, styles.moaWrapper]}>
               <Pressable
                 onPress={() =>
-                  handlePressCharacter(
-                    'Moa',
-                    '/(main)/(tabs)/fox/videos/Videos',
-                  )
+                  handlePressCharacter('Moa', '/(main)/(tabs)/fox/videos')
                 }
               >
                 <Image
@@ -125,7 +117,7 @@ export default function FoxScreen() {
                 <Pressable
                   style={[styles.itemContainer, styles.moaBubble]}
                   onPress={() =>
-                    handlePressTextbox('/(main)/(tabs)/fox/videos/Videos')
+                    handlePressTextbox('/(main)/(tabs)/fox/videos')
                   }
                 >
                   <AppBubbleText markup={moaMessage} orientation={'right'} />

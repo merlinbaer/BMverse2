@@ -30,7 +30,7 @@ export default function LoginPage() {
 
   const onPress = () => {
     localStore$.isOnboarding.set(false)
-    router.replace(`/(onboarding)/welcome`)
+    router.replace(`/(onboarding)`)
   }
 
   return (

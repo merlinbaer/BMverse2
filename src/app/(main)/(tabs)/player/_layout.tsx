@@ -16,7 +16,7 @@ export default function Layout() {
       }}
     >
       <Stack.Screen
-        name="Player"
+        name="index"
         options={{
           ...LayoutScreenHeader,
           headerLeft: undefined,

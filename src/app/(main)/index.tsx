@@ -1,5 +1,5 @@
 import { Redirect } from 'expo-router'
 
 export default function ProtectedIndex() {
-  return <Redirect href="/(main)/(tabs)/news/News" />
+  return <Redirect href="/(main)/(tabs)/news" />
 }

@@ -25,8 +25,8 @@ export default function InstallScreen() {
   const handleContinue = () => {
     isInstallDismissed$.set(true)
     const nextRoute = localStore$.isOnboarding.get()
-      ? '/(onboarding)/welcome'
-      : '/(main)/(tabs)/news/News'
+      ? '/(onboarding)'
+      : '/(main)/(tabs)/news'
     router.replace(nextRoute)
   }
 

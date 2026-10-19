@@ -30,7 +30,7 @@ export default function GamesScreen() {
   }
 
   const handleGoToProfile = () => {
-    router.push('/profile/Profile')
+    router.push('/profile')
   }
 
   const renderContent = () => {

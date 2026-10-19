@@ -4,8 +4,8 @@ import { LayoutScreenHeader } from '@/layout/HeaderHelper'
 
 export default function Layout() {
   return (
-    <Stack initialRouteName="News">
-      <Stack.Screen name="News" options={{ ...LayoutScreenHeader }} />
+    <Stack>
+      <Stack.Screen name="index" options={{ ...LayoutScreenHeader }} />
     </Stack>
   )
 }

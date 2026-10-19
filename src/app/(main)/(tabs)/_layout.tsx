@@ -14,7 +14,6 @@ export default function TabsLayout() {
   return (
     <React.Fragment>
       <Tabs
-        initialRouteName="news"
         screenOptions={{
           sceneStyle: { backgroundColor: COLORS.BACKGROUND },
           headerShown: false,

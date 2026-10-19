@@ -15,7 +15,7 @@ export default function WelcomePage() {
   const onAcceptPress = () => {
     localStore$.isOnboarding.set(false)
     localStore$.isVersion1Upgrade.set(false)
-    router.replace(`/(main)/(tabs)/news/News`)
+    router.replace(`/(main)/(tabs)/news`)
   }
   return (
     <AppScreen contentContainerStyle={styles.contentContainer}>

@@ -1,8 +1,8 @@
 import { useValue } from '@legendapp/state/react'
 import { Asset } from 'expo-asset'
 import {
-  useAudioPlayer,
-  useAudioPlayerStatus,
+  AudioLockScreenOptions,
+  AudioMetadata,
   useAudioPlaylist,
   useAudioPlaylistStatus,
 } from 'expo-audio'
@@ -24,7 +24,10 @@ import { isValidUrl } from '@/services/urlHelper'
 async function getFallbackArtworkUri(): Promise<string | undefined> {
   try {
     const fallbackAssetModule = IMAGES.cover200.notFound
-    if (!fallbackAssetModule) return undefined
+    if (!fallbackAssetModule) {
+      console.log('BMverse: useTrackPlayer: Fallback asset module not found')
+      return undefined
+    }
 
     const asset = Asset.fromModule(fallbackAssetModule)
     await asset.downloadAsync()
@@ -68,47 +71,68 @@ async function getFallbackArtworkUri(): Promise<string | undefined> {
 }
 
 /**
- * Ensures an Android-compatible local file URI exists for lock screen artwork metadata.
+ * Ensures an Android-compatible local file URI exists for lock screen artwork metadata from bundled assets.
  */
 async function prepareAndroidArtworkFile(
   asset: Asset,
   candidate: string,
 ): Promise<string | undefined> {
-  if (candidate.startsWith('file://')) {
-    try {
-      const fileInfo = await FileSystemLegacy.getInfoAsync(candidate)
-      if (fileInfo.exists) {
-        return candidate
-      }
-    } catch (e) {
-      console.log('BMverse: useTrackPlayer: getInfoAsync failed:', candidate, e)
-    }
-  } else if (
+  if (
     isValidUrl(candidate) &&
     (candidate.startsWith('http://') || candidate.startsWith('https://'))
   ) {
     return candidate
   }
 
+  const cacheDir = FileSystemLegacy.cacheDirectory
+  if (
+    candidate.startsWith('file://') &&
+    cacheDir &&
+    candidate.startsWith(cacheDir)
+  ) {
+    try {
+      const fileInfo = await FileSystemLegacy.getInfoAsync(candidate)
+      if (fileInfo.exists) {
+        return candidate
+      }
+    } catch (e) {
+      console.log(
+        'BMverse: useTrackPlayer: getInfoAsync failed for cached candidate:',
+        candidate,
+        e,
+      )
+    }
+  }
+
   try {
     const ext = asset.type ? `.${asset.type}` : '.png'
-    const cacheFilename = `artwork_cache_${asset.hash || asset.name || 'unknown'}${ext}`
-    const cachePath = `${FileSystemLegacy.cacheDirectory}${cacheFilename}`
+    const cacheFilename = `artwork_cache_${asset.hash || asset.name || 'fallback'}${ext}`
+    const cachePath = `${cacheDir}${cacheFilename}`
 
     const cacheInfo = await FileSystemLegacy.getInfoAsync(cachePath)
     if (cacheInfo.exists) {
       return cachePath
     }
 
-    const sourceUri = asset.localUri || candidate
+    let sourceUri = asset.localUri || candidate
+    if (sourceUri.startsWith('/') && !sourceUri.startsWith('file://')) {
+      sourceUri = `file://${sourceUri}`
+    }
+
     if (sourceUri && sourceUri !== cachePath) {
       try {
         await FileSystemLegacy.copyAsync({ from: sourceUri, to: cachePath })
+        console.log(
+          'BMverse: useTrackPlayer: Copied asset artwork to cache for Android:',
+          cachePath,
+        )
         return cachePath
       } catch (copyErr) {
         console.log(
           'BMverse: useTrackPlayer: copyAsync failed from',
           sourceUri,
+          'to',
+          cachePath,
           copyErr,
         )
       }
@@ -125,21 +149,97 @@ async function prepareAndroidArtworkFile(
 }
 
 /**
+ * Ensures an Android-compatible local file URI exists for lock screen artwork from documents / file picker.
+ */
+async function prepareAndroidLocalFile(
+  localUri: string,
+): Promise<string | undefined> {
+  let formattedUri = localUri
+  if (formattedUri.startsWith('/') && !formattedUri.startsWith('file://')) {
+    formattedUri = `file://${formattedUri}`
+  }
+
+  const cacheDir = FileSystemLegacy.cacheDirectory
+
+  // If already in cache directory and exists
+  if (cacheDir && formattedUri.startsWith(cacheDir)) {
+    try {
+      const fileInfo = await FileSystemLegacy.getInfoAsync(formattedUri)
+      if (fileInfo.exists) {
+        return formattedUri
+      }
+    } catch (e) {
+      console.log(
+        'BMverse: useTrackPlayer: cache getInfoAsync failed:',
+        formattedUri,
+        e,
+      )
+    }
+  }
+
+  // Copy document / local file to cache directory for Android lockscreen/MediaSession access
+  try {
+    const rawFilename =
+      formattedUri.split('/').pop() || `doc_artwork_${Date.now()}.png`
+    const sanitizedFilename = rawFilename.replace(/[^a-zA-Z0-9._-]/g, '_')
+    const cachePath = `${cacheDir}artwork_cache_${sanitizedFilename}`
+
+    const cacheInfo = await FileSystemLegacy.getInfoAsync(cachePath)
+    if (cacheInfo.exists) {
+      return cachePath
+    }
+
+    const sourceInfo = await FileSystemLegacy.getInfoAsync(formattedUri)
+    if (sourceInfo.exists) {
+      await FileSystemLegacy.copyAsync({ from: formattedUri, to: cachePath })
+      console.log(
+        'BMverse: useTrackPlayer: Copied document artwork to cache for Android:',
+        cachePath,
+      )
+      return cachePath
+    }
+  } catch (e) {
+    console.log(
+      'BMverse: useTrackPlayer: prepareAndroidLocalFile failed:',
+      formattedUri,
+      e,
+    )
+  }
+
+  return formattedUri
+}
+
+/**
  * Helper: Resolves raw cover URI (file path, web URL, or asset number) to an Android/iOS lockscreen compatible URI.
  */
 export async function resolveArtworkUri(
   rawUri: string | number | null | undefined,
 ): Promise<string | undefined> {
+  console.log('BMverse: useTrackPlayer: resolveArtworkUri called with:', rawUri)
   if (!rawUri) {
     return await getFallbackArtworkUri()
   }
 
   if (typeof rawUri === 'string') {
-    if (isValidUrl(rawUri)) {
+    if (
+      isValidUrl(rawUri) &&
+      (rawUri.startsWith('http://') || rawUri.startsWith('https://'))
+    ) {
       return rawUri
     }
+
+    if (Platform.OS === 'android') {
+      const androidCachedPath = await prepareAndroidLocalFile(rawUri)
+      if (androidCachedPath) return androidCachedPath
+      return await getFallbackArtworkUri()
+    }
+
     if (rawUri.startsWith('/')) {
       return `file://${rawUri}`
+    }
+
+    if (isValidUrl(rawUri) || rawUri.startsWith('file://')) {
+      return rawUri
     }
   }
 
@@ -217,6 +317,7 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     }
     void ensurePixel()
   }, [TRANSPARENT_PIXEL_PATH])
+
   const activeTracks = useValue(activeTrackList$)
   const allFiles = useValue(musicFiles$)
   const activeIndex = useValue(activeTrackIndex$)
@@ -242,13 +343,6 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   })
   const status = useAudioPlaylistStatus(playlist)
 
-  // Proxy player for lock screen metadata (since AudioPlaylist currently lacks it in expo-audio)
-  const proxyPlayer = useAudioPlayer(null)
-  const proxyStatus = useAudioPlayerStatus(proxyPlayer)
-
-  const isReplacing = useRef(false)
-  const lastStatusPlaying = useRef(status?.playing)
-  const lastProxyPlaying = useRef(proxyStatus.playing)
   const lastSyncedIndex = useRef(-1)
 
   const [resolvedArtworkUrl, setResolvedArtworkUrl] = useState<
@@ -268,11 +362,19 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   useEffect(() => {
     let isCancelled = false
     const loadArtwork = async () => {
-      if (!currentTrack) return
+      if (!currentTrack) {
+        setResolvedArtworkUrl(undefined)
+        return
+      }
 
+      console.log(
+        'BMverse: useTrackPlayer: Resolving artwork for track:',
+        currentTrack.title || currentTrack.origTitle,
+      )
       const url = await resolveArtworkUri(currentTrack.appCoverUri)
 
       if (!isCancelled) {
+        console.log('BMverse: useTrackPlayer: Resolved artwork url:', url)
         setResolvedArtworkUrl(url)
       }
     }
@@ -283,16 +385,19 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     }
   }, [currentTrack])
 
-  // Synchronize current track metadata to lock screen via proxy player
+  // Synchronize current track metadata & lock screen controls to playlist
   useEffect(() => {
-    if (!proxyPlayer) return
+    if (!playlist) return
 
     if (!currentTrack) {
+      console.log(
+        'BMverse: useTrackPlayer: No current track, clearing lock screen controls',
+      )
       try {
-        proxyPlayer.setActiveForLockScreen(false)
+        playlist.clearLockScreenControls()
       } catch (e) {
         console.log(
-          'BMverse: useTrackPlayer: Failed to deactivate lock screen controls',
+          'BMverse: useTrackPlayer: Failed to clear lock screen controls:',
           e,
         )
       }
@@ -302,15 +407,6 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     // Do not set lock screen controls with transient pixel while artwork resolution is in progress
     if (resolvedArtworkUrl === undefined) return
 
-    isReplacing.current = true
-
-    // Load source into proxy player (muted) so it can be active for lock screen
-    proxyPlayer.replace(currentTrack.audioUri)
-    proxyPlayer.volume = 0
-
-    // Resolve artwork URL for lock screen
-    // Note: Play/Pause on the lock screen will control this proxy player.
-    // We relay those states back to the playlist in the next effect.
     const artworkUrl =
       typeof resolvedArtworkUrl === 'string' &&
       isValidUrl(resolvedArtworkUrl) &&
@@ -318,78 +414,48 @@ export const useTrackPlayer = (onFinished?: () => void) => {
         ? resolvedArtworkUrl
         : TRANSPARENT_PIXEL_PATH
 
+    const metadata: AudioMetadata = {
+      title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
+      artist:
+        currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
+      albumTitle:
+        currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
+      artworkUrl,
+    }
+
+    const lockScreenOptions: AudioLockScreenOptions = {
+      showNextTrack: true,
+      showPreviousTrack: true,
+      showSeekForward: false,
+      showSeekBackward: false,
+      isLiveStream: false,
+    }
+
+    console.log(
+      'BMverse: useTrackPlayer: Setting active for lock screen with metadata:',
+      metadata,
+      'options:',
+      lockScreenOptions,
+    )
+
     try {
-      proxyPlayer.setActiveForLockScreen(true, {
-        title: currentTrack.title || currentTrack.origTitle || 'Unknown Title',
-        artist:
-          currentTrack.artist || currentTrack.origArtist || 'Unknown Artist',
-        albumTitle:
-          currentTrack.album || currentTrack.origAlbum || 'Unknown Album',
-        artworkUrl: artworkUrl,
-      })
+      playlist.setActiveForLockScreen(true, metadata, lockScreenOptions)
     } catch (e) {
-      console.log('useTrackPlayer: setActiveForLockScreen failed', e)
+      console.log(
+        'BMverse: useTrackPlayer: playlist.setActiveForLockScreen failed:',
+        e,
+      )
     }
-
-    // Initial sync of playing state after replacement
-    if (status?.playing) {
-      proxyPlayer.play()
-    } else {
-      proxyPlayer.pause()
-    }
-    lastStatusPlaying.current = status?.playing
-    lastProxyPlaying.current = proxyStatus.playing
-
-    // Reset isReplacing after a short delay to allow status to stabilize
-    const timer = setTimeout(() => {
-      isReplacing.current = false
-    }, 500)
-
-    return () => clearTimeout(timer)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTrack, proxyPlayer, resolvedArtworkUrl])
-
-  // Synchronize playback state between real playlist and proxy player (lock screen)
-  useEffect(() => {
-    if (!proxyPlayer || !status) return
-
-    const isPlaying = status.playing
-    const isProxyPlaying = proxyStatus.playing
-
-    if (isPlaying !== lastStatusPlaying.current) {
-      // In-app change: Sync TO proxy
-      if (isPlaying) {
-        proxyPlayer.play()
-      } else {
-        proxyPlayer.pause()
-      }
-      lastStatusPlaying.current = isPlaying
-      // We don't update lastProxyPlaying here to avoid the race condition loop.
-      // It will be updated in the next cycles when isProxyPlaying matches isPlaying.
-    } else if (isProxyPlaying !== lastProxyPlaying.current) {
-      // Proxy state changed (lock screen interaction or sync finishing)
-
-      // CRITICAL: We only sync back to the playlist if we are NOT in the middle of a track change.
-      // A track change causes the proxy player to be replaced, which momentarily reports playing: false.
-      if (isProxyPlaying !== isPlaying && !isReplacing.current) {
-        // This is a real change from the lock screen controls
-        if (isProxyPlaying) {
-          playlist.play()
-        } else {
-          playlist.pause()
-        }
-        lastStatusPlaying.current = isProxyPlaying
-      }
-      lastProxyPlaying.current = isProxyPlaying
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status?.playing, proxyStatus.playing, proxyPlayer, playlist])
+  }, [currentTrack, playlist, resolvedArtworkUrl, TRANSPARENT_PIXEL_PATH])
 
   // Synchronize external index -> Playlist index (Manual selection from lists)
   useEffect(() => {
     if (activeIndex !== lastSyncedIndex.current) {
       if (!status) return
 
+      console.log(
+        `BMverse: useTrackPlayer: Syncing external index ${activeIndex} to playlist`,
+      )
       lastSyncedIndex.current = activeIndex
       if (playlist && activeIndex >= 0 && activeIndex < files.length) {
         if (status.currentIndex !== activeIndex) {
@@ -409,6 +475,9 @@ export const useTrackPlayer = (onFinished?: () => void) => {
       status.currentIndex !== -1 &&
       status.currentIndex !== lastSyncedIndex.current
     ) {
+      console.log(
+        `BMverse: useTrackPlayer: Syncing playlist index ${status.currentIndex} to external activeTrackIndex$`,
+      )
       lastSyncedIndex.current = status.currentIndex
       activeTrackIndex$.set(status.currentIndex)
     }
@@ -416,31 +485,48 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   }, [status?.currentIndex, activeIndex])
 
   const next = useCallback(() => {
+    console.log('BMverse: useTrackPlayer: next() called')
     playlist.next()
   }, [playlist])
 
   const previous = useCallback(() => {
+    console.log('BMverse: useTrackPlayer: previous() called')
     playlist.previous()
   }, [playlist])
 
   // Auto-advance
   useEffect(() => {
     if (status?.didJustFinish) {
+      console.log(
+        'BMverse: useTrackPlayer: Track finished at index:',
+        status.currentIndex,
+      )
       if (status.currentIndex === files.length - 1) {
+        console.log('BMverse: useTrackPlayer: Reached end of playlist')
         onFinished?.()
       }
     }
   }, [status?.didJustFinish, status?.currentIndex, files.length, onFinished])
 
-  const handlePlayPause = () => {
+  const handlePlayPause = useCallback(() => {
+    console.log(
+      'BMverse: useTrackPlayer: handlePlayPause called, current playing:',
+      status?.playing,
+    )
     if (status?.playing) {
       playlist.pause()
     } else {
       playlist.play()
     }
-  }
+  }, [playlist, status?.playing])
 
-  const seek = (time: number) => playlist.seekTo(time)
+  const seek = useCallback(
+    (time: number) => {
+      console.log('BMverse: useTrackPlayer: seekTo called with time:', time)
+      void playlist.seekTo(time)
+    },
+    [playlist],
+  )
 
   return {
     player: playlist,
