@@ -53,7 +53,7 @@ module.exports = [
     },
     settings: {
       react: {
-        version: '19.2.3',
+        version: '19.3.0',
       },
     },
   },
@@ -74,6 +74,7 @@ module.exports = [
       'web-build/',
       '*.config.js',
       'supabase/',
+      'expo-env.d.ts',
     ],
   },
 ]
