@@ -1,14 +1,8 @@
 import { useValue } from '@legendapp/state/react'
 import { Image } from 'expo-image'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import {
-  ColorValue,
-  PanResponder,
-  PanResponderInstance,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native'
+import React, { useEffect, useMemo, useState } from 'react'
+import { ColorValue, Pressable, StyleSheet, View } from 'react-native'
+import { Gesture, GestureDetector } from 'react-native-gesture-handler'
 
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
@@ -58,72 +52,66 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
 
   const [isSeeking, setIsSeeking] = useState(false)
   const [seekProgress, setSeekProgress] = useState(0)
-
-  const progressBarWidthRef = useRef(0)
-  const durationRef = useRef(duration)
-  const seekRef = useRef(seek)
-  const initialLocationX = useRef(0)
-
-  useEffect(() => {
-    durationRef.current = duration
-  }, [duration])
-
-  useEffect(() => {
-    seekRef.current = seek
-  }, [seek])
+  const [progressBarWidth, setProgressBarWidth] = useState(0)
 
   const progress = isSeeking ? seekProgress : playerProgress
   const currentTime = isSeeking ? seekProgress * duration : playerCurrentTime
 
-  const [panResponder, setPanResponder] = useState<PanResponderInstance | null>(
-    null,
-  )
+  const tapGesture = useMemo(() => {
+    return Gesture.Tap()
+      .runOnJS(true)
+      .maxDuration(500)
+      .onBegin(e => {
+        setIsSeeking(true)
+        if (progressBarWidth > 0) {
+          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+          setSeekProgress(newProgress)
+        }
+      })
+      .onEnd(e => {
+        if (progressBarWidth > 0) {
+          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+          seek(newProgress * duration)
+        }
+        setIsSeeking(false)
+      })
+      .onFinalize(() => {
+        setIsSeeking(false)
+      })
+  }, [duration, progressBarWidth, seek])
 
-  useEffect(() => {
-    setPanResponder(
-      PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onMoveShouldSetPanResponder: () => true,
-        onPanResponderGrant: evt => {
-          setIsSeeking(true)
-          const x = evt.nativeEvent.locationX
-          initialLocationX.current = x
-          if (progressBarWidthRef.current > 0) {
-            const newProgress = Math.max(
-              0,
-              Math.min(1, x / progressBarWidthRef.current),
-            )
-            setSeekProgress(newProgress)
-          }
-        },
-        onPanResponderMove: (evt, gestureState) => {
-          if (progressBarWidthRef.current > 0) {
-            const x = initialLocationX.current + gestureState.dx
-            const newProgress = Math.max(
-              0,
-              Math.min(1, x / progressBarWidthRef.current),
-            )
-            setSeekProgress(newProgress)
-          }
-        },
-        onPanResponderRelease: (evt, gestureState) => {
-          if (progressBarWidthRef.current > 0) {
-            const x = initialLocationX.current + gestureState.dx
-            const newProgress = Math.max(
-              0,
-              Math.min(1, x / progressBarWidthRef.current),
-            )
-            seekRef.current(newProgress * durationRef.current)
-          }
-          setIsSeeking(false)
-        },
-        onPanResponderTerminate: () => {
-          setIsSeeking(false)
-        },
-        onPanResponderTerminationRequest: () => false,
-      }),
-    )
-  }, [])
+  const panGesture = useMemo(() => {
+    return Gesture.Pan()
+      .runOnJS(true)
+      .minDistance(0)
+      .onBegin(e => {
+        setIsSeeking(true)
+        if (progressBarWidth > 0) {
+          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+          setSeekProgress(newProgress)
+        }
+      })
+      .onUpdate(e => {
+        if (progressBarWidth > 0) {
+          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+          setSeekProgress(newProgress)
+        }
+      })
+      .onEnd(e => {
+        if (progressBarWidth > 0) {
+          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+          seek(newProgress * duration)
+        }
+        setIsSeeking(false)
+      })
+      .onFinalize(() => {
+        setIsSeeking(false)
+      })
+  }, [duration, progressBarWidth, seek])
+
+  const scrubGesture = useMemo(() => {
+    return Gesture.Race(panGesture, tapGesture)
+  }, [panGesture, tapGesture])
 
   useEffect(() => {
     if (currentTrack?.appCoverUri) {
@@ -170,30 +158,31 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
         </AppText>
       </View>
 
-      <View
-        style={styles.progressContainer}
-        {...(panResponder?.panHandlers || {})}
-        onLayout={e => {
-          progressBarWidthRef.current = e.nativeEvent.layout.width
-        }}
-      >
-        <View style={styles.progressBarBg} pointerEvents="none">
-          <View
-            style={[styles.progressBarFill, { width: `${progress * 100}%` }]}
-          />
-          <View
-            style={[styles.progressHandle, { left: `${progress * 100}%` }]}
-          />
+      <GestureDetector gesture={scrubGesture}>
+        <View
+          style={styles.progressContainer}
+          onLayout={e => {
+            setProgressBarWidth(e.nativeEvent.layout.width)
+          }}
+        >
+          <View style={styles.progressBarBg} pointerEvents="none">
+            <View
+              style={[styles.progressBarFill, { width: `${progress * 100}%` }]}
+            />
+            <View
+              style={[styles.progressHandle, { left: `${progress * 100}%` }]}
+            />
+          </View>
+          <View style={styles.timeRow} pointerEvents="none">
+            <AppText fontSize={FONT.SIZE.XS} style={styles.timeText}>
+              {formatAudioTime(currentTime)}
+            </AppText>
+            <AppText fontSize={FONT.SIZE.XS} style={styles.timeText}>
+              {`-${formatAudioTime(duration - currentTime)}`}
+            </AppText>
+          </View>
         </View>
-        <View style={styles.timeRow} pointerEvents="none">
-          <AppText fontSize={FONT.SIZE.XS} style={styles.timeText}>
-            {formatAudioTime(currentTime)}
-          </AppText>
-          <AppText fontSize={FONT.SIZE.XS} style={styles.timeText}>
-            {`-${formatAudioTime(duration - currentTime)}`}
-          </AppText>
-        </View>
-      </View>
+      </GestureDetector>
 
       <View style={styles.controlsRow}>
         <Pressable onPress={previous} style={styles.skipButton}>
