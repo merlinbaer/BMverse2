@@ -2,7 +2,12 @@ import { useValue } from '@legendapp/state/react'
 import { Image } from 'expo-image'
 import React, { useEffect, useMemo, useState } from 'react'
 import { ColorValue, Pressable, StyleSheet, View } from 'react-native'
-import { Gesture, GestureDetector } from 'react-native-gesture-handler'
+import {
+  GestureDetector,
+  useCompetingGestures,
+  usePanGesture,
+  useTapGesture,
+} from 'react-native-gesture-handler'
 
 import { AppModalScreen } from '@/components/AppModalScreen'
 import { AppText } from '@/components/AppText'
@@ -57,61 +62,57 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
   const progress = isSeeking ? seekProgress : playerProgress
   const currentTime = isSeeking ? seekProgress * duration : playerCurrentTime
 
-  const tapGesture = useMemo(() => {
-    return Gesture.Tap()
-      .runOnJS(true)
-      .maxDuration(500)
-      .onBegin(e => {
-        setIsSeeking(true)
-        if (progressBarWidth > 0) {
-          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
-          setSeekProgress(newProgress)
-        }
-      })
-      .onEnd(e => {
-        if (progressBarWidth > 0) {
-          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
-          seek(newProgress * duration)
-        }
-        setIsSeeking(false)
-      })
-      .onFinalize(() => {
-        setIsSeeking(false)
-      })
-  }, [duration, progressBarWidth, seek])
+  const tapGesture = useTapGesture({
+    runOnJS: true,
+    maxDuration: 500,
+    onBegin: e => {
+      setIsSeeking(true)
+      if (progressBarWidth > 0) {
+        const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+        setSeekProgress(newProgress)
+      }
+    },
+    onDeactivate: e => {
+      if (progressBarWidth > 0) {
+        const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+        seek(newProgress * duration)
+      }
+      setIsSeeking(false)
+    },
+    onFinalize: () => {
+      setIsSeeking(false)
+    },
+  })
 
-  const panGesture = useMemo(() => {
-    return Gesture.Pan()
-      .runOnJS(true)
-      .minDistance(0)
-      .onBegin(e => {
-        setIsSeeking(true)
-        if (progressBarWidth > 0) {
-          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
-          setSeekProgress(newProgress)
-        }
-      })
-      .onUpdate(e => {
-        if (progressBarWidth > 0) {
-          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
-          setSeekProgress(newProgress)
-        }
-      })
-      .onEnd(e => {
-        if (progressBarWidth > 0) {
-          const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
-          seek(newProgress * duration)
-        }
-        setIsSeeking(false)
-      })
-      .onFinalize(() => {
-        setIsSeeking(false)
-      })
-  }, [duration, progressBarWidth, seek])
+  const panGesture = usePanGesture({
+    runOnJS: true,
+    minDistance: 0,
+    onBegin: e => {
+      setIsSeeking(true)
+      if (progressBarWidth > 0) {
+        const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+        setSeekProgress(newProgress)
+      }
+    },
+    onUpdate: e => {
+      if (progressBarWidth > 0) {
+        const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+        setSeekProgress(newProgress)
+      }
+    },
+    onDeactivate: e => {
+      if (progressBarWidth > 0) {
+        const newProgress = Math.max(0, Math.min(1, e.x / progressBarWidth))
+        seek(newProgress * duration)
+      }
+      setIsSeeking(false)
+    },
+    onFinalize: () => {
+      setIsSeeking(false)
+    },
+  })
 
-  const scrubGesture = useMemo(() => {
-    return Gesture.Race(panGesture, tapGesture)
-  }, [panGesture, tapGesture])
+  const scrubGesture = useCompetingGestures(panGesture, tapGesture)
 
   useEffect(() => {
     if (currentTrack?.appCoverUri) {

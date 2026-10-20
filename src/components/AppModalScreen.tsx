@@ -3,9 +3,9 @@ import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect } from 'react'
 import { ColorValue, Platform, Pressable, StyleSheet, View } from 'react-native'
 import {
-  Gesture,
   GestureDetector,
   GestureHandlerRootView,
+  usePanGesture,
 } from 'react-native-gesture-handler'
 import Animated, {
   interpolate,
@@ -61,17 +61,18 @@ export function AppModalScreen({
     }
   }, [translateY])
 
-  const gesture = Gesture.Pan()
-    .onUpdate(event => {
+  const gesture = usePanGesture({
+    onUpdate: event => {
       if (event.translationY > 0) translateY.set(event.translationY)
-    })
-    .onEnd(event => {
+    },
+    onDeactivate: event => {
       if (event.translationY > 150 || event.velocityY > 500) {
         runOnJS(handleDismiss)()
       } else {
         translateY.set(withSpring(0, { damping: 20 }))
       }
-    })
+    },
+  })
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
