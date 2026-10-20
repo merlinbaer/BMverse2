@@ -5,7 +5,10 @@ import { LayoutScreenHeader } from '@/layout/HeaderHelper'
 export default function Layout() {
   return (
     <Stack>
-      <Stack.Screen name="index" options={{ ...LayoutScreenHeader }} />
+      <Stack.Screen
+        name="index"
+        options={{ title: 'Profile', ...LayoutScreenHeader }}
+      />
     </Stack>
   )
 }

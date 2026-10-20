@@ -347,6 +347,27 @@ export const playAlbum = async (albumName: string) => {
   activeTrackIndex$.set(0)
 }
 
+export const playAllTracks = async () => {
+  const allFiles = musicFiles$.peek()
+  if (!allFiles || allFiles.length === 0) return
+
+  const rawTracks = allFiles.slice().sort((a, b) => {
+    return (
+      (a.album || a.origAlbum || '').localeCompare(
+        b.album || b.origAlbum || '',
+      ) ||
+      (a.disc ?? a.origDisc ?? 0) - (b.disc ?? b.origDisc ?? 0) ||
+      (a.track ?? a.origTrack ?? 0) - (b.track ?? b.origTrack ?? 0) ||
+      a.title.localeCompare(b.title)
+    )
+  })
+
+  const preparedTracks = await prepareTracksForPlayback(rawTracks)
+
+  activeTrackList$.set(preparedTracks)
+  activeTrackIndex$.set(0)
+}
+
 export const playlistNameUpdate = (playlistId: string, newName: string) => {
   const playlist$ = playlists$.find(p => p.id.get() === playlistId)
   if (playlist$) {
