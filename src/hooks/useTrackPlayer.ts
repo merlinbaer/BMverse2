@@ -5,7 +5,7 @@ import {
   useAudioPlaylist,
   useAudioPlaylistStatus,
 } from 'expo-audio'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
   activeTrackIndex$,
@@ -43,14 +43,30 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   const lastSyncedIndex = useRef(-1)
   const isLockScreenActiveRef = useRef(false)
   const lastActivePlaylistIdRef = useRef<string | null>(null)
+  const [isLooping, setIsLooping] = useState(false)
 
   // Reset lock screen active status if the playlist instance changes
   useEffect(() => {
     if (playlist && playlist.id !== lastActivePlaylistIdRef.current) {
       lastActivePlaylistIdRef.current = playlist.id
       isLockScreenActiveRef.current = false
+      lastSyncedIndex.current = -1
     }
   }, [playlist])
+
+  // Synchronize loop mode with playlist instance
+  useEffect(() => {
+    if (playlist) {
+      try {
+        playlist.loop = isLooping ? 'all' : 'none'
+      } catch (e) {
+        console.log(
+          'BMverse: useTrackPlayer: Failed to set loop mode on playlist:',
+          e,
+        )
+      }
+    }
+  }, [playlist, isLooping])
 
   // Synchronize current track metadata & lock screen controls to playlist
   useEffect(() => {
@@ -175,12 +191,18 @@ export const useTrackPlayer = (onFinished?: () => void) => {
         'BMverse: useTrackPlayer: Track finished at index:',
         status.currentIndex,
       )
-      if (status.currentIndex === files.length - 1) {
+      if (!isLooping && status.currentIndex === files.length - 1) {
         console.log('BMverse: useTrackPlayer: Reached end of playlist')
         onFinished?.()
       }
     }
-  }, [status?.didJustFinish, status?.currentIndex, files.length, onFinished])
+  }, [
+    status?.didJustFinish,
+    status?.currentIndex,
+    files.length,
+    onFinished,
+    isLooping,
+  ])
 
   const handlePlayPause = useCallback(() => {
     console.log(
@@ -202,14 +224,51 @@ export const useTrackPlayer = (onFinished?: () => void) => {
     [playlist],
   )
 
+  const shuffle = useCallback(() => {
+    if (files.length < 2) return
+    console.log('BMverse: useTrackPlayer: shuffle() called')
+    try {
+      playlist.pause()
+    } catch (e) {
+      console.log('BMverse: useTrackPlayer: Failed to pause on shuffle:', e)
+    }
+
+    const shuffled = [...files]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      const temp = shuffled[i]
+      shuffled[i] = shuffled[j]
+      shuffled[j] = temp
+    }
+
+    lastSyncedIndex.current = -1
+    activeTrackList$.set(shuffled)
+    activeTrackIndex$.set(0)
+  }, [files, playlist])
+
+  const toggleLoop = useCallback(() => {
+    setIsLooping(prev => {
+      const next = !prev
+      console.log(
+        'BMverse: useTrackPlayer: toggleLoop called, new state:',
+        next,
+      )
+      return next
+    })
+  }, [])
+
   return {
     player: playlist,
     status,
     currentTrack,
+    tracksCount: files.length,
     handlePlayPause,
     next,
     previous,
     seek,
+    shuffle,
+    isLooping,
+    toggleLoop,
     isPlaying: status?.playing ?? false,
     progress:
       (status?.duration ?? 0) > 0

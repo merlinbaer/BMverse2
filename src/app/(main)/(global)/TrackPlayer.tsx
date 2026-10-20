@@ -40,10 +40,14 @@ export default function TrackPlayerScreen() {
 function TrackContent({ dismiss }: { dismiss: () => void }) {
   const {
     currentTrack,
+    tracksCount,
     handlePlayPause,
     next,
     previous,
     seek,
+    shuffle,
+    isLooping,
+    toggleLoop,
     isPlaying,
     progress: playerProgress,
     currentTime: playerCurrentTime,
@@ -216,6 +220,31 @@ function TrackContent({ dismiss }: { dismiss: () => void }) {
           />
         </Pressable>
       </View>
+
+      <View
+        style={[
+          styles.secondaryControlsRow,
+          tracksCount < 3 && styles.secondaryControlsRowCentered,
+        ]}
+      >
+        {tracksCount >= 3 && (
+          <Pressable onPress={shuffle} style={styles.controlIconButton}>
+            <IMAGES.vector.MaterialIcons
+              name="shuffle"
+              size={28}
+              color={COLORS.TEXT}
+            />
+          </Pressable>
+        )}
+
+        <Pressable onPress={toggleLoop} style={styles.controlIconButton}>
+          <IMAGES.vector.MaterialIcons
+            name="repeat"
+            size={28}
+            color={isLooping ? COLORS.PRIMARY : COLORS.TEXT_MUTED}
+          />
+        </Pressable>
+      </View>
     </View>
   )
 }
@@ -236,6 +265,9 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
     paddingHorizontal: 20,
   },
+  controlIconButton: {
+    padding: 8,
+  },
   controlsRow: {
     alignItems: 'center',
     flexDirection: 'row',
@@ -244,7 +276,7 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     alignItems: 'center',
-    marginBottom: 50,
+    marginBottom: 20,
     width: '100%',
   },
   playButton: {
@@ -267,7 +299,7 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   progressContainer: {
-    marginBottom: 40,
+    marginBottom: 20,
     paddingVertical: 10,
     width: '100%',
   },
@@ -279,6 +311,18 @@ const styles = StyleSheet.create({
     marginTop: -3,
     position: 'absolute',
     width: 12,
+  },
+  secondaryControlsRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    paddingHorizontal: 32,
+    width: '100%',
+  },
+  secondaryControlsRowCentered: {
+    justifyContent: 'center',
+    paddingHorizontal: 0,
   },
   skipButton: {
     padding: 10,
