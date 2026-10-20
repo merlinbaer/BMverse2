@@ -6,7 +6,7 @@ import { isValidUrl } from '@/services/urlHelper'
 import { MusicFile } from '@/types/player'
 
 /**
- * Copies a local file or asset to the Android cache directory to ensure MediaSession / lock screen access.
+ * Copies a local file or asset to the Android cache directory to ensure MediaSession and lock screen access.
  */
 async function ensureAndroidCachedFile(
   uri: string,
