@@ -5,17 +5,20 @@ import { File, FileMode, Paths } from 'expo-file-system'
 import { Platform } from 'react-native'
 
 import { IMAGES } from '@/constants/images'
-import { getAssetLocalUri, getFallbackArtworkAssetUri } from '@/services/assets'
-import { musicFiles$, playlists$ } from '@/services/legend'
 import { generateId } from '@/services/legend/config'
+import { musicFiles$, playlists$ } from '@/services/legend/local/player'
 import {
   parseM4aBufferMetadata,
   parseMp3BufferMetadata,
 } from '@/services/player/tagParser'
-import { isValidUrl } from '@/services/urlHelper'
 import { MusicFile } from '@/types/player'
 
 import { getPlaylistTimestamp } from '../dateTimeHelper'
+
+export {
+  prepareLockScreenArtworkUri,
+  prepareTracksForPlayback,
+} from './artwork'
 
 /**
  * Extracts metadata from a local file URI.
@@ -395,183 +398,4 @@ export const deleteSingleMusicFile = async (fileId: string) => {
     console.error('deleteSingleMusicFile error:', error)
     throw error
   }
-}
-
-/**
- * Copies a local file URI to Paths.cache on Android if not already there, ensuring lock screen accessibility.
- */
-async function ensureAndroidCachedFile(
-  sourceUri: string,
-  defaultFilename?: string,
-): Promise<string | null> {
-  try {
-    let formattedUri = sourceUri
-    if (formattedUri.startsWith('/') && !formattedUri.startsWith('file://')) {
-      formattedUri = `file://${formattedUri}`
-    }
-
-    const cacheDir = Paths.cache.uri
-    if (cacheDir && formattedUri.startsWith(cacheDir)) {
-      const file = new File(formattedUri)
-      if (file.exists) {
-        return formattedUri
-      }
-    }
-
-    const rawFilename =
-      formattedUri.split('/').pop() ||
-      defaultFilename ||
-      `artwork_${Date.now()}.png`
-    const sanitizedFilename = rawFilename.replace(/[^a-zA-Z0-9._-]/g, '_')
-    const cacheFilename = `artwork_cache_${sanitizedFilename}`
-
-    const destinationFile = new File(Paths.cache, cacheFilename)
-    if (destinationFile.exists) {
-      return destinationFile.uri
-    }
-
-    const sourceFile = new File(formattedUri)
-    if (sourceFile.exists) {
-      try {
-        await sourceFile.copy(destinationFile)
-        return destinationFile.uri
-      } catch (copyErr) {
-        console.error(
-          `BMverse: ensureAndroidCachedFile copy failed for ${formattedUri}, trying base64 fallback:`,
-          copyErr,
-        )
-        const base64 = await sourceFile.base64()
-        await destinationFile.write(base64, { encoding: 'base64' })
-        return destinationFile.uri
-      }
-    } else {
-      console.warn(
-        `BMverse: ensureAndroidCachedFile source file does not exist: ${formattedUri}`,
-      )
-      return null
-    }
-  } catch (e) {
-    console.error('BMverse: ensureAndroidCachedFile error:', e)
-    return null
-  }
-}
-
-/**
- * Resolves and prepares a safe lock screen artwork URI (file:// in cache on Android or standard file/URL on iOS/Web).
- */
-export async function prepareLockScreenArtworkUri(
-  rawCoverUri: string | number | null | undefined,
-): Promise<string | null> {
-  try {
-    if (!rawCoverUri) {
-      const fallbackUri = await getFallbackArtworkAssetUri()
-      if (!fallbackUri) return null
-
-      if (Platform.OS === 'android') {
-        return await ensureAndroidCachedFile(fallbackUri, 'fallback.png')
-      }
-      return fallbackUri
-    }
-
-    if (typeof rawCoverUri === 'string') {
-      if (
-        isValidUrl(rawCoverUri) &&
-        (rawCoverUri.startsWith('http://') ||
-          rawCoverUri.startsWith('https://'))
-      ) {
-        return rawCoverUri
-      }
-
-      let formattedUri = rawCoverUri
-      if (formattedUri.startsWith('/') && !formattedUri.startsWith('file://')) {
-        formattedUri = `file://${formattedUri}`
-      }
-
-      if (Platform.OS === 'android') {
-        const cached = await ensureAndroidCachedFile(formattedUri)
-        if (cached) return cached
-
-        // Fallback if missing
-        const fallbackUri = await getFallbackArtworkAssetUri()
-        if (fallbackUri) {
-          return await ensureAndroidCachedFile(fallbackUri, 'fallback.png')
-        }
-        return null
-      }
-
-      return formattedUri
-    }
-
-    if (typeof rawCoverUri === 'number') {
-      const assetUri = await getAssetLocalUri(rawCoverUri)
-      if (!assetUri) {
-        const fallbackUri = await getFallbackArtworkAssetUri()
-        if (!fallbackUri) return null
-        if (Platform.OS === 'android') {
-          return await ensureAndroidCachedFile(fallbackUri, 'fallback.png')
-        }
-        return fallbackUri
-      }
-
-      if (Platform.OS === 'android') {
-        return await ensureAndroidCachedFile(
-          assetUri,
-          `asset_${rawCoverUri}.png`,
-        )
-      }
-
-      return assetUri
-    }
-
-    return null
-  } catch (error) {
-    console.error('BMverse: prepareLockScreenArtworkUri failed:', error)
-    try {
-      const fallbackUri = await getFallbackArtworkAssetUri()
-      if (fallbackUri && Platform.OS === 'android') {
-        return await ensureAndroidCachedFile(fallbackUri, 'fallback.png')
-      }
-      return fallbackUri ?? null
-    } catch {
-      return null
-    }
-  }
-}
-
-/**
- * Prepares an array of MusicFiles for playback by resolving and populating safe lock screen URIs in `coverUri`.
- * Memoizes artwork preparation across tracks that share the same `appCoverUri` to eliminate duplicate I/O operations.
- */
-export async function prepareTracksForPlayback(
-  tracks: MusicFile[],
-): Promise<MusicFile[]> {
-  const coverCache = new Map<string | number, string | null>()
-  const preparedTracks: MusicFile[] = []
-
-  for (const track of tracks) {
-    const rawCover = track.appCoverUri
-    let safeCoverUri: string | null = null
-
-    if (rawCover === null || rawCover === undefined) {
-      if (coverCache.has('__FALLBACK__')) {
-        safeCoverUri = coverCache.get('__FALLBACK__') ?? null
-      } else {
-        safeCoverUri = await prepareLockScreenArtworkUri(null)
-        coverCache.set('__FALLBACK__', safeCoverUri)
-      }
-    } else if (coverCache.has(rawCover)) {
-      safeCoverUri = coverCache.get(rawCover) ?? null
-    } else {
-      safeCoverUri = await prepareLockScreenArtworkUri(rawCover)
-      coverCache.set(rawCover, safeCoverUri)
-    }
-
-    preparedTracks.push({
-      ...track,
-      coverUri: safeCoverUri,
-      appCoverUri: rawCover,
-    })
-  }
-
-  return preparedTracks
 }

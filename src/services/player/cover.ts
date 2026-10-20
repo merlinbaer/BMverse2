@@ -6,14 +6,14 @@ import Canvas, { Image as CanvasImage } from 'react-native-canvas'
 
 import { COLORS } from '@/constants/constants'
 import { IMAGES } from '@/constants/images'
+import { generateId } from '@/services/legend/config'
 import {
   cleanupMusicFileCovers,
   cleanupPlaylistImages,
   coverFiles$,
   musicFiles$,
   playlists$,
-} from '@/services/legend'
-import { generateId } from '@/services/legend/config'
+} from '@/services/legend/local/player'
 import { CoverFile } from '@/types/player'
 
 function getTop5DominantColors(data: Uint8ClampedArray | number[]): string[] {

@@ -4,7 +4,7 @@ import { Href } from 'expo-router'
 
 import { IMAGES } from '@/constants/images'
 import { getPlaylistTimestamp } from '@/services/dateTimeHelper'
-import { prepareTracksForPlayback } from '@/services/player/files'
+import { prepareTracksForPlayback } from '@/services/player/artwork'
 import { ListItemType } from '@/types/list'
 import { CoverFile, MusicFile, Playlist } from '@/types/player'
 
