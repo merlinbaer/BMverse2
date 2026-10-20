@@ -5,12 +5,12 @@ import { Dimensions, FlatList, Pressable, StyleSheet, View } from 'react-native'
 
 import { AppText } from '@/components/AppText'
 import { COLORS, FONT, LAYOUT } from '@/constants/constants'
-import { playAlbum, playPlaylist } from '@/services/legend'
 import { ListItemType } from '@/types/list'
 
 interface AppHorizontalListProps {
   title: string
   data: ListItemType[]
+  onPressItem?: (item: ListItemType) => void | Promise<void>
 }
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window')
@@ -19,26 +19,23 @@ const PADDING = LAYOUT.paddingHorizontal
 // Calculate item width to fit 3 items with gaps and outer padding
 const ITEM_SIZE = (SCREEN_WIDTH - PADDING * 2 - GAP * 2) / 3
 
-export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
+export function AppHorizontalList({
+  title,
+  data,
+  onPressItem,
+}: AppHorizontalListProps) {
   const router = useRouter()
 
   if (!data || data.length === 0) return null
 
   const renderItem = ({ item }: { item: ListItemType }) => {
-    const handlePress = async () => {
-      if (item.route) {
-        const pathname =
-          typeof item.route === 'object' && true && 'pathname' in item.route
-            ? item.route.pathname
-            : item.route
+    const isPressable = !!onPressItem || !!item.route
 
-        if (pathname === '/(main)/(tabs)/player/PlayerPlaylistDetail') {
-          await playPlaylist(item.id)
-        } else if (pathname === '/(main)/(tabs)/player/PlayerMetaAlbumSongs') {
-          await playAlbum(item.id)
-        }
-
-        router.push('/(main)/(global)/TrackPlayer')
+    const handlePress = () => {
+      if (onPressItem) {
+        onPressItem(item)
+      } else if (item.route) {
+        router.push(item.route)
       }
     }
 
@@ -46,7 +43,10 @@ export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
       typeof item.icon === 'string' ? { uri: item.icon } : item.icon
 
     return (
-      <Pressable onPress={handlePress} style={styles.itemContainer}>
+      <Pressable
+        onPress={isPressable ? handlePress : undefined}
+        style={styles.itemContainer}
+      >
         <Image
           source={imageSource}
           style={styles.image}
