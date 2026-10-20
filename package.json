@@ -1,6 +1,6 @@
 {
   "name": "bmverse2",
-  "version": "2.0.0",
+  "version": "2.0.3",
   "main": "expo-router/entry",
   "license": "MIT",
   "scripts": {
@@ -89,6 +89,9 @@
     "react-native-youtube-iframe": "^2.4.1",
     "uuid": "^14.0.1",
     "workbox-window": "^7.4.1"
+  },
+  "resolutions": {
+    "react-native": "0.88.0"
   },
   "private": true
 }

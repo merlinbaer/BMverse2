@@ -66,6 +66,8 @@ Für AltStore, Android und Web (app.json):
 - "bundleIdentifier": "eu.bruu.bmverse", # IOS Build identifier
 - "projectId": "777dff8d-b5cb-401c-8fe8-045f75656806" # Expo Project id
 
+npx --yes eas-cli build -p ios --profile production --clear-cache
+
 Für Apple Store:
 
 - "slug": "BMverse",
