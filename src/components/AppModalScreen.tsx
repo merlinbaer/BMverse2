@@ -9,13 +9,13 @@ import {
 } from 'react-native-gesture-handler'
 import Animated, {
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { scheduleOnRN } from 'react-native-worklets'
 
 import { COLORS } from '@/constants/constants'
 
@@ -43,7 +43,7 @@ export function AppModalScreen({
     translateY.set(
       withTiming(startOffset, { duration: 250 }, (finished?: boolean) => {
         if (finished) {
-          runOnJS(router.back)()
+          scheduleOnRN(router.back)
         }
       }),
     )
@@ -67,7 +67,7 @@ export function AppModalScreen({
     },
     onDeactivate: event => {
       if (event.translationY > 150 || event.velocityY > 500) {
-        runOnJS(handleDismiss)()
+        scheduleOnRN(handleDismiss)
       } else {
         translateY.set(withSpring(0, { damping: 20 }))
       }
