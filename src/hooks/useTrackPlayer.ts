@@ -41,22 +41,35 @@ export const useTrackPlayer = (onFinished?: () => void) => {
   const status = useAudioPlaylistStatus(playlist)
 
   const lastSyncedIndex = useRef(-1)
+  const isLockScreenActiveRef = useRef(false)
+  const lastActivePlaylistIdRef = useRef<string | null>(null)
+
+  // Reset lock screen active status if the playlist instance changes
+  useEffect(() => {
+    if (playlist && playlist.id !== lastActivePlaylistIdRef.current) {
+      lastActivePlaylistIdRef.current = playlist.id
+      isLockScreenActiveRef.current = false
+    }
+  }, [playlist])
 
   // Synchronize current track metadata & lock screen controls to playlist
   useEffect(() => {
     if (!playlist) return
 
     if (!currentTrack) {
-      console.log(
-        'BMverse: useTrackPlayer: No current track, clearing lock screen controls',
-      )
-      try {
-        playlist.clearLockScreenControls()
-      } catch (e) {
+      if (isLockScreenActiveRef.current) {
         console.log(
-          'BMverse: useTrackPlayer: Failed to clear lock screen controls:',
-          e,
+          'BMverse: useTrackPlayer: No current track, clearing lock screen controls',
         )
+        try {
+          playlist.clearLockScreenControls()
+        } catch (e) {
+          console.log(
+            'BMverse: useTrackPlayer: Failed to clear lock screen controls:',
+            e,
+          )
+        }
+        isLockScreenActiveRef.current = false
       }
       return
     }
@@ -84,18 +97,26 @@ export const useTrackPlayer = (onFinished?: () => void) => {
       isLiveStream: false,
     }
 
-    console.log(
-      'BMverse: useTrackPlayer: Setting active for lock screen with metadata:',
-      metadata,
-      'options:',
-      lockScreenOptions,
-    )
-
     try {
-      playlist.setActiveForLockScreen(true, metadata, lockScreenOptions)
+      if (!isLockScreenActiveRef.current) {
+        console.log(
+          'BMverse: useTrackPlayer: Initializing lock screen with metadata:',
+          metadata,
+          'options:',
+          lockScreenOptions,
+        )
+        playlist.setActiveForLockScreen(true, metadata, lockScreenOptions)
+        isLockScreenActiveRef.current = true
+      } else {
+        console.log(
+          'BMverse: useTrackPlayer: Updating lock screen metadata in place:',
+          metadata,
+        )
+        playlist.updateLockScreenMetadata(metadata)
+      }
     } catch (e) {
       console.log(
-        'BMverse: useTrackPlayer: playlist.setActiveForLockScreen failed:',
+        'BMverse: useTrackPlayer: Failed to sync lock screen metadata:',
         e,
       )
     }
