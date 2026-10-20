@@ -25,7 +25,7 @@ export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
   if (!data || data.length === 0) return null
 
   const renderItem = ({ item }: { item: ListItemType }) => {
-    const handlePress = () => {
+    const handlePress = async () => {
       if (item.route) {
         const pathname =
           typeof item.route === 'object' && true && 'pathname' in item.route
@@ -33,9 +33,9 @@ export function AppHorizontalList({ title, data }: AppHorizontalListProps) {
             : item.route
 
         if (pathname === '/(main)/(tabs)/player/PlayerPlaylistDetail') {
-          playPlaylist(item.id)
+          await playPlaylist(item.id)
         } else if (pathname === '/(main)/(tabs)/player/PlayerMetaAlbumSongs') {
-          playAlbum(item.id)
+          await playAlbum(item.id)
         }
 
         router.push('/(main)/(global)/TrackPlayer')

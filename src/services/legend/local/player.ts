@@ -4,6 +4,7 @@ import { Href } from 'expo-router'
 
 import { IMAGES } from '@/constants/images'
 import { getPlaylistTimestamp } from '@/services/dateTimeHelper'
+import { prepareTracksForPlayback } from '@/services/player/files'
 import { ListItemType } from '@/types/list'
 import { CoverFile, MusicFile, Playlist } from '@/types/player'
 
@@ -304,12 +305,12 @@ export const albumTracksList$ = (albumName: string) =>
       }))
   })
 
-export const playPlaylist = (playlistId: string) => {
+export const playPlaylist = async (playlistId: string) => {
   const playlist = playlists$.find(p => p.id.peek() === playlistId)?.peek()
   const allFiles = musicFiles$.peek()
   if (!playlist || !allFiles) return
 
-  const tracks = playlist.tracks
+  const rawTracks = playlist.tracks
     .map(track => {
       const file = allFiles.find(f => f.id === track.musicFileId)
       return file ? { ...file, trackNum: track.trackNum } : null
@@ -318,15 +319,17 @@ export const playPlaylist = (playlistId: string) => {
     .sort((a, b) => a.trackNum - b.trackNum)
     .map(({ trackNum: _trackNum, ...file }) => file as MusicFile)
 
-  activeTrackList$.set(tracks)
+  const preparedTracks = await prepareTracksForPlayback(rawTracks)
+
+  activeTrackList$.set(preparedTracks)
   activeTrackIndex$.set(0)
 }
 
-export const playAlbum = (albumName: string) => {
+export const playAlbum = async (albumName: string) => {
   const allFiles = musicFiles$.peek()
   if (!allFiles) return
 
-  const tracks = allFiles
+  const rawTracks = allFiles
     .filter(file => (file.album || file.origAlbum) === albumName)
     .sort((a, b) => {
       return (
@@ -338,7 +341,9 @@ export const playAlbum = (albumName: string) => {
       )
     })
 
-  activeTrackList$.set(tracks)
+  const preparedTracks = await prepareTracksForPlayback(rawTracks)
+
+  activeTrackList$.set(preparedTracks)
   activeTrackIndex$.set(0)
 }
 

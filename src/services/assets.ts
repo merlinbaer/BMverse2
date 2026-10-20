@@ -1,10 +1,11 @@
 import { Asset } from 'expo-asset'
-import { Platform } from 'react-native'
+import { Image, Platform } from 'react-native'
 
 import channelDataRaw from '@/constants/channel.json'
 import flagsDataRaw from '@/constants/flags.json'
 import { IMAGES } from '@/constants/images'
 import { isOfflineReady$ } from '@/services/pwa'
+import { isValidUrl } from '@/services/urlHelper'
 
 export interface FlagItem {
   setlist_artwork: string
@@ -90,4 +91,59 @@ export async function initAssets() {
   } catch (error) {
     console.error('BMverse: Asset preloading failed:', error)
   }
+}
+
+/**
+ * Resolves a bundled Expo asset module to a local file URI formatted with file://.
+ */
+export async function getAssetLocalUri(
+  assetModule: string | number,
+): Promise<string | undefined> {
+  try {
+    const asset = Asset.fromModule(assetModule)
+    await asset.downloadAsync()
+
+    let uri = asset.localUri || asset.uri
+
+    if (!uri || (!isValidUrl(uri) && !uri.startsWith('/'))) {
+      try {
+        const resolved = Image.resolveAssetSource(
+          typeof assetModule === 'number' ? assetModule : { uri: assetModule },
+        )
+        if (resolved?.uri) {
+          uri = resolved.uri
+        }
+      } catch (e) {
+        console.log(
+          'BMverse: assets.ts: resolveAssetSource fallback failed:',
+          e,
+        )
+      }
+    }
+
+    if (uri?.startsWith('/') && !uri.startsWith('file://')) {
+      return `file://${uri}`
+    }
+
+    return uri || undefined
+  } catch (error) {
+    console.log('BMverse: assets.ts: getAssetLocalUri failed:', error)
+    return undefined
+  }
+}
+
+/**
+ * Resolves IMAGES.cover200.notFound to a local file URI.
+ */
+export async function getFallbackArtworkAssetUri(): Promise<
+  string | undefined
+> {
+  const fallbackAssetModule = IMAGES.cover200.notFound
+  if (!fallbackAssetModule) {
+    console.log(
+      'BMverse: assets.ts: Fallback asset module not found in IMAGES.cover200.notFound',
+    )
+    return undefined
+  }
+  return await getAssetLocalUri(fallbackAssetModule)
 }
