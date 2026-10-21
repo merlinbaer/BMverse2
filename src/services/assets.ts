@@ -1,4 +1,5 @@
 import { Asset } from 'expo-asset'
+import { Image as ExpoImage } from 'expo-image'
 import { Image, Platform } from 'react-native'
 
 import channelDataRaw from '@/constants/channel.json'
@@ -105,6 +106,32 @@ export async function getAssetLocalUri(
 
     let uri = asset.localUri || asset.uri
 
+    // In production Android, asset.localUri is a drawable name like "assets_images_..." without a schema or path
+    if (
+      Platform.OS === 'android' &&
+      (!uri ||
+        (!isValidUrl(uri) &&
+          !uri.startsWith('/') &&
+          !uri.startsWith('file://')))
+    ) {
+      try {
+        const imageRef = await ExpoImage.loadAsync(assetModule)
+        const cacheKey = `bmverse_asset_${assetModule}`
+        await ExpoImage.writeToCacheAsync(imageRef, cacheKey)
+        const cachedPath = await ExpoImage.getCachePathAsync(cacheKey)
+        if (cachedPath) {
+          return cachedPath.startsWith('file://')
+            ? cachedPath
+            : `file://${cachedPath}`
+        }
+      } catch (expoImgErr) {
+        console.warn(
+          'BMverse: assets.ts: ExpoImage extraction fallback failed:',
+          expoImgErr,
+        )
+      }
+    }
+
     if (!uri || (!isValidUrl(uri) && !uri.startsWith('/'))) {
       try {
         const resolved = Image.resolveAssetSource(
@@ -128,6 +155,21 @@ export async function getAssetLocalUri(
     return uri || undefined
   } catch (error) {
     console.log('BMverse: assets.ts: getAssetLocalUri failed:', error)
+    if (Platform.OS === 'android') {
+      try {
+        const imageRef = await ExpoImage.loadAsync(assetModule)
+        const cacheKey = `bmverse_asset_${assetModule}`
+        await ExpoImage.writeToCacheAsync(imageRef, cacheKey)
+        const cachedPath = await ExpoImage.getCachePathAsync(cacheKey)
+        if (cachedPath) {
+          return cachedPath.startsWith('file://')
+            ? cachedPath
+            : `file://${cachedPath}`
+        }
+      } catch (fallbackErr) {
+        console.warn('BMverse: assets.ts: outer fallback failed:', fallbackErr)
+      }
+    }
     return undefined
   }
 }

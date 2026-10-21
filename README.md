@@ -60,6 +60,7 @@ eas will be called now locally (no global install/always newest version): "npx e
 
 ### 1. Production Build - EAS IOS
 
+**CHANGE Version Number!!!**  
 Für AltStore, Android und Web (app.json):
 
 - "slug": "bmverse2", # Expo Project readable name
@@ -79,7 +80,7 @@ Für Apple Store:
 ### 2. Submit to Apple TestFlight
 
 Für AltStore (eu.bmverse.bmverse):  
-npx eas-cli submit -p ios --profile production
+npx --yes eas-cli submit -p ios --profile production
 
 Für Apple Store (eu.bmverse.bmverse2):  
 is included in the build_special_ios.sh script
@@ -90,11 +91,11 @@ yarn expo export --platform web --clear
 
 ### 4. Production Build - EAS android
 
-npx eas-cli build -p android --profile production --clear-cache
+npx --yes eas-cli build -p android --profile production --clear-cache
 
 ### 5. Submit android for Test in Google Play Store
 
-npx eas-cli submit -p android --profile production
+npx --yes eas-cli submit -p android --profile production
 
 ### 6. Build and submit an expo go version to TestFlight (not the same as in simulator)
 

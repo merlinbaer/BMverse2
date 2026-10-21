@@ -20,6 +20,14 @@ async function ensureAndroidCachedFile(
       formattedUri = `file://${formattedUri}`
     }
 
+    // Guard: Only attempt file operations if formattedUri is a valid file URI
+    if (!formattedUri.startsWith('file://')) {
+      console.warn(
+        `BMverse: ensureAndroidCachedFile received non-file URI: ${uri}`,
+      )
+      return null
+    }
+
     const cacheDir = Paths.cache
     const filename =
       customName || formattedUri.split('/').pop() || 'artwork.png'
