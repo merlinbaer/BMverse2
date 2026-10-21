@@ -29,6 +29,15 @@
       ],
       "versions": [
         {
+          "downloadURL": "https://app.bmverse.bruu.eu/releases/",
+          "size": 40300000,
+          "version": "2.0.3",
+          "buildVersion": "32",
+          "date": "2026-10-21T09:45:00+02:00",
+          "localizedDescription": "- Shuffle and Loop added to Mediaplayer \n- iPhone Duo Support \n- Lockscreen Controls extended \n- Play All added to Mediaplayer ",
+          "minOSVersion": "17.4"
+        },
+        {
           "downloadURL": "https://app.bmverse.bruu.eu/releases/f0d3c6c1-9edd-48ce-8cda-5efa4a41a1e8",
           "size": 38300000,
           "version": "2.0.2",

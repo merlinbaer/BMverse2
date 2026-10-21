@@ -99,7 +99,7 @@ npx --yes eas-cli submit -p android --profile production
 
 ### 6. Build and submit an expo go version to TestFlight (not the same as in simulator)
 
-npx eas-cli go
+npx --yes eas-cli go
 
 ## Commands
 
